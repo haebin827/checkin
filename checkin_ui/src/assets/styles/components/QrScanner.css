@@ -1,0 +1,266 @@
+.qr-scanner-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.qr-scanner-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: #4a90e2;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 5px;
+  margin-right: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+
+.back-button:hover {
+  transform: translateX(-3px);
+  color: #3a7dca;
+}
+
+.qr-scanner-header h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #333;
+  flex-grow: 1;
+  text-align: center;
+  padding-right: 40px; /* 뒤로가기 버튼 영역만큼 오프셋 */
+}
+
+.qr-scanner-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+.scanner-start-container,
+.scanner-active-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.qr-icon {
+  font-size: 80px;
+  color: #4a90e2;
+  margin-bottom: 20px;
+}
+
+.scanner-start-container p {
+  margin-bottom: 30px;
+  color: #555;
+  font-size: 16px;
+}
+
+.start-scan-button,
+.stop-scan-button {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.start-scan-button:hover {
+  background-color: #3a7dca;
+  transform: translateY(-2px);
+}
+
+.start-scan-button:active {
+  transform: translateY(0);
+}
+
+.stop-scan-button {
+  background-color: #e74c3c;
+  margin-top: 15px;
+}
+
+.stop-scan-button:hover {
+  background-color: #c0392b;
+}
+
+.error-message {
+  color: #e74c3c;
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+#reader {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto 20px;
+  border: 2px solid #eee;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 300px;
+}
+
+.scanner-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* HTML5QrCode 라이브러리 스타일 오버라이드 */
+#reader video {
+  width: 100% !important;
+  height: auto !important;
+  border-radius: 6px;
+}
+
+#reader img {
+  display: none;
+}
+
+/* HTML5QrCode 라이브러리의 추가 스타일 오버라이드 */
+#reader__scan_region {
+  padding: 0 !important;
+}
+
+#reader__dashboard {
+  padding: 0 !important;
+}
+
+#reader__dashboard button {
+  display: none !important; /* 라이브러리 자체 버튼 숨기기 */
+}
+
+#reader__dashboard > div {
+  margin: 0 !important;
+}
+
+#reader__dashboard #reader__filescan_input {
+  display: none !important; /* 파일 스캔 인풋 숨기기 */
+}
+
+#reader__camera_selection {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 8px !important;
+  margin-top: 10px !important;
+  margin-bottom: 10px !important;
+  border: 1px solid #ddd !important;
+  border-radius: 4px !important;
+  background-color: #f9f9f9 !important;
+}
+
+#reader__status_span {
+  font-size: 14px !important;
+  color: #555 !important;
+  margin-top: 5px !important;
+}
+
+.scanning-text {
+  margin-top: 15px;
+  color: #555;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .qr-scanner-container {
+    padding: 15px;
+    border-radius: 0;
+    box-shadow: none;
+    margin-bottom: 0;
+  }
+  
+  .qr-scanner-header h2 {
+    font-size: 18px;
+  }
+  
+  .qr-icon {
+    font-size: 60px;
+  }
+  
+  #reader {
+    max-width: 90%;
+  }
+}
+
+.qr-reader-placeholder {
+  width: 100%;
+  max-width: 500px;
+  height: 300px;
+  margin: 0 auto;
+  border: 2px solid #eee;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9f9f9;
+}
+
+.qr-reader-placeholder p {
+  color: #666;
+  font-style: italic;
+}
+
+.qr-reader-simulation {
+  width: 100%;
+  max-width: 500px;
+  height: 300px;
+  margin: 0 auto;
+  border: 2px solid #eee;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  position: relative;
+  overflow: hidden;
+}
+
+.simulation-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.05);
+  z-index: 1;
+}
+
+.simulation-overlay p {
+  margin-bottom: 15px;
+  color: #555;
+  font-style: italic;
+}
+
+.simulate-button {
+  transition: all 0.2s;
+}
+
+.simulate-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.simulate-button:active {
+  transform: translateY(0);
+} 
