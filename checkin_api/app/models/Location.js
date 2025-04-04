@@ -19,6 +19,9 @@ module.exports = (sequelize, Sequelize) => {
             address: {
                 type: Sequelize.STRING,
             },
+            qrSecret: {
+                type: Sequelize.STRING
+            }
         },
         {
             timestamps: true,

@@ -13,7 +13,7 @@ db.history = require("./History")(sequelize, Sequelize);
 db.location = require("./Location")(sequelize, Sequelize);
 db.childLocation = require("./ChildLocation")(sequelize, Sequelize);
 
-// User - Location (optional 1:optional 1)
+// User - Location (optional 1:optional many)
 db.user.belongsTo(db.location, {
     foreignKey: {
         name: "location_id",
@@ -23,7 +23,7 @@ db.user.belongsTo(db.location, {
     as: "location"
 });
 
-db.location.hasOne(db.user, {
+db.location.hasMany(db.user, {
     foreignKey: {
         name: "location_id",
         field: "locationId",

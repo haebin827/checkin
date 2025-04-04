@@ -1,0 +1,157 @@
+/* 404 페이지 스타일 - 로그인 페이지와 일관성 유지 */
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --primary-color: #4CAF50;     /* 신뢰감을 주는 녹색 */
+  --secondary-color: #388E3C;   /* 진한 녹색 */
+  --accent-color: #8BC34A;      /* 밝은 녹색 */
+  --background-color: #F1F8E9;  /* 부드러운 연녹색 배경 */
+  --card-color: #ffffff;
+  --text-color: #37474F;        /* 진한 청록색 */
+  --text-light: #607D8B;        /* 중간 청록색 */
+  --error-color: #F44336;
+  --success-color: #4CAF50;
+  --border-color: #DCEDC8;      /* 연한 녹색 테두리 */
+  --highlight-color: #FFEB3B;   /* 안전 강조색(노란색) */
+  --shadow-color: rgba(76, 175, 80, 0.2); /* 녹색 그림자 */
+}
+
+.notfound-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--background-color);
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%238bc34a' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  padding: 20px;
+}
+
+.notfound-card {
+  background-color: var(--card-color);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px var(--shadow-color);
+  width: 100%;
+  max-width: 440px;
+  padding: 40px 32px;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+
+.notfound-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, var(--error-color), #FF9800);
+  border-radius: 16px 16px 0 0;
+}
+
+.notfound-header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.notfound-icon {
+  font-size: 80px;
+  color: var(--error-color);
+  margin-bottom: 20px;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-20px);
+  }
+  60% {
+    transform: translateY(-10px);
+  }
+}
+
+.notfound-header h1 {
+  color: var(--error-color);
+  font-size: 32px;
+  margin-bottom: 8px;
+  font-weight: 700;
+  position: relative;
+  display: inline-block;
+}
+
+.notfound-header h1::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 3px;
+  background-color: var(--error-color);
+  border-radius: 3px;
+}
+
+.notfound-header p {
+  color: var(--text-light);
+  font-size: 16px;
+  margin-top: 16px;
+  margin-bottom: 24px;
+}
+
+.notfound-message {
+  margin: 20px 0 30px;
+  color: var(--text-color);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.return-button {
+  display: inline-block;
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: 600;
+  padding: 14px 32px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  margin-top: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.return-button:hover {
+  background-color: var(--secondary-color);
+  transform: translateY(-2px);
+}
+
+.return-button:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 480px) {
+  .notfound-card {
+    padding: 30px 20px;
+  }
+  
+  .notfound-header h1 {
+    font-size: 28px;
+  }
+  
+  .notfound-icon {
+    font-size: 60px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .notfound-container {
+    padding: 40px;
+  }
+  
+  .notfound-card {
+    max-width: 480px;
+  }
+} 

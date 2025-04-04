@@ -1,0 +1,246 @@
+/* 아이디/비밀번호 찾기 페이지 스타일 - 로그인 페이지와 일관성 유지 */
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --primary-color: #4CAF50;     /* 신뢰감을 주는 녹색 */
+  --secondary-color: #388E3C;   /* 진한 녹색 */
+  --accent-color: #8BC34A;      /* 밝은 녹색 */
+  --background-color: #F1F8E9;  /* 부드러운 연녹색 배경 */
+  --card-color: #ffffff;
+  --text-color: #37474F;        /* 진한 청록색 */
+  --text-light: #607D8B;        /* 중간 청록색 */
+  --error-color: #F44336;
+  --success-color: #4CAF50;
+  --border-color: #DCEDC8;      /* 연한 녹색 테두리 */
+  --kakao-color: #FEE500;
+  --google-color: #FFFFFF;
+  --highlight-color: #FFEB3B;   /* 안전 강조색(노란색) */
+  --shadow-color: rgba(76, 175, 80, 0.2); /* 녹색 그림자 */
+}
+
+.forgot-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--background-color);
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%238bc34a' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  padding: 20px;
+}
+
+.forgot-card {
+  background-color: var(--card-color);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px var(--shadow-color);
+  width: 100%;
+  max-width: 440px;
+  padding: 40px 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+.forgot-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+  border-radius: 16px 16px 0 0;
+}
+
+.forgot-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.forgot-header h1 {
+  color: var(--primary-color);
+  font-size: 28px;
+  margin-bottom: 8px;
+  font-weight: 700;
+  position: relative;
+  display: inline-block;
+}
+
+.forgot-header h1::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 3px;
+  background-color: var(--accent-color);
+  border-radius: 3px;
+}
+
+.forgot-header p {
+  color: var(--text-light);
+  font-size: 16px;
+  margin-top: 16px;
+}
+
+.forgot-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.radio-group {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 8px;
+}
+
+.radio-option {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.radio-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.radio-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  padding: 12px 24px;
+  background-color: #f5f5f5;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  width: 130px;
+}
+
+.radio-input:checked + .radio-label {
+  border-color: var(--primary-color);
+  background-color: rgba(76, 175, 80, 0.1);
+}
+
+.radio-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+  color: var(--text-light);
+  transition: color 0.3s ease;
+}
+
+.radio-input:checked + .radio-label .radio-icon {
+  color: var(--primary-color);
+}
+
+.radio-text {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--text-color);
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.input-group input {
+  padding: 14px 16px;
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  background-color: #FAFAFA;
+  font-family: 'Rubik', sans-serif;
+}
+
+.input-group input:focus {
+  border-color: var(--primary-color);
+  outline: none;
+  box-shadow: 0 0 0 4px var(--shadow-color);
+  background-color: white;
+}
+
+.send-button {
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: 600;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.send-button:hover {
+  background-color: var(--secondary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.send-button:active {
+  transform: translateY(0);
+}
+
+.send-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.back-link {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+  font-size: 14px;
+  color: var(--text-light);
+}
+
+.back-link a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+  margin-left: 5px;
+  transition: color 0.2s;
+}
+
+.back-link a:hover {
+  color: var(--secondary-color);
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .forgot-card {
+    padding: 30px 20px;
+  }
+  
+  .radio-group {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .radio-label {
+    width: 100%;
+    max-width: 200px;
+  }
+} 

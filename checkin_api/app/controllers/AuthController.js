@@ -3,7 +3,6 @@ const EmailService = require('../services/EmailService');
 const {validationResult} = require('express-validator');
 
 exports.login = async(req, res) => {
-
     const {username, password} = req.body;
 
     try {
@@ -83,7 +82,7 @@ exports.sendOTPEmail = async (req, res) => {
     if (!email) {
         return res.status(400).json({
             success: false,
-            message: 'No email found'
+            message: "No email found"
         });
     }
 
@@ -98,13 +97,14 @@ exports.sendOTPEmail = async (req, res) => {
         });
     } catch (err) {
         console.error("EmailService/sendWelcomeEmail:", err);
-        res.status(500).json({ success: false, message: err.message || 'Fail to send an email' });
+        res.status(500).json({ success: false, message: err.message || "Fail to send an email" });
     }
 };
 
 // ---------------------------------------------------------
 // Social login
 // ---------------------------------------------------------
+
 exports.authentication = async(req, res) => {
     if (req.user) {
         req.session.user = {

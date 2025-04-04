@@ -1,0 +1,280 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --primary-color: #4CAF50;     /* 신뢰감을 주는 녹색 */
+  --secondary-color: #388E3C;   /* 진한 녹색 */
+  --accent-color: #8BC34A;      /* 밝은 녹색 */
+  --background-color: #F1F8E9;  /* 부드러운 연녹색 배경 */
+  --card-color: #ffffff;
+  --text-color: #37474F;        /* 진한 청록색 */
+  --text-light: #607D8B;        /* 중간 청록색 */
+  --error-color: #F44336;
+  --success-color: #4CAF50;
+  --border-color: #DCEDC8;      /* 연한 녹색 테두리 */
+}
+
+.confirmation-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--background-color);
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%238bc34a' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  padding: 20px;
+}
+
+.confirmation-card {
+  background-color: var(--card-color);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(76, 175, 80, 0.2);
+  width: 100%;
+  max-width: 500px;
+  position: relative;
+  overflow: hidden;
+}
+
+.confirmation-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+  border-radius: 16px 16px 0 0;
+}
+
+.confirmation-header {
+  text-align: center;
+  padding: 30px 32px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.confirmation-header h1 {
+  color: var(--primary-color);
+  font-size: 28px;
+  margin-bottom: 8px;
+  font-weight: 700;
+  position: relative;
+  display: inline-block;
+}
+
+.confirmation-header h1::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 3px;
+  background-color: var(--accent-color);
+  border-radius: 3px;
+}
+
+.confirmation-header p {
+  color: var(--text-light);
+  font-size: 16px;
+  margin-top: 16px;
+}
+
+.email-display {
+  margin-top: 16px;
+  padding: 10px 16px;
+  background-color: rgba(76, 175, 80, 0.08);
+  border-radius: 10px;
+  color: var(--primary-color);
+  font-weight: 500;
+  word-break: break-all;
+  display: inline-block;
+}
+
+.confirmation-body {
+  padding: 30px 32px;
+}
+
+.otp-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 30px 0;
+}
+
+.otp-input {
+  width: 50px;
+  height: 60px;
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-color);
+  background-color: #FAFAFA;
+  transition: all 0.3s ease;
+  font-family: 'Rubik', sans-serif;
+}
+
+.otp-input:focus {
+  border-color: var(--primary-color);
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.2);
+  background-color: white;
+}
+
+.otp-input.error {
+  border-color: var(--error-color);
+  background-color: rgba(244, 67, 54, 0.05);
+}
+
+.otp-input.success {
+  border-color: var(--success-color);
+  background-color: rgba(76, 175, 80, 0.05);
+}
+
+.error-message {
+  color: var(--error-color);
+  text-align: center;
+  margin: 10px 0 20px;
+  padding: 10px 12px;
+  background-color: rgba(244, 67, 54, 0.08);
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.success-message {
+  color: var(--success-color);
+  text-align: center;
+  margin: 10px 0 20px;
+  padding: 12px;
+  background-color: rgba(76, 175, 80, 0.08);
+  border-radius: 10px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.resend-button, 
+.verify-button {
+  padding: 16px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.resend-button {
+  background-color: #f2f2f2;
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  flex: 1;
+}
+
+.resend-button:hover:not(:disabled) {
+  background-color: #e6e6e6;
+}
+
+.verify-button {
+  background-color: var(--primary-color);
+  color: white;
+  flex: 2;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.verify-button:hover:not(:disabled) {
+  background-color: var(--secondary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.verify-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.resend-button:disabled,
+.verify-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.helper-text {
+  text-align: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+  color: var(--text-light);
+  font-size: 14px;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+  .confirmation-card {
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 480px) {
+  .confirmation-container {
+    padding: 15px;
+  }
+  
+  .confirmation-header {
+    padding: 24px 20px 16px;
+  }
+  
+  .confirmation-body {
+    padding: 20px;
+  }
+  
+  .otp-container {
+    gap: 6px;
+  }
+  
+  .otp-input {
+    width: 40px;
+    height: 50px;
+    font-size: 20px;
+  }
+  
+  .button-container {
+    flex-direction: column;
+  }
+  
+  .resend-button, 
+  .verify-button {
+    width: 100%;
+    padding: 14px;
+  }
+}
+
+@media (max-width: 350px) {
+  .otp-input {
+    width: 35px;
+    height: 45px;
+    font-size: 18px;
+  }
+} 
