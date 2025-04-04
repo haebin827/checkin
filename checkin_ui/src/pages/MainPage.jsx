@@ -61,7 +61,7 @@ const MainPage = () => {
       <Navbar />
       <main className="main-content">
         <div className="content-container">
-          <h1>체크인 서비스에 오신 것을 환영합니다</h1>
+          <h1>Welcome to Check-In service.</h1>
           {renderContent()}
         </div>
       </main>

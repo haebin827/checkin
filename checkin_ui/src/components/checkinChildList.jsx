@@ -23,9 +23,9 @@ const CheckinChildList = forwardRef(({ onSelectChild }, ref) => {
   useEffect(() => {
     // 예시 데이터
     setLocations([
-      { id: 1, name: '강남 센터' },
-      { id: 2, name: '송파 센터' },
-      { id: 3, name: '서초 센터' }
+      { id: 1, name: 'Suwanee Center' },
+      { id: 2, name: 'Duluth Center' },
+      { id: 3, name: 'Buford Center' }
     ]);
   }, []);
 
@@ -38,10 +38,10 @@ const CheckinChildList = forwardRef(({ onSelectChild }, ref) => {
       setTimeout(() => {
         // 예시 데이터
         setChildren([
-          { id: 1, name: '김민준', checkedIn: false },
-          { id: 2, name: '이서연', checkedIn: false },
-          { id: 3, name: '박지우', checkedIn: false },
-          { id: 4, name: '최예은', checkedIn: false }
+          { id: 1, name: 'Haebin Noh', checkedIn: false },
+          { id: 2, name: 'Jaeyull Noh', checkedIn: false },
+          { id: 3, name: 'test name', checkedIn: false },
+          { id: 4, name: 'test name2', checkedIn: false }
         ]);
         setLoading(false);
       }, 500);
@@ -66,14 +66,14 @@ const CheckinChildList = forwardRef(({ onSelectChild }, ref) => {
   return (
     <div className="checkin-child-list">
       <div className="location-selector">
-        <label htmlFor="location">위치 선택:</label>
+        <label htmlFor="location">Select location:</label>
         <select 
           id="location" 
           value={selectedLocation} 
           onChange={handleLocationChange}
           className="location-select"
         >
-          <option value="">위치를 선택하세요</option>
+          <option value="">--- Select ---</option>
           {locations.map(location => (
             <option key={location.id} value={location.id}>
               {location.name}
@@ -86,7 +86,7 @@ const CheckinChildList = forwardRef(({ onSelectChild }, ref) => {
         <div className="loading">로딩 중...</div>
       ) : selectedLocation ? (
         <div className="children-list">
-          <h3>아이들 목록</h3>
+          <h3>List of children</h3>
           {children.length > 0 ? (
             <ul>
               {children.map(child => (
@@ -111,12 +111,12 @@ const CheckinChildList = forwardRef(({ onSelectChild }, ref) => {
               ))}
             </ul>
           ) : (
-            <p>이 위치에 등록된 아이가 없습니다.</p>
+            <p>No children registered at this location.</p>
           )}
         </div>
       ) : (
         <div className="no-location">
-          <p>위치를 선택하면 아이들 목록이 표시됩니다.</p>
+          <p>Select a location to view children.</p>
         </div>
       )}
     </div>

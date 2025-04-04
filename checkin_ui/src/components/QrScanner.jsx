@@ -102,7 +102,7 @@ const QrScanner = ({ childId, childName, onBack }) => {
         >
           <FaArrowLeft />
         </button>
-        <h2>{childName} 체크인</h2>
+        <h2>Check-In: {childName}</h2>
       </div>
 
       <div className="qr-scanner-content">
@@ -115,14 +115,14 @@ const QrScanner = ({ childId, childName, onBack }) => {
               className="start-scan-button"
               disabled={!childId}
             >
-              카메라 열기
+              Open camera
             </button>
           ) : (
             <button 
               onClick={stopScanner} 
               className="stop-scan-button"
             >
-              스캐너 정지
+              Stop Scanner
             </button>
           )}
           
