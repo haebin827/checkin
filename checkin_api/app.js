@@ -8,7 +8,7 @@ const helmet = require("helmet");
 const session = require("express-session");
 const MySQLStore = require("express-mysql-session")(session);
 const passport = require("passport");
-//const errorHandler = require("./app/middlewares/errorHandler");
+const errorHandler = require("./app/middlewares/errorHandler");
 
 var app = express();
 
@@ -63,22 +63,21 @@ db.sequelize.sync()
     });
 
 // drop the table if it already exists
-/*db.sequelize.sync({ force: true }).then(() => {
+/*
+db.sequelize.sync({ force: true }).then(() => {
   console.log("Drop and re-sync db.");
-});*/
+});
+*/
 
+require('./app/routes/AuthRoute')(app);
+require('./app/routes/GoogleAuthRoute')(app);
+require('./app/routes/KakaoAuthRoute')(app);
 
 app.get("/", (req, res) => {
     res.json({ message: "Welcome to Check In system." });
 });
 
-app.use((err, req, res, next) => {
-    console.error("ERROR: ", err.stack);
-    res.status(500).json({
-        success: false,
-        message: err.message || "오류가 발생했습니다"
-    });
-});
+app.use(errorHandler);
 
 const port = process.env.PORT || 8080;
 app.listen(port, () => {

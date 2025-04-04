@@ -1,5 +1,4 @@
 module.exports = (sequelize, Sequelize) => {
-
     const Child = sequelize.define("child",
         {
             id: {
@@ -7,7 +6,7 @@ module.exports = (sequelize, Sequelize) => {
                 primaryKey: true,
                 autoIncrement: true,
             },
-            eng_name: {
+            engName: {
                 type: Sequelize.STRING,
                 allowNull: false,
                 validate: {
@@ -16,7 +15,7 @@ module.exports = (sequelize, Sequelize) => {
                     is: /^[a-zA-Z\s]+$/,
                 },
             },
-            kor_name: {
+            korName: {
                 type: Sequelize.STRING,
                 validate: {
                     len: [2, 20],
@@ -70,6 +69,9 @@ module.exports = (sequelize, Sequelize) => {
         },
         {
             timestamps: true,
+            underscored: true,
+            tableName: 'child',
+            freezeTableName: true
         }
     );
 

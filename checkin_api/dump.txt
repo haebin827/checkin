@@ -1,0 +1,9 @@
+{
+  "username": "asdf",
+  "password": "asdf",
+  "engName": "John Doe",
+  "korName": "존 도우",
+  "email": "haebin.noh@gmail.com",
+  "phone": "01012345678",
+  "role": "guardian"
+}

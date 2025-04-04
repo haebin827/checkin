@@ -10,19 +10,19 @@ module.exports = (sequelize, Sequelize) => {
                 type: Sequelize.STRING,
                 allowNull: false,
                 unique: true,
-                validate: {
+                /*validate: {
                     len: [5, 20],
                     isAlphanumeric: true,
-                },
+                },*/
             },
             password: {
                 type: Sequelize.STRING,
                 allowNull: false,
-                validate: {
+                /*validate: {
                     len: [8, 30],
-                },
+                },*/
             },
-            eng_name: {
+            engName: {
                 type: Sequelize.STRING,
                 allowNull: false,
                 validate: {
@@ -31,7 +31,7 @@ module.exports = (sequelize, Sequelize) => {
                     is: /^[a-zA-Z\s]+$/,
                 },
             },
-            kor_name: {
+            korName: {
                 type: Sequelize.STRING,
                 validate: {
                     len: [2, 20],
@@ -63,10 +63,21 @@ module.exports = (sequelize, Sequelize) => {
                 type: Sequelize.ENUM('guardian', 'admin', 'manager'),
                 defaultValue: 'guardian',
                 allowNull: false
+            },
+            googleId: {
+                type: Sequelize.STRING,
+                unique: true,
+            },
+            kakaoId: {
+                type: Sequelize.STRING,
+                unique: true,
             }
         },
         {
             timestamps: true,
+            underscored: true,
+            tableName: 'user',
+            freezeTableName: true
         }
     );
 

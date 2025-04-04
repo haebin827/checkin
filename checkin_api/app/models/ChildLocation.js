@@ -1,5 +1,4 @@
 module.exports = (sequelize, Sequelize) => {
-
     const ChildLocation = sequelize.define("child_location",
         {
             id: {
@@ -7,7 +6,7 @@ module.exports = (sequelize, Sequelize) => {
                 primaryKey: true,
                 autoIncrement: true,
             },
-            child_id: {
+            childId: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
                 references: {
@@ -15,7 +14,7 @@ module.exports = (sequelize, Sequelize) => {
                     key: "id",
                 },
             },
-            location_id: {
+            locationId: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
                 references: {
@@ -26,6 +25,9 @@ module.exports = (sequelize, Sequelize) => {
         },
         {
             timestamps: true,
+            underscored: true,
+            tableName: 'child_location',
+            freezeTableName: true
         }
     );
 

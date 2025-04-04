@@ -1,17 +1,5 @@
-const dbConfig = require("../configs/dbConfig.js");
+const sequelize = require("../configs/dbConfig")
 const Sequelize = require("sequelize");
-
-const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
-    host: dbConfig.HOST,
-    dialect: dbConfig.dialect,
-
-    pool: {
-        max: dbConfig.pool.max,
-        min: dbConfig.pool.min,
-        acquire: dbConfig.pool.acquire,
-        idle: dbConfig.pool.idle
-    }
-});
 
 const db = {};
 
@@ -25,10 +13,11 @@ db.history = require("./History")(sequelize, Sequelize);
 db.location = require("./Location")(sequelize, Sequelize);
 db.childLocation = require("./ChildLocation")(sequelize, Sequelize);
 
-// user - location (optional 1:optional 1)
+// User - Location (optional 1:optional 1)
 db.user.belongsTo(db.location, {
     foreignKey: {
         name: "location_id",
+        field: "locationId",
         allowNull: true
     },
     as: "location"
@@ -37,77 +26,137 @@ db.user.belongsTo(db.location, {
 db.location.hasOne(db.user, {
     foreignKey: {
         name: "location_id",
+        field: "locationId",
         allowNull: true
     },
     as: "user"
 });
 
-// child - user (M:N)
+// Child - User (M:N)
 db.child.belongsToMany(db.user, {
     through: db.userChild,
-    foreignKey: "child_id",
-    otherKey: "user_id",
-    as: "user",
+    foreignKey: {
+        name: "child_id",
+        field: "childId"
+    },
+    otherKey: {
+        name: "user_id",
+        field: "userId"
+    },
+    as: "users",
 });
 
 db.user.belongsToMany(db.child, {
     through: db.userChild,
-    foreignKey: "user_id",
-    otherKey: "child_id",
-    as: "child",
+    foreignKey: {
+        name: "user_id",
+        field: "userId"
+    },
+    otherKey: {
+        name: "child_id",
+        field: "childId"
+    },
+    as: "children",
 });
 
-// child - history (1:optional N)
+// Child - History (1:optional N)
 db.child.hasMany(db.history, {
-    foreignKey: "child_id",
-    as: "history",
+    foreignKey: {
+        name: "child_id",
+        field: "childId"
+    },
+    as: "histories",
     onDelete: "CASCADE",
 });
 
 db.history.belongsTo(db.child, {
-    foreignKey: "child_id",
+    foreignKey: {
+        name: "child_id",
+        field: "childId",
+        allowNull: false
+    },
     as: "child",
-    allowNull: false,
 });
 
-// child - location (M:N)
+// Child - Location (M:N)
 db.child.belongsToMany(db.location, {
     through: db.childLocation,
-    foreignKey: "child_id",
-    otherKey: "location_id",
-    as: "location",
+    foreignKey: {
+        name: "child_id",
+        field: "childId"
+    },
+    otherKey: {
+        name: "location_id",
+        field: "locationId"
+    },
+    as: "locations",
 });
 
 db.location.belongsToMany(db.child, {
     through: db.childLocation,
-    foreignKey: "location_id",
-    otherKey: "child_id",
-    as: "child",
+    foreignKey: {
+        name: "location_id",
+        field: "locationId"
+    },
+    otherKey: {
+        name: "child_id",
+        field: "childId"
+    },
+    as: "children",
 });
 
-// location - history (1:optional N)
+// Location - History (1:optional N)
 db.location.hasMany(db.history, {
-    foreignKey: "location_id",
-    as: "history",
+    foreignKey: {
+        name: "location_id",
+        field: "locationId"
+    },
+    as: "histories",
     onDelete: "CASCADE",
 });
 
 db.history.belongsTo(db.location, {
-    foreignKey: "location_id",
+    foreignKey: {
+        name: "location_id",
+        field: "locationId",
+        allowNull: false
+    },
     as: "location",
-    allowNull: false,
 });
 
-// user - history (1:optional N)
+// User - History (1:optional N)
 db.user.hasMany(db.history, {
-    foreignKey: "checkin_by",
-    as: "checkin_history",
+    foreignKey: {
+        name: "checkin_by",
+        field: "checkinBy"
+    },
+    as: "checkinHistories",
 });
 
 db.history.belongsTo(db.user, {
-    foreignKey: "checkin_by",
-    as: "checkin_user",
-    allowNull: false,
+    foreignKey: {
+        name: "checkin_by",
+        field: "checkinBy",
+        allowNull: false
+    },
+    as: "checkinUser",
+});
+
+db.user.hasMany(db.history, {
+    foreignKey: {
+        name: "checkout_by",
+        field: "checkoutBy"
+    },
+    as: "checkoutHistories",
+});
+
+db.history.belongsTo(db.user, {
+    foreignKey: {
+        name: "checkout_by",
+        field: "checkoutBy",
+        allowNull: true
+    },
+    as: "checkoutUser",
 });
 
 module.exports = db;

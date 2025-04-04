@@ -1,5 +1,4 @@
 module.exports = (sequelize, Sequelize) => {
-
     const History = sequelize.define("history",
         {
             id: {
@@ -7,41 +6,39 @@ module.exports = (sequelize, Sequelize) => {
                 primaryKey: true,
                 autoIncrement: true,
             },
-            child_id: {
+            childId: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
             },
-            /*status: {
+            status: {
                 type: Sequelize.BOOLEAN,
                 defaultValue: 1,
-            },*/
-            checkin_datetime: {
+            },
+            checkinDatetime: {
                 type: Sequelize.DATE,
                 allowNull: false,
                 defaultValue: Sequelize.NOW,
             },
-            /*checkout_datetime: {
+            checkoutDatetime: {
                 type: Sequelize.DATE,
-            },*/
-            checkin_by: {
+            },
+            checkinBy: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
             },
-            /*checkout_by: {
+            checkoutBy: {
                 type: Sequelize.INTEGER,
-                allowNull: true,
-            },*/
-            is_qr_used: {
-                type: Sequelize.BOOLEAN,
-                defaultValue: true,
             },
-            location_id: {
+            locationId: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
             },
         },
         {
             timestamps: true,
+            underscored: true,
+            tableName: 'history',
+            freezeTableName: true
         }
     );
 

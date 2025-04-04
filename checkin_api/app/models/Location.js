@@ -22,6 +22,9 @@ module.exports = (sequelize, Sequelize) => {
         },
         {
             timestamps: true,
+            underscored: true,
+            tableName: 'location',
+            freezeTableName: true
         }
     );
 
