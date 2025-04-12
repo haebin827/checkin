@@ -1,6 +1,7 @@
 const AuthService = require('../services/AuthService');
 const EmailService = require('../services/EmailService');
 const {validationResult} = require('express-validator');
+const db = require('../models');
 
 exports.login = async(req, res) => {
     const {username, password} = req.body;
@@ -12,11 +13,10 @@ exports.login = async(req, res) => {
             user
         });
     } catch(err) {
-        // 로그인 실패 시 시도 제한 정보 추가
         const limiterInfo = req.rateLimit || {};
 
         console.log("RATE LIMIT: ", req.rateLimit)
-        res.status(400).json({
+        res.status(500).json({
             success: false,
             message: err.message,
             attempts: limiterInfo.current || 0,
@@ -43,7 +43,7 @@ exports.logout = async(req, res) => {
 };
 
 exports.validateRegistration = [
-    //registerValidation,
+    //userValidation,
     async (req, res) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
@@ -107,21 +107,112 @@ exports.sendOTPEmail = async (req, res) => {
 
 exports.authentication = async(req, res) => {
     if (req.user) {
+        // 임시 사용자인 경우 추가 정보 페이지로 리다이렉트
+        if (req.user.isTemporary) {
+            req.session.tempUser = req.user;
+            return res.redirect(`${process.env.CORS_ORIGIN_URL}/additional-info`);
+        }
+
+        // 정규 사용자 세션 설정
         req.session.user = {
             id: req.user.id,
             username: req.user.username,
-            name: req.user.name,
+            name: req.user.engName,
             role: req.user.role
         };
+
+        res.redirect(`${process.env.CORS_ORIGIN_URL}/main`);
+    } else {
+        res.redirect(`${process.env.CORS_ORIGIN_URL}/login`);
     }
-    res.redirect(`${process.env.CORS_ORIGIN_URL}/home`);
 };
 
 exports.loginFailed = async(req, res) => {
     res.status(401).json({
         success: false,
-        message: 'Failed to login with Kakao.'
+        message: 'Failed to login with social account.'
     });
+};
+
+exports.completeRegistration = async (req, res) => {
+    try {
+        // 세션에서 임시 사용자 정보 가져오기
+        const tempUser = req.session.tempUser;
+        if (!tempUser || !tempUser.isTemporary) {
+            return res.status(400).json({
+                success: false,
+                message: 'No temporary user found'
+            });
+        }
+
+        // 추가 정보 유효성 검사
+        const { engName, korName, phone } = req.body;
+        if (!engName || !phone) {
+            return res.status(400).json({
+                success: false,
+                message: 'English name and phone number are required'
+            });
+        }
+
+        // 전화번호 형식 검사
+        if (!/^\d{10,12}$/.test(phone)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid phone number format'
+            });
+        }
+
+        // 트랜잭션 시작
+        const transaction = await db.sequelize.transaction();
+        try {
+            // 사용자 생성
+            const userData = {
+                googleId: tempUser.googleId || null,
+                kakaoId: tempUser.kakaoId || null,
+                email: tempUser.email,
+                username: tempUser.username,
+                role: tempUser.role,
+                engName: engName,
+                korName: korName || null,
+                phone: phone
+            };
+
+            const newUser = await db.user.create(userData, { transaction });
+            await transaction.commit();
+
+            // 세션 업데이트
+            delete req.session.tempUser;
+            req.session.user = {
+                id: newUser.id,
+                username: newUser.username,
+                name: newUser.engName,
+                role: newUser.role
+            };
+
+            return res.status(201).json({
+                success: true,
+                user: {
+                    id: newUser.id,
+                    username: newUser.username,
+                    engName: newUser.engName,
+                    role: newUser.role
+                }
+            });
+        } catch (err) {
+            await transaction.rollback();
+            console.error('User creation error:', err);
+            return res.status(500).json({
+                success: false,
+                message: err.message || 'Failed to create user'
+            });
+        }
+    } catch (err) {
+        console.error('Complete registration error:', err);
+        return res.status(500).json({
+            success: false,
+            message: err.message || 'Failed to complete registration'
+        });
+    }
 };
 
 // ---------------------------------------------------------
@@ -152,9 +243,7 @@ exports.handleFindRequest = async (req, res) => {
 exports.verifyUsername = async (req, res) => {
     try {
         const { token } = req.query;
-        console.log(token);
         const decoded = EmailService.verifyToken(token);
-        console.log("DECODED: ", decoded)
 
         if (decoded.type !== 'findId') {
             return res.status(400).json({ success: false, message: 'Invalid token type' });

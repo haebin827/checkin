@@ -8,19 +8,11 @@ module.exports = (sequelize, Sequelize) => {
             },
             childId: {
                 type: Sequelize.INTEGER,
-                allowNull: false,
-                references: {
-                    model: "child",
-                    key: "id",
-                },
+                allowNull: false
             },
             locationId: {
                 type: Sequelize.INTEGER,
-                allowNull: false,
-                references: {
-                    model: "location",
-                    key: "id",
-                },
+                allowNull: false
             },
         },
         {

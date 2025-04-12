@@ -14,7 +14,7 @@ const loginAttemptTracker = (req, res, next) => {
     const ipIsLocked = cache.get(ipLockKey);     // 현재 IP가 잠겼는지 확인
 
     if (!ipIsLocked && cache.get(ipKey) >= 20) {
-        cache.del(ipKey); // IP 시도 횟수 초기화
+        cache.del(ipKey);
         console.log(`IP ${ip} lock released, attempt counter reset`);
     }
 
@@ -75,7 +75,7 @@ const loginAttemptTracker = (req, res, next) => {
         let responseBody;
         try {
             responseBody = JSON.parse(body);
-        } catch (e) {
+        } catch (err) {
             responseBody = body;
         }
 

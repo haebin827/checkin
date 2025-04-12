@@ -8,30 +8,30 @@ module.exports = (sequelize, Sequelize) => {
             },
             childId: {
                 type: Sequelize.INTEGER,
-                allowNull: false,
+                allowNull: false
             },
-            status: {
+            /*status: {
                 type: Sequelize.BOOLEAN,
                 defaultValue: 1,
-            },
+            },*/
             checkinDatetime: {
                 type: Sequelize.DATE,
                 allowNull: false,
                 defaultValue: Sequelize.NOW,
             },
-            checkoutDatetime: {
+            /*checkoutDatetime: {
                 type: Sequelize.DATE,
-            },
+            },*/
             checkinBy: {
                 type: Sequelize.INTEGER,
-                allowNull: false,
+                allowNull: false
             },
-            checkoutBy: {
+            /*checkoutBy: {
                 type: Sequelize.INTEGER,
-            },
+            },*/
             locationId: {
                 type: Sequelize.INTEGER,
-                allowNull: false,
+                allowNull: false
             },
         },
         {

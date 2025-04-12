@@ -8,19 +8,11 @@ module.exports = (sequelize, Sequelize) => {
             },
             userId: {
                 type: Sequelize.INTEGER,
-                allowNull: false,
-                references: {
-                    model: "user",
-                    key: "id",
-                },
+                allowNull: false
             },
             childId: {
                 type: Sequelize.INTEGER,
-                allowNull: false,
-                references: {
-                    model: "child",
-                    key: "id",
-                },
+                allowNull: false
             },
             relationship: {
                 type: Sequelize.STRING,
@@ -29,6 +21,10 @@ module.exports = (sequelize, Sequelize) => {
                     notEmpty: true,
                     len: [1, 20],
                 },
+            },
+            locationId: {
+                type: Sequelize.INTEGER,
+                allowNull: true
             },
         },
         {

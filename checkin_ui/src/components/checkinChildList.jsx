@@ -1,5 +1,5 @@
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { FaCheckCircle, FaQrcode } from 'react-icons/fa';
+import { FaCheckCircle, FaQrcode, FaChevronDown, FaChevronUp, FaBirthdayCake, FaPhone, FaPrint } from 'react-icons/fa';
 import '../assets/styles/components/CheckinChildList.css';
 
 const CheckinChildList = forwardRef(({ onSelectChild }, ref) => {
@@ -7,6 +7,7 @@ const CheckinChildList = forwardRef(({ onSelectChild }, ref) => {
   const [selectedLocation, setSelectedLocation] = useState('');
   const [children, setChildren] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [expandedChildId, setExpandedChildId] = useState(null);
 
   // 외부에서 호출할 수 있는 메소드 노출
   useImperativeHandle(ref, () => ({
@@ -36,12 +37,36 @@ const CheckinChildList = forwardRef(({ onSelectChild }, ref) => {
       // 실제 구현 시 API 호출로 변경
       // 예시: fetchChildrenByLocation(selectedLocation)
       setTimeout(() => {
-        // 예시 데이터
+        // 예시 데이터 - birth와 phone 정보 추가
         setChildren([
-          { id: 1, name: 'Haebin Noh', checkedIn: false },
-          { id: 2, name: 'Jaeyull Noh', checkedIn: false },
-          { id: 3, name: 'test name', checkedIn: false },
-          { id: 4, name: 'test name2', checkedIn: false }
+          { 
+            id: 1, 
+            name: 'Haebin Noh', 
+            birth: '2016-05-12', 
+            phone: '010-1234-5678',
+            checkedIn: false 
+          },
+          { 
+            id: 2, 
+            name: 'Jaeyull Noh', 
+            birth: '2018-08-25', 
+            phone: '010-2345-6789',
+            checkedIn: false 
+          },
+          { 
+            id: 3, 
+            name: 'test name', 
+            birth: '2019-03-15', 
+            phone: '010-3456-7890',
+            checkedIn: false 
+          },
+          { 
+            id: 4, 
+            name: 'test name2', 
+            birth: '2020-11-30', 
+            phone: '010-4567-8901',
+            checkedIn: false 
+          }
         ]);
         setLoading(false);
       }, 500);
@@ -61,6 +86,28 @@ const CheckinChildList = forwardRef(({ onSelectChild }, ref) => {
       console.log('체크인 버튼 클릭됨:', child);
       onSelectChild(child);
     }
+  };
+
+  // 아이 이름 클릭 핸들러
+  const handleChildNameClick = (childId) => {
+    setExpandedChildId(expandedChildId === childId ? null : childId);
+  };
+
+  // 프린트 라벨 버튼 클릭 핸들러
+  const handlePrintLabel = (child) => {
+    console.log('라벨 인쇄 요청:', child);
+    // 여기에 라벨 인쇄 로직 추가
+    alert(`${child.name}의 라벨 인쇄가 요청되었습니다.`);
+  };
+
+  // 생년월일 포맷팅 함수
+  const formatBirthDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
   };
 
   return (
@@ -83,31 +130,67 @@ const CheckinChildList = forwardRef(({ onSelectChild }, ref) => {
       </div>
 
       {loading ? (
-        <div className="loading">로딩 중...</div>
+        <div className="loading">Loading...</div>
       ) : selectedLocation ? (
         <div className="children-list">
           <h3>List of children</h3>
           {children.length > 0 ? (
             <ul>
               {children.map(child => (
-                <li key={child.id} className="child-item">
-                  <span className="child-name">{child.name}</span>
-                  <button 
-                    className={`checkin-button ${child.checkedIn ? 'checked' : ''}`}
-                    onClick={() => handleCheckInClick(child)}
-                    disabled={child.checkedIn}
-                  >
-                    {child.checkedIn ? (
-                      <>
-                        <FaCheckCircle /> 완료
-                      </>
-                    ) : (
-                      <>
-                        <FaQrcode /> Check In
-                      </>
-                    )}
-                  </button>
-                </li>
+                <React.Fragment key={child.id}>
+                  <li className="child-item">
+                    <div 
+                      className="child-info"
+                      onClick={() => handleChildNameClick(child.id)}
+                    >
+                      <span className="child-name">{child.name}</span>
+                      <span className="expand-icon">
+                        {expandedChildId === child.id ? <FaChevronUp /> : <FaChevronDown />}
+                      </span>
+                    </div>
+                    <div className="button-group">
+                      <button 
+                        className="print-label-button"
+                        onClick={() => handlePrintLabel(child)}
+                      >
+                        <FaPrint /> Print Label
+                      </button>
+                      <button 
+                        className={`checkin-button ${child.checkedIn ? 'checked' : ''}`}
+                        onClick={() => handleCheckInClick(child)}
+                        disabled={child.checkedIn}
+                      >
+                        {child.checkedIn ? (
+                          <>
+                            <FaCheckCircle /> 완료
+                          </>
+                        ) : (
+                          <>
+                            <FaQrcode /> Check In
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </li>
+                  {expandedChildId === child.id && (
+                    <div className="child-details">
+                      <div className="child-details-content">
+                        <div className="detail-item">
+                          <div>
+                            <span className="detail-label">Birth Date</span>
+                            <span className="detail-value">{formatBirthDate(child.birth)}</span>
+                          </div>
+                        </div>
+                        <div className="detail-item">
+                          <div>
+                            <span className="detail-label">Phone</span>
+                            <span className="detail-value">{child.phone}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </React.Fragment>
               ))}
             </ul>
           ) : (

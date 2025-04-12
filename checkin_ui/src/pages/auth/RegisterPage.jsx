@@ -1,13 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import RegisterForm from '../../components/auth/RegisterForm';
+import RegisterForm from '../../components/forms/RegisterForm.jsx';
 import '../../assets/styles/pages/RegisterPage.css';
-import EmailConfirmationPage from "../../components/auth/EmailConfirmationPage.jsx";
+import EmailConfirmationForm from "../../components/forms/EmailConfirmationForm.jsx";
 
 const RegisterPage = () => {
   return (
         <RegisterForm />
-      /*<EmailConfirmationPage/>*/
+      /*<EmailConfirmationForm/>*/
   );
 };
 

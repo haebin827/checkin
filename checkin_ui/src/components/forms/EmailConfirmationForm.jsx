@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { FaSpinner, FaCheck, FaEnvelope } from 'react-icons/fa';
 import '../../assets/styles/pages/EmailConfirmationPage.css';
 
-const EmailConfirmationPage = () => {
+const EmailConfirmationForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -245,4 +245,4 @@ const EmailConfirmationPage = () => {
   );
 };
 
-export default EmailConfirmationPage; 
+export default EmailConfirmationForm;

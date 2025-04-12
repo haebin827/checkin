@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../../assets/styles/pages/ForgotIdOrPw.css';
 
-const ForgotIdOrPw = () => {
+const ForgotIdOrPwPage = () => {
     const [searchType, setSearchType] = useState('id');
     const [email, setEmail] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -92,4 +92,4 @@ const ForgotIdOrPw = () => {
     );
 };
 
-export default ForgotIdOrPw;
+export default ForgotIdOrPwPage;

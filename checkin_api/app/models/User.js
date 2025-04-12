@@ -17,33 +17,35 @@ module.exports = (sequelize, Sequelize) => {
             },
             password: {
                 type: Sequelize.STRING,
-                allowNull: false,
+                //allowNull: false,
                 /*validate: {
                     len: [8, 30],
                 },*/
             },
             engName: {
                 type: Sequelize.STRING,
-                allowNull: false,
-                validate: {
+                defaultValue: null,
+                //allowNull: false,
+                /*validate: {
                     notEmpty: true,
                     len: [2, 50],
                     is: /^[a-zA-Z\s]+$/,
-                },
+                },*/
             },
             korName: {
                 type: Sequelize.STRING,
-                validate: {
+                defaultValue: null,
+                /*validate: {
                     len: [2, 20],
                     is: /^[가-힣\s]+$/,
-                },
+                },*/
             },
             phone: {
                 type: Sequelize.STRING,
-                allowNull: false,
+                defaultValue: null,
                 unique: true,
                 validate: {
-                    notEmpty: true,
+                    //notEmpty: true,
                     len: [10, 12],
                     is: /^\d{10,12}$/,
                 },
@@ -55,9 +57,6 @@ module.exports = (sequelize, Sequelize) => {
                 validate: {
                     isEmail: true
                 }
-            },
-            locationId: {
-                type: Sequelize.INTEGER,
             },
             role: {
                 type: Sequelize.ENUM('guardian', 'admin', 'manager'),

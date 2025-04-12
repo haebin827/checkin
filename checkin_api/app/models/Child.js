@@ -40,10 +40,6 @@ module.exports = (sequelize, Sequelize) => {
                     is: /^\d{10,12}$/
                 },
             },
-            enrollCode: {
-                type: Sequelize.STRING,
-                allowNull: false
-            }
             /*hospital_name: {
                 type: Sequelize.STRING,
                 validate: {

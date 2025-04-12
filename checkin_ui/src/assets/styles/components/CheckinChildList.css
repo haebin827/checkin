@@ -68,9 +68,23 @@
   border-bottom: none;
 }
 
+.child-info {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  flex: 1;
+}
+
 .child-name {
   font-size: 16px;
   color: #333;
+  margin-right: 8px;
+}
+
+.expand-icon {
+  color: #999;
+  margin-left: 8px;
+  transition: transform 0.3s ease;
 }
 
 .checkin-button {
@@ -119,6 +133,89 @@
   color: #666;
 }
 
+/* Child Details Styles */
+.child-details {
+  background-color: #f9f9f9;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  border-bottom: 1px solid #eee;
+  animation: slideDown 0.3s ease forwards;
+}
+
+@keyframes slideDown {
+  from {
+    max-height: 0;
+    opacity: 0;
+  }
+  to {
+    max-height: 200px;
+    opacity: 1;
+  }
+}
+
+.child-details-content {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.detail-icon {
+  color: #4a90e2;
+  font-size: 18px;
+  min-width: 20px;
+}
+
+.detail-label {
+  display: block;
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 4px;
+}
+
+.detail-value {
+  display: block;
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+.button-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.print-label-button {
+  background-color: #ff8a00;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.print-label-button:hover {
+  background-color: #e67e00;
+  transform: translateY(-1px);
+}
+
+.print-label-button:active {
+  transform: translateY(0);
+}
+
 @media (max-width: 768px) {
   .checkin-child-list {
     padding: 16px;
@@ -131,7 +228,40 @@
     gap: 10px;
   }
   
+  .child-info {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
   .checkin-button {
     align-self: flex-end;
+  }
+  
+  .child-details-content {
+    padding: 12px;
+  }
+  
+  .detail-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  
+  .detail-icon {
+    margin-bottom: 4px;
+  }
+  
+  .button-group {
+    align-self: flex-end;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+  
+  .print-label-button,
+  .checkin-button {
+    padding: 7px 12px;
+    font-size: 13px;
   }
 } 

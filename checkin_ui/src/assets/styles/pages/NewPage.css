@@ -1,0 +1,201 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --primary-color: #1b5e20;
+  --secondary-color: #2e7d32;
+  --accent-color: #388e3c;
+  --background-color: #f9f9f9;
+  --card-color: #ffffff;
+  --text-primary: #212121;
+  --text-secondary: #757575;
+  --border-color: #e0e0e0;
+  --hover-color: #f1f8e9;
+  --active-color: #c8e6c9;
+  --footer-height: 60px;
+  --footer-height-mobile: 45px;
+  --footer-height-small: 40px;
+}
+
+.new-page {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--background-color);
+  min-height: calc(100vh - var(--footer-height));
+  padding: 2rem 1rem;
+  padding-bottom: 80px;
+  color: var(--text-primary);
+  margin-bottom: var(--footer-height);
+  background-color: var(--background-color);
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%238bc34a' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.new-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding-top: 90px;
+  padding-bottom: var(--footer-height);
+}
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  color: var(--primary-color);
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 0;
+  position: relative;
+  display: inline-block;
+}
+
+.page-header h1::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background-color: var(--accent-color);
+  border-radius: 2px;
+}
+
+/* Form Type Selector Styles */
+.form-type-selector {
+  background-color: var(--card-color);
+  border-radius: 10px;
+  padding: 1.2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.option-tabs {
+  display: flex;
+  width: 100%;
+  max-width: 350px;
+  margin: 0 auto;
+  background-color: #f5f5f5;
+  border-radius: 6px;
+  padding: 3px;
+  position: relative;
+}
+
+.option-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 8px 10px;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: all 0.3s ease;
+}
+
+.option-tab:focus {
+  outline: none;
+}
+
+.option-tab.active {
+  background-color: var(--card-color);
+  color: var(--primary-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.option-icon {
+  font-size: 1rem;
+}
+
+.form-container {
+  margin-bottom: 2rem;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .new-page {
+    min-height: calc(100vh - var(--footer-height-mobile));
+    margin-bottom: var(--footer-height-mobile);
+  }
+
+  .new-container {
+    padding-top: 80px;
+    padding-bottom: var(--footer-height-mobile);
+  }
+  
+  .option-tabs {
+    max-width: 280px;
+  }
+  
+  .option-tab {
+    padding: 8px 6px;
+    font-size: 0.85rem;
+  }
+  
+  .option-icon {
+    font-size: 0.9rem;
+  }
+  
+  .page-header h1 {
+    font-size: 1.75rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .new-page {
+    min-height: calc(100vh - var(--footer-height-small));
+    margin-bottom: var(--footer-height-small);
+    padding: 1rem 0.5rem;
+  }
+  
+  .new-container {
+    padding-top: 70px;
+    padding-bottom: var(--footer-height-small);
+  }
+  
+  .form-type-selector {
+    padding: 0.8rem;
+  }
+  
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .option-tabs {
+    max-width: 240px;
+    padding: 2px;
+  }
+  
+  .option-tab {
+    flex-direction: column;
+    padding: 6px 4px;
+    gap: 2px;
+    font-size: 0.75rem;
+  }
+  
+  .option-icon {
+    font-size: 0.8rem;
+  }
+}
+
+/* 추가: 더 작은 모바일 화면에 대한 스타일 */
+@media (max-width: 375px) {
+  .option-tabs {
+    max-width: 200px;
+  }
+  
+  .option-tab {
+    padding: 5px 3px;
+    font-size: 0.7rem;
+  }
+  
+  .option-icon {
+    font-size: 0.75rem;
+  }
+} 

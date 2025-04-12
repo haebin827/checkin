@@ -8,6 +8,36 @@ const QrScanner = ({ childId, childName, onBack }) => {
   const [scannerInstance, setScannerInstance] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
 
+  const qrCodeSuccessCallback = async (decodedText) => {
+    console.log(`QR Code decoded: ${decodedText}`);
+
+    try {
+      // QR 코드 스캔 결과를 콘솔에 기록 (실제로는 API 호출)
+      console.log(`아이 ID: ${childId}, QR 코드: ${decodedText}`);
+
+      // 실제 구현 시 API 호출
+      // const response = await API.post('/qr/verify', {
+      //   qrCode: decodedText,
+      //   childId: childId
+      // });
+
+      // 성공 메시지
+      console.log("QR 코드 스캔 성공");
+
+      // 스캐너 정지
+      await stopScanner();
+
+      // 뒤로 가기 (체크인 완료 후)
+      setTimeout(() => {
+        onBack();
+      }, 1000);
+
+    } catch (error) {
+      console.error("QR 검증 오류:", error);
+      setErrorMessage("QR 코드 검증 중 오류가 발생했습니다.");
+    }
+  };
+
   // 카메라 스캐너 시작
   const startScanner = async () => {
     try {
@@ -18,36 +48,6 @@ const QrScanner = ({ childId, childName, onBack }) => {
       }
 
       const html5QrCode = new Html5Qrcode("reader");
-      
-      const qrCodeSuccessCallback = async (decodedText) => {
-        console.log(`QR Code decoded: ${decodedText}`);
-        
-        try {
-          // QR 코드 스캔 결과를 콘솔에 기록 (실제로는 API 호출)
-          console.log(`아이 ID: ${childId}, QR 코드: ${decodedText}`);
-          
-          // 실제 구현 시 API 호출
-          // const response = await API.post('/qr/verify', {
-          //   qrCode: decodedText,
-          //   childId: childId
-          // });
-          
-          // 성공 메시지
-          console.log("QR 코드 스캔 성공");
-          
-          // 스캐너 정지
-          await stopScanner();
-          
-          // 뒤로 가기 (체크인 완료 후)
-          setTimeout(() => {
-            onBack();
-          }, 1000);
-          
-        } catch (error) {
-          console.error("QR 검증 오류:", error);
-          setErrorMessage("QR 코드 검증 중 오류가 발생했습니다.");
-        }
-      };
       
       const config = { fps: 10, qrbox: { width: 250, height: 250 } };
       

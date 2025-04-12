@@ -59,7 +59,26 @@ db.user.belongsToMany(db.child, {
     as: "children",
 });
 
-// Child - History (1:optional N)
+// UserChild - Location (M:1)
+db.userChild.belongsTo(db.location, {
+    foreignKey: {
+        name: "location_id",
+        field: "locationId",
+        allowNull: false
+    },
+    as: "location"
+});
+
+db.location.hasMany(db.userChild, {
+    foreignKey: {
+        name: "location_id",
+        field: "locationId",
+        allowNull: false
+    },
+    as: "userChildren"
+});
+
+// Child - HistoryPage (1:optional N)
 db.child.hasMany(db.history, {
     foreignKey: {
         name: "child_id",
@@ -105,7 +124,7 @@ db.location.belongsToMany(db.child, {
     as: "children",
 });
 
-// Location - History (1:optional N)
+// Location - HistoryPage (1:optional N)
 db.location.hasMany(db.history, {
     foreignKey: {
         name: "location_id",
@@ -124,7 +143,7 @@ db.history.belongsTo(db.location, {
     as: "location",
 });
 
-// User - History (1:optional N)
+// User - HistoryPage (1:optional N)
 db.user.hasMany(db.history, {
     foreignKey: {
         name: "checkin_by",

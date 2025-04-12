@@ -1,19 +1,32 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const KakaoStrategy = require('passport-kakao').Strategy;
-const bcrypt = require('bcryptjs');
 const db = require('../models');
 const User = db.user;
 require('dotenv').config();
 
 passport.serializeUser((user, done) => {
-    done(null, user.id);
+    // 임시 사용자인 경우 전체 객체를 세션에 저장
+    if (user.isTemporary) {
+        done(null, { tempUser: user });
+    } else {
+        // 정규 사용자인 경우 ID만 저장
+        done(null, { id: user.id });
+    }
 });
 
-passport.deserializeUser(async (id, done) => {
+passport.deserializeUser(async (serialized, done) => {
+
+    console.log("TEMP USER: ", serialized.tempUser)
     try {
-        const user = await User.findByPk(id, {
-            attributes: ['id', 'username', 'eng_name', 'kor_name', 'email', 'role']
+        // 임시 사용자인 경우 그대로 반환
+        if (serialized.tempUser) {
+            return done(null, serialized.tempUser);
+        }
+
+        // 정규 사용자인 경우 데이터베이스에서 조회
+        const user = await User.findByPk(serialized.id, {
+            attributes: ['id', 'username', 'email', 'role', 'engName', 'korName', 'phone']
         });
 
         if (user) {
@@ -40,11 +53,12 @@ passport.use(
             passReqToCallback: true
         },
         async (request, accessToken, refreshToken, profile, done) => {
+            console.log("STRATEGY")
             try {
                 if (!profile.id || !profile.emails || !profile.emails[0].value || !profile.displayName) {
                     throw new Error('No profile info.');
                 }
-
+                console.log(profile.emails);
                 const email = profile.emails[0].value.toLowerCase();
                 const googleId = profile.id;
                 const displayName = profile.displayName.trim();
@@ -57,7 +71,7 @@ passport.use(
                         where: { googleId: googleId },
                         attributes: ['id', 'username', 'eng_name', 'kor_name', 'email', 'role'],
                         transaction
-                    });
+                    })
 
                     if (user) {
                         await transaction.commit();
@@ -83,6 +97,7 @@ passport.use(
                     let isUnique = false;
                     let counter = 1;
 
+                    console.log("NEW USER")
                     while (!isUnique) {
                         const existingUser = await User.findOne({
                             where: { username: username },
@@ -97,19 +112,24 @@ passport.use(
                         }
                     }
 
-                    const newUser = await User.create({
+                    /*const newUser = await User.create({
                         googleId: googleId,
                         email: email,
                         username: username,
-                        eng_name: displayName,
-                        kor_name: '',
-                        phone: '',
-                        password: await bcrypt.hash(Math.random().toString(36).slice(-8), 10), // 임의 비밀번호 생성
                         role: 'guardian'
-                    }, { transaction });
+                    }, { transaction });*/
+                    const tempUser = {
+                        googleId: googleId,
+                        email: email,
+                        username: username,
+                        role: 'guardian',
+                        isTemporary: true
+                    }
+
+                    console.log("STRATEGY TEMP USER: ", tempUser)
 
                     await transaction.commit();
-                    return done(null, newUser);
+                    return done(null, tempUser);
                 } catch (err) {
                     await transaction.rollback();
                     throw err;
@@ -193,19 +213,18 @@ passport.use(
                         }
                     }
 
-                    const newUser = await User.create({
+                    const tempUser = {
                         kakaoId: kakaoId,
                         email: email,
                         username: username,
-                        eng_name: displayName,
-                        kor_name: '',
-                        phone: '',
-                        password: await bcrypt.hash(Math.random().toString(36).slice(-8), 10), // 임의 비밀번호 생성
-                        role: 'guardian'
-                    }, { transaction });
+                        role: 'guardian',
+                        isTemporary: true
+                    }
+
+                    console.log("STRATEGY TEMP USER: ", tempUser)
 
                     await transaction.commit();
-                    return done(null, newUser);
+                    return done(null, tempUser);
                 } catch (err) {
                     await transaction.rollback();
                     throw err;
