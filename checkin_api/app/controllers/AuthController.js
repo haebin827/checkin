@@ -2,6 +2,7 @@ const AuthService = require('../services/AuthService');
 const EmailService = require('../services/EmailService');
 const {validationResult} = require('express-validator');
 const db = require('../models');
+const {updateUserValidation} = require('../validations/validations');
 
 exports.login = async(req, res) => {
     const {username, password} = req.body;
@@ -96,10 +97,87 @@ exports.sendOTPEmail = async (req, res) => {
             maxAttempts: data.maxAttempts
         });
     } catch (err) {
-        console.error("EmailService/sendWelcomeEmail:", err);
+        console.error("AuthService/sendWelcomeEmail:", err);
         res.status(500).json({ success: false, message: err.message || "Fail to send an email" });
     }
 };
+
+exports.changePassword = async(req, res) => {
+    try {
+        const { userId, currentPassword, newPassword } = req.body;
+
+        if (!userId || !currentPassword || !newPassword) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Datas are required"
+            });
+        }
+
+        await AuthService.changePassword(userId, currentPassword, newPassword);
+        res.status(200).json({
+            success: true,
+            message: "Password changed successfully"
+        });
+    } catch (err) {
+        console.error("AuthController/changePassword:", err);
+        res.status(500).json({ 
+            success: false, 
+            message: "Failed to change password"
+        });
+    }
+};
+
+exports.getUser = async(req, res) => {
+    const {id} = req.query;
+
+    if (!id) {
+        return res.status(400).json({
+            success: false,
+            message: "User ID is required"
+        });
+    }
+
+    try {
+        const user = await AuthService.getUser(id);
+
+        res.status(200).json({
+            success: true,
+            user
+        });
+    } catch(err) {
+        console.error("AuthController/getUser:", err);
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch user data"
+        });
+    }
+};
+
+exports.updateUser = [
+    //updateUserValidation,
+    async(req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                errors: errors.array()
+            });
+        }
+
+        const user = req.body;
+        console.log("edit user: ", user);
+        try {
+            const response = await AuthService.updateUser(user);
+            res.status(200).json({success: true, user: response});
+        } catch(err) {
+            console.error("AuthController/updateUser:", err);
+            res.status(500).json({
+                success: false,
+                message: "Failed to update user data"
+            });
+        }
+    }
+];
 
 // ---------------------------------------------------------
 // Social login
@@ -113,12 +191,13 @@ exports.authentication = async(req, res) => {
             return res.redirect(`${process.env.CORS_ORIGIN_URL}/additional-info`);
         }
 
-        // 정규 사용자 세션 설정
         req.session.user = {
             id: req.user.id,
             username: req.user.username,
             name: req.user.engName,
-            role: req.user.role
+            role: req.user.role,
+            email: req.user.email,
+            phone: req.user.phone
         };
 
         res.redirect(`${process.env.CORS_ORIGIN_URL}/main`);
@@ -136,7 +215,6 @@ exports.loginFailed = async(req, res) => {
 
 exports.completeRegistration = async (req, res) => {
     try {
-        // 세션에서 임시 사용자 정보 가져오기
         const tempUser = req.session.tempUser;
         if (!tempUser || !tempUser.isTemporary) {
             return res.status(400).json({
@@ -145,7 +223,6 @@ exports.completeRegistration = async (req, res) => {
             });
         }
 
-        // 추가 정보 유효성 검사
         const { engName, korName, phone } = req.body;
         if (!engName || !phone) {
             return res.status(400).json({
@@ -154,7 +231,6 @@ exports.completeRegistration = async (req, res) => {
             });
         }
 
-        // 전화번호 형식 검사
         if (!/^\d{10,12}$/.test(phone)) {
             return res.status(400).json({
                 success: false,
@@ -162,10 +238,8 @@ exports.completeRegistration = async (req, res) => {
             });
         }
 
-        // 트랜잭션 시작
         const transaction = await db.sequelize.transaction();
         try {
-            // 사용자 생성
             const userData = {
                 googleId: tempUser.googleId || null,
                 kakaoId: tempUser.kakaoId || null,
@@ -180,13 +254,14 @@ exports.completeRegistration = async (req, res) => {
             const newUser = await db.user.create(userData, { transaction });
             await transaction.commit();
 
-            // 세션 업데이트
             delete req.session.tempUser;
             req.session.user = {
                 id: newUser.id,
                 username: newUser.username,
                 name: newUser.engName,
-                role: newUser.role
+                role: newUser.role,
+                email: newUser.email,
+                phone: newUser.phone
             };
 
             return res.status(201).json({

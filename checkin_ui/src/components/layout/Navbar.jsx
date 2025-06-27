@@ -55,7 +55,12 @@ const Navbar = () => {
         <div className={`navbar-menu ${menuOpen ? 'open' : ''}`}>
           <Link to="/main" className={`menu-item ${isActive('/main') ? 'active' : ''}`}>Dashboard</Link>
           <Link to="/history" className={`menu-item ${isActive('/history') ? 'active' : ''}`}>History</Link>
-          <Link to="/new" className={`menu-item ${isActive('/new') ? 'active' : ''}`}>Registration</Link>
+          {user.role !== 'guardian' &&
+              <Link to="/data" className={`menu-item ${isActive('/data') ? 'active' : ''}`}>Data</Link>
+          }
+          {user.role !== 'guardian' &&
+            <Link to="/new" className={`menu-item ${isActive('/new') ? 'active' : ''}`}>Registration</Link>
+          }
         </div>
 
         <div className="navbar-right">
@@ -65,7 +70,7 @@ const Navbar = () => {
               <div className="avatar">
                 <FaUser />
               </div>
-              <span className="user-name">User</span>
+              <span className="user-name">{user.engName}</span>
               <FaChevronDown className={`dropdown-icon ${profileOpen ? 'open' : ''}`} />
             </div>
 

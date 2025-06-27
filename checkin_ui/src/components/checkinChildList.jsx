@@ -1,8 +1,11 @@
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { FaCheckCircle, FaQrcode, FaChevronDown, FaChevronUp, FaBirthdayCake, FaPhone, FaPrint } from 'react-icons/fa';
 import '../assets/styles/components/CheckinChildList.css';
+import {useAuth} from "../hooks/useAuth.jsx";
 
 const CheckinChildList = forwardRef(({ onSelectChild }, ref) => {
+  const {user} = useAuth();
+
   const [locations, setLocations] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState('');
   const [children, setChildren] = useState([]);
@@ -149,12 +152,14 @@ const CheckinChildList = forwardRef(({ onSelectChild }, ref) => {
                       </span>
                     </div>
                     <div className="button-group">
-                      <button 
-                        className="print-label-button"
-                        onClick={() => handlePrintLabel(child)}
-                      >
-                        <FaPrint /> Print Label
-                      </button>
+                        {user.role !== 'guardian' &&
+                        <button
+                          className="print-label-button"
+                          onClick={() => handlePrintLabel(child)}
+                        >
+                          <FaPrint /> Print Label
+                        </button>
+                      }
                       <button 
                         className={`checkin-button ${child.checkedIn ? 'checked' : ''}`}
                         onClick={() => handleCheckInClick(child)}

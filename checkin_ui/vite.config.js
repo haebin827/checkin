@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
       host: true, //test
       allowedHosts: [
         // ngrok domain
-        'b8ba-172-125-145-52.ngrok-free.app'
+        '8dab-2600-1700-1c00-7310-7cb3-62d-74f8-f828.ngrok-free.app'
       ]
     },
     plugins: [react()],

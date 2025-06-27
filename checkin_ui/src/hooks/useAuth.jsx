@@ -14,6 +14,7 @@ export const AuthProvider = ({ children }) => {
     const checkSession = async () => {
         try {
             const response = await AuthService.getCurrentSession();
+            console.log("USER: ", response.data)
             if (response.data.success) {
                 setUser(response.data.user);
             } else {

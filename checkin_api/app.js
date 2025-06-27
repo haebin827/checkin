@@ -1,7 +1,7 @@
 require('dotenv').config();
 
-var express = require('express');
-var path = require('path');
+const express = require('express');
+const path = require('path');
 const cors = require("cors");
 const logger = require('morgan');
 const helmet = require("helmet");
@@ -10,7 +10,7 @@ const MySQLStore = require("express-mysql-session")(session);
 const passport = require("passport");
 const errorHandler = require("./app/middlewares/errorHandler");
 
-var app = express();
+const app = express();
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -69,13 +69,7 @@ db.sequelize.sync({ force: true }).then(() => {
 });
 */
 
-require('./app/routes/AuthRoute')(app);
-require('./app/routes/GoogleAuthRoute')(app);
-require('./app/routes/KakaoAuthRoute')(app);
-
-app.get("/", (req, res) => {
-    res.json({ message: "Welcome to Check In system." });
-});
+require('./app/routes')(app);
 
 app.use(errorHandler);
 

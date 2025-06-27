@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { FaKey, FaEye, FaEyeSlash, FaTimes } from 'react-icons/fa';
+import { FaKey, FaEye, FaEyeSlash, FaTimes, FaQuestionCircle } from 'react-icons/fa';
+import { toast } from 'react-toastify';
+import './ChangePasswordModal.css';
 
-const ChangePasswordModal = ({ isOpen, onClose, onSubmit }) => {
+const ChangePasswordModal = ({ isOpen, onClose, onSubmit, user }) => {
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
     newPassword: '',
@@ -12,14 +14,13 @@ const ChangePasswordModal = ({ isOpen, onClose, onSubmit }) => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Handle password form input change
-  const handlePasswordInputChange = (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setPasswordForm(prev => ({
       ...prev,
       [name]: value
     }));
-    
+
     // Clear errors when typing
     if (passwordErrors[name]) {
       setPasswordErrors(prev => ({
@@ -28,8 +29,7 @@ const ChangePasswordModal = ({ isOpen, onClose, onSubmit }) => {
       }));
     }
   };
-  
-  // Toggle password visibility
+
   const togglePasswordVisibility = (field) => {
     if (field === 'current') {
       setShowCurrentPassword(!showCurrentPassword);
@@ -37,8 +37,7 @@ const ChangePasswordModal = ({ isOpen, onClose, onSubmit }) => {
       setShowNewPassword(!showNewPassword);
     }
   };
-  
-  // Validate password form
+
   const validatePasswordForm = () => {
     const errors = {};
     
@@ -50,9 +49,19 @@ const ChangePasswordModal = ({ isOpen, onClose, onSubmit }) => {
       errors.newPassword = 'New password is required';
     } else if (passwordForm.newPassword.length < 8) {
       errors.newPassword = 'Password must be at least 8 characters';
+    } else if (!/[A-Z]/.test(passwordForm.newPassword)) {
+      errors.newPassword = 'Password must contain at least one uppercase letter';
+    } else if (!/[a-z]/.test(passwordForm.newPassword)) {
+      errors.newPassword = 'Password must contain at least one lowercase letter';
+    } else if (!/[0-9]/.test(passwordForm.newPassword)) {
+      errors.newPassword = 'Password must contain at least one number';
+    } else if (!/[!@#$%^&*]/.test(passwordForm.newPassword)) {
+      errors.newPassword = 'Password must contain at least one special character (!@#$%^&*)';
     }
     
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+    if (!passwordForm.confirmPassword) {
+      errors.confirmPassword = 'Please confirm your new password';
+    } else if (passwordForm.newPassword !== passwordForm.confirmPassword) {
       errors.confirmPassword = 'Passwords do not match';
     }
     
@@ -60,7 +69,6 @@ const ChangePasswordModal = ({ isOpen, onClose, onSubmit }) => {
     return Object.keys(errors).length === 0;
   };
   
-  // Submit password change
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -68,13 +76,29 @@ const ChangePasswordModal = ({ isOpen, onClose, onSubmit }) => {
       setIsSubmitting(true);
       try {
         await onSubmit(passwordForm);
-        onClose();
+        setPasswordForm({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: ''
+        });
       } catch (error) {
         console.error('Password change failed:', error);
+        const errorMessage = error.response?.data?.message || 'Failed to change password';
+        toast.error(errorMessage);
       } finally {
         setIsSubmitting(false);
       }
     }
+  };
+
+  const handleClose = () => {
+    setPasswordForm({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    });
+    setPasswordErrors({});
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -83,8 +107,8 @@ const ChangePasswordModal = ({ isOpen, onClose, onSubmit }) => {
     <div className="modal-overlay">
       <div className="invite-modal">
         <div className="modal-header">
-          <h2><FaKey /> Change Password</h2>
-          <button className="close-button" onClick={onClose}>
+          <h2>Change Password</h2>
+          <button className="close-button" onClick={handleClose}>
             <FaTimes />
           </button>
         </div>
@@ -98,8 +122,9 @@ const ChangePasswordModal = ({ isOpen, onClose, onSubmit }) => {
                 id="currentPassword"
                 name="currentPassword"
                 value={passwordForm.currentPassword}
-                onChange={handlePasswordInputChange}
+                onChange={handleChange}
                 className={passwordErrors.currentPassword ? 'error' : ''}
+                autoComplete="current-password"
               />
               <button 
                 type="button" 
@@ -115,15 +140,31 @@ const ChangePasswordModal = ({ isOpen, onClose, onSubmit }) => {
           </div>
           
           <div className="form-group">
-            <label htmlFor="newPassword">New Password</label>
+            <div className="label-with-tooltip">
+              <label htmlFor="newPassword">New Password</label>
+              <div className="tooltip-container">
+                <FaQuestionCircle className="tooltip-icon" />
+                <div className="tooltip-content">
+                  <p>Password must:</p>
+                  <ul>
+                    <li>Be at least 8 characters long</li>
+                    <li>Contain at least one uppercase letter</li>
+                    <li>Contain at least one lowercase letter</li>
+                    <li>Contain at least one number</li>
+                    <li>Contain at least one special character (!@#$%^&*)</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
             <div className="password-input-wrapper">
               <input
                 type={showNewPassword ? "text" : "password"}
                 id="newPassword"
                 name="newPassword"
                 value={passwordForm.newPassword}
-                onChange={handlePasswordInputChange}
+                onChange={handleChange}
                 className={passwordErrors.newPassword ? 'error' : ''}
+                autoComplete="new-password"
               />
               <button 
                 type="button" 
@@ -145,8 +186,9 @@ const ChangePasswordModal = ({ isOpen, onClose, onSubmit }) => {
               id="confirmPassword"
               name="confirmPassword"
               value={passwordForm.confirmPassword}
-              onChange={handlePasswordInputChange}
+              onChange={handleChange}
               className={passwordErrors.confirmPassword ? 'error' : ''}
+              autoComplete="new-password"
             />
             {passwordErrors.confirmPassword && (
               <div className="error-message">{passwordErrors.confirmPassword}</div>

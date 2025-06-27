@@ -1,51 +1,63 @@
-import React, { useState, useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
-import { FaUser, FaKey, FaEdit, FaEnvelope, FaPhone, FaIdCard } from 'react-icons/fa';
+import { FaUser } from 'react-icons/fa';
 import ChangePasswordModal from '../components/modals/ChangePasswordModal';
 import EditProfileModal from '../components/modals/EditProfileModal';
 import '../assets/styles/pages/MyInfo.css';
+import {useAuth} from "../hooks/useAuth.jsx";
+import AuthService from '../services/AuthService';
+import { toast } from 'react-toastify';
 
 const ProfilePage = () => {
+  const {user} = useAuth();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState(null);
-  
-  // 모달 상태
+
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  
-  // Fetch user data (mock data for now)
+  const [currUser, setCurrUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
-    setIsLoading(true);
-    
-    // In a real application, this would be an API call
-    setTimeout(() => {
-      setUser({
-        name: 'John Doe',
-        englishName: 'John Doe',
-        koreanName: '홍길동',
-        email: 'john.doe@example.com',
-        phone: '010-1234-5678',
-        id: 'john_doe',
-        created_at: '2023-01-15'
-      });
-      setIsLoading(false);
-    }, 800);
-  }, []);
-  
-  // Handle password change modal
+    const fetchUser = async() => {
+      if (!user?.id) return;
+      
+      try {
+        setIsLoading(true);
+        const response = await AuthService.getUser(user.id);
+        
+        if (!response.data.success) {
+          toast.error('Failed to load user data');
+          return;
+        }
+        
+        setCurrUser(response.data.user);
+      } catch (error) {
+        console.error('Failed to fetch user data:', error);
+        const errorMessage = error.response?.data?.message || 'Failed to load user information';
+        toast.error(errorMessage);
+
+        if (error.response?.status === 401) {
+          navigate('/login');
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, [user?.id, navigate]);
+
+  console.log("CURR", currUser)
   const handleChangePassword = () => {
     setIsPasswordModalOpen(true);
   };
   
-  // Handle profile edit modal
   const handleEditProfile = () => {
     setIsProfileModalOpen(true);
   };
   
-  // Close modals
   const closePasswordModal = () => {
     setIsPasswordModalOpen(false);
   };
@@ -54,45 +66,46 @@ const ProfilePage = () => {
     setIsProfileModalOpen(false);
   };
   
-  // Handle password change submission
   const handlePasswordSubmit = async (passwordData) => {
     try {
-      // In a real application, this would be an API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      alert('Password updated successfully!');
-      return true;
+      await AuthService.changePassword({
+        userId: user.id,
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword
+      });
+      
+      toast.success('Password updated successfully!');
+      closePasswordModal();
     } catch (error) {
       console.error('Password update failed:', error);
+      toast.error(error.response?.data?.message || 'Failed to update password');
       throw error;
     }
   };
   
-  // Handle profile update submission
   const handleProfileSubmit = async (profileData) => {
     try {
-      // In a real application, this would be an API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setUser(prev => ({
-        ...prev,
+      const response = await AuthService.updateUser({
         ...profileData,
-        name: profileData.englishName // Update display name
-      }));
-      alert('Profile updated successfully!');
-      return true;
+        id: user.id
+      });
+      
+      if (response.data.success) {
+        toast.success('Profile updated successfully!');
+        const updatedUserResponse = await AuthService.getUser(user.id);
+        if (updatedUserResponse.data.success) {
+          setCurrUser(updatedUserResponse.data.user);
+        }
+        return true;
+      } else {
+        toast.error(response.data.message || 'Failed to update profile');
+        return false;
+      }
     } catch (error) {
       console.error('Profile update failed:', error);
-      throw error;
+      toast.error(error.response?.data?.message || 'Failed to update profile');
+      return false;
     }
-  };
-  
-  // Format date
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
   };
 
   return (
@@ -105,19 +118,16 @@ const ProfilePage = () => {
             
             <div className="admin-actions">
               <button className="admin-button" onClick={handleChangePassword}>
-                <FaKey /> Change Password
+                Change Password
               </button>
               <button className="admin-button invite-button" onClick={handleEditProfile}>
-                <FaEdit /> Edit Profile
+                Edit Profile
               </button>
             </div>
           </div>
-          
+
           {isLoading ? (
-            <div className="loading-container">
-              <div className="loading-spinner"></div>
-              <p>Loading profile information...</p>
-            </div>
+            <div className="loading-spinner">Loading...</div>
           ) : (
             <div className="profile-card">
               <div className="profile-header">
@@ -125,39 +135,34 @@ const ProfilePage = () => {
                   <FaUser />
                 </div>
                 <div className="profile-title">
-                  <h2>{user.name}</h2>
-                  <p>Member since {formatDate(user.created_at)}</p>
+                  <h2>{currUser?.engName || user?.engName}</h2>
+                  {(currUser?.role === 'manager' || user?.role === 'manager') && (
+                    <p className="manager-location">
+                      {currUser?.location?.name || user?.location?.name || 'Location not assigned'}
+                    </p>
+                  )}
                 </div>
               </div>
               
               <div className="profile-details">
                 <div className="detail-item">
-                  <div className="detail-icon">
-                    <FaIdCard />
-                  </div>
                   <div className="detail-content">
                     <label>User ID</label>
-                    <p>{user.id}</p>
+                    <p>{currUser?.username || user?.username}</p>
                   </div>
                 </div>
                 
                 <div className="detail-item">
-                  <div className="detail-icon">
-                    <FaEnvelope />
-                  </div>
                   <div className="detail-content">
                     <label>Email</label>
-                    <p>{user.email}</p>
+                    <p>{currUser?.email || user?.email}</p>
                   </div>
                 </div>
                 
                 <div className="detail-item">
-                  <div className="detail-icon">
-                    <FaPhone />
-                  </div>
                   <div className="detail-content">
                     <label>Phone</label>
-                    <p>{user.phone}</p>
+                    <p>{currUser?.phone || user?.phone}</p>
                   </div>
                 </div>
               </div>
@@ -171,18 +176,14 @@ const ProfilePage = () => {
         isOpen={isPasswordModalOpen}
         onClose={closePasswordModal}
         onSubmit={handlePasswordSubmit}
+        user={currUser || user}
       />
       
       <EditProfileModal
         isOpen={isProfileModalOpen}
         onClose={closeProfileModal}
         onSubmit={handleProfileSubmit}
-        initialData={{
-          englishName: user?.englishName,
-          koreanName: user?.koreanName,
-          id: user?.id,
-          phone: user?.phone
-        }}
+        initialData={currUser || user}
       />
     </>
   );

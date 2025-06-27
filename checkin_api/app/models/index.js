@@ -11,7 +11,6 @@ db.userChild = require("./UserChild")(sequelize, Sequelize);
 db.child = require("./Child")(sequelize, Sequelize);
 db.history = require("./History")(sequelize, Sequelize);
 db.location = require("./Location")(sequelize, Sequelize);
-db.childLocation = require("./ChildLocation")(sequelize, Sequelize);
 
 // User - Location (optional 1:optional many)
 db.user.belongsTo(db.location, {
@@ -97,33 +96,6 @@ db.history.belongsTo(db.child, {
     as: "child",
 });
 
-// Child - Location (M:N)
-db.child.belongsToMany(db.location, {
-    through: db.childLocation,
-    foreignKey: {
-        name: "child_id",
-        field: "childId"
-    },
-    otherKey: {
-        name: "location_id",
-        field: "locationId"
-    },
-    as: "locations",
-});
-
-db.location.belongsToMany(db.child, {
-    through: db.childLocation,
-    foreignKey: {
-        name: "location_id",
-        field: "locationId"
-    },
-    otherKey: {
-        name: "child_id",
-        field: "childId"
-    },
-    as: "children",
-});
-
 // Location - HistoryPage (1:optional N)
 db.location.hasMany(db.history, {
     foreignKey: {
@@ -176,6 +148,25 @@ db.history.belongsTo(db.user, {
         allowNull: true
     },
     as: "checkoutUser",
+});
+
+// Child - Location (1:N)
+db.child.belongsTo(db.location, {
+    foreignKey: {
+        name: "location_id",
+        field: "locationId",
+        allowNull: false
+    },
+    as: "location"
+});
+
+db.location.hasMany(db.child, {
+    foreignKey: {
+        name: "location_id",
+        field: "locationId",
+        allowNull: false
+    },
+    as: "children"
 });
 
 module.exports = db;

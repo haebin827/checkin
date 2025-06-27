@@ -9,7 +9,12 @@ const AuthService = {
     async login(username, password, req) {
         try {
             const user = await User.findOne({
-                where: { username: username }
+                where: { username: username },
+                include: [{
+                    model: db.location,
+                    as: 'location',
+                    attributes: ['id', 'name']
+                }]
             });
 
             if(!user) {
@@ -38,8 +43,11 @@ const AuthService = {
                 username: user.username,
                 engName: user.engName,
                 korName: user.korName,
-                role: user.role
+                role: user.role,
+                locationId: user.location_id
             };
+
+            console.log("LOGIN USER: ", req.session.user)
 
             if (req.rateLimit) {
                 req.rateLimit.current = 0;
@@ -91,7 +99,10 @@ const AuthService = {
                 engName: user.engName,
                 korName: user.korName,
                 role: session.user.role,
-                provider: authProvider
+                email: session.user.email,
+                phone: session.user.phone,
+                provider: authProvider,
+                locationId: user.location_id
             };
 
         } catch(err) {
@@ -101,6 +112,7 @@ const AuthService = {
     },
 
     async register(data) {
+
         const transaction = await db.sequelize.transaction();
 
         try {
@@ -117,7 +129,6 @@ const AuthService = {
             }, { transaction });
 
             await transaction.commit();
-
             return {
                 id: newUser.id,
                 engName: newUser.engName,
@@ -155,6 +166,19 @@ const AuthService = {
             return user ? user : null;
         } catch (err) {
             console.error('Email check error:', err);
+            throw err;
+        }
+    },
+
+    async findUserByPhone(phone) {
+        try {
+            const user = await User.findOne({
+                where: { phone: phone }
+            });
+
+            return user ? user : null;
+        } catch (err) {
+            console.error('Phone check error:', err);
             throw err;
         }
     },
@@ -219,6 +243,97 @@ const AuthService = {
             throw err;
         }
     },
+
+    async changePassword(userId, currentPassword, newPassword) {
+        const transaction = await db.sequelize.transaction();
+
+        try {
+            const user = await User.findByPk(userId, {
+                attributes: ['password']
+            });
+
+            if (!user) {
+                throw new Error("User not found");
+            }
+
+            const isMatch = await bcrypt.compare(currentPassword, user.password);
+            if (!isMatch) {
+                throw new Error("Current password is incorrect");
+            }
+
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
+            await User.update(
+                { password: hashedPassword },
+                { 
+                    where: { id: userId },
+                    transaction 
+                }
+            );
+
+            await transaction.commit();
+            return { success: true };
+        } catch (error) {
+            await transaction.rollback();
+            console.error('Password change error:', error);
+            throw error;
+        }
+    },
+
+    async getUser(id) {
+        try {
+            const user = await User.findByPk(id, {
+                include: [{
+                    model: db.location,
+                    as: 'location',
+                    attributes: ['id', 'name']
+                }]
+            });
+
+            if (!user) {
+                throw new Error('User not found.');
+            }
+
+            return user;
+        } catch (err) {
+            console.error('Get user error:', err);
+            throw new Error('Failed to fetch user data');
+        }
+    },
+
+    async updateUser(data) {
+        const transaction = await db.sequelize.transaction();
+
+        try {
+            const user = await User.findByPk(data.id, { transaction });
+
+            if (!user) {
+                await transaction.rollback();
+                throw new Error('User not found');
+            }
+
+            const updateData = {
+                engName: data.engName,
+                korName: data.korName,
+                username: data.username,
+                phone: data.phone,
+            };
+
+            await User.update(
+                updateData,
+                {
+                    where: { id: data.id },
+                    transaction
+                }
+            );
+
+            await transaction.commit();
+            return updateData;
+        } catch (error) {
+            if (transaction) await transaction.rollback();
+            console.error('Update user error:', error);
+            throw error;
+        }
+    }
 }
 
 module.exports = AuthService;

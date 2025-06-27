@@ -8,7 +8,7 @@ const instance = axios.create({
     withCredentials: true
 });
 
-instance.interceptors.response.use(
+/*instance.interceptors.response.use(
     (res) => res,
     (err) => {
         if (err.response) {
@@ -28,6 +28,6 @@ instance.interceptors.response.use(
         }
         return Promise.reject(err);
     }
-);
+);*/
 
 export default instance;

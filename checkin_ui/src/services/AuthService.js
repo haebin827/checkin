@@ -21,7 +21,6 @@ const validateRegistration = (data) => {
 }
 
 const sendOTPEmail = (email) => {
-    console.log("Email: ", email)
     return http.post(`/auth/opt-email`, {email: email});
 }
 
@@ -45,8 +44,29 @@ const resetPassword = (data) => {
     return http.post(`/auth/reset-password`, data)
 };
 
+const changePassword = (data) => {
+    return http.post(`/auth/change-pw`, data);
+};
+
 const updateAdditionalInfo = (data) => {
     return http.post(`/auth/update-info`, data)
+}
+
+const getUser = async (id) => {
+    if (!id) {
+        throw new Error('User ID is required');
+    }
+    
+    try {
+        return await http.get(`/auth/user?id=${id}`);
+    } catch (error) {
+        console.error('Failed to fetch user:', error);
+        throw error;
+    }
+}
+
+const updateUser = (data) => {
+    return http.post(`/auth/update`, data)
 }
 
 const AuthService = {
@@ -61,7 +81,10 @@ const AuthService = {
     findAccount,
     verifyUsername,
     resetPassword,
-    updateAdditionalInfo
+    changePassword,
+    updateAdditionalInfo,
+    getUser,
+    updateUser
 }
 
 export default AuthService;
