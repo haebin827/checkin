@@ -6,16 +6,61 @@ import QrScanner from '../components/QrScanner';
 import InviteModal from '../components/modals/InviteModal';
 import { FaEnvelope, FaQrcode } from 'react-icons/fa';
 import '../assets/styles/pages/MainPage.css';
+import {useAuth} from "../hooks/useAuth.jsx";
+import LocationService from "../services/LocationService.js";
+import Modal from "../components/common/Modal.jsx";
+import { toast } from 'react-hot-toast';
 
 const MainPage = () => {
+
+  const {user} = useAuth();
+
   const [selectedChild, setSelectedChild] = useState(null);
   const childListRef = useRef(null);
-  
-  // Modal state
+
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-  
-  // Mock user role (in a real app, this would come from authentication context)
-  const [userRole, setUserRole] = useState('admin'); // Change to 'user' to test non-admin view
+  const [loadingQr, setLoadingQr] = useState(false);
+  const [showQrModal, setShowQrModal] = useState(false);
+  const [eventUrl, setEventUrl] = useState('');
+  const [currentQrCode, setCurrentQrCode] = useState('');
+
+  const handleQrClick = async (e) => {
+    e.stopPropagation();
+    setLoadingQr(true);
+    setShowQrModal(true);
+    setEventUrl('');
+    setCurrentQrCode('');
+
+    try {
+      const response = await LocationService.getQr(user.locationId);
+      if (response.data && response.data.success) {
+        setCurrentQrCode(response.data.qrCode);
+        if (response.data.url) {
+          setEventUrl(response.data.url);
+        }
+      } else {
+        console.error('QR code generation failed:', response.data.message);
+        toast.error('Failed to generate QR code');
+      }
+    } catch (err) {
+      console.error('QR code generation failed:', err);
+      toast.error('Failed to generate QR code. Please try again.');
+    } finally {
+      setLoadingQr(false);
+    }
+  };
+
+  const handleDownload = () => {
+    if (!currentQrCode) return;
+
+    const link = document.createElement('a');
+    link.href = currentQrCode;
+    link.download = `qr-code.png`;
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // 아이 선택 핸들러
   const handleChildSelect = (child) => {
@@ -48,12 +93,6 @@ const MainPage = () => {
     setIsInviteModalOpen(true);
   };
 
-  // Admin handler - QR code generation
-  const handleQrGenerate = () => {
-    console.log('QR generation clicked');
-    // Implement QR code generation
-  };
-  
   // Invite form submit handler
   const handleSendInviteSubmit = (data) => {
     console.log('Sending invite email:', data);
@@ -92,7 +131,7 @@ const MainPage = () => {
             <div className="page-header">
               <h1>Welcome to Check-In service.</h1>
               
-              {userRole === 'admin' && (
+              {user.role !== 'guardian' && (
                 <div className="admin-actions">
                   <button 
                     className="admin-button invite-button"
@@ -100,12 +139,14 @@ const MainPage = () => {
                   >
                     <FaEnvelope /> Send invite email
                   </button>
-                  <button 
-                    className="admin-button qr-button"
-                    onClick={handleQrGenerate}
-                  >
-                    <FaQrcode /> QR
-                  </button>
+                  {user.role !== 'admin' &&
+                    <button
+                      className="admin-button qr-button"
+                      onClick={(e) => handleQrClick(e)}
+                    >
+                      <FaQrcode /> QR
+                    </button>
+                  }
                 </div>
               )}
             </div>
@@ -121,6 +162,53 @@ const MainPage = () => {
         onClose={() => setIsInviteModalOpen(false)}
         onSend={handleSendInviteSubmit}
       />
+
+      <Modal
+          isOpen={showQrModal}
+          onClose={() => setShowQrModal(false)}
+          title="QR CODE"
+      >
+        <div className="qr-modal-content">
+          {loadingQr ? (
+              <div className="qr-loading">
+                <div className="loading-spinner"></div>
+                <p>Generating QR code...</p>
+              </div>
+          ) : (
+              currentQrCode ? (
+                  <div className="qr-image-container">
+                    <img
+                        src={currentQrCode}
+                        alt="QR code"
+                        className="qr-image"
+                    />
+                    <p className="qr-description">Scan this QR code to check in</p>
+                  </div>
+              ) : (
+                  <div className="qr-error">
+                    <p>Unable to generate QR code.</p>
+                    <p>Please try again later.</p>
+                  </div>
+              )
+          )}
+          <div className="qr-modal-actions">
+            {currentQrCode && !loadingQr && (
+                <button
+                    className="qr-download-button"
+                    onClick={handleDownload}
+                >
+                    Download QR Code
+                </button>
+            )}
+            <button
+                className="qr-close-button"
+                onClick={() => setShowQrModal(false)}
+            >
+                Close
+            </button>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 };

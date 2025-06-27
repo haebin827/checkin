@@ -27,5 +27,11 @@ module.exports = (app) => {
 
     router.post('/logout', auth.logout);
 
+    router.post('/change-pw', auth.changePassword);
+
+    router.get('/user', auth.getUser);
+
+    router.post('/update', auth.updateUser);
+
     app.use('/api/auth', router)
 }

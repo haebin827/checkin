@@ -6,23 +6,14 @@ const jwt = require('jsonwebtoken');
 const transporter = nodemailer.createTransport(emailConfig);
 
 function generateCode() {
-
-    //return crypto.randomBytes(3).toString('hex');
-
-    // ------------------------------------------------------------------
-    // crypto.randomInt(): 내부적으로 OS의 암호학적 난수 생성기를 사용
-    // ------------------------------------------------------------------
-    // 운영체제의 보안 엔트로피 소스를 기반으로 한 암호학적으로 안전한 난수 생성기(CSPRNG) 를 사용
-    //  => 시드 노출 없이 시스템이 가진 물리적 난수 소스(마우스 움직임, 키보드 입력, 네트워크 노이즈 등) 를 기반으로 한 예측 불가능하고 공격에 강한 난수값을 생성
-    // ------------------------------------------------------------------
     return crypto.randomInt(100000, 1000000).toString();
 }
 
-function generateToken(data) {
+function generateToken(data, expiresIn = '5m') {
     return jwt.sign(
         data,
         process.env.JWT_SECRET,
-        { expiresIn: '5m' }
+        { expiresIn }
     );
 }
 
@@ -65,7 +56,7 @@ async function sendEmail(email) {
 }
 
 async function sendFindIdEmail(email) {
-    const token = generateToken({ email, type: 'findId' });
+    const token = generateToken({ email, type: 'findId' }, '5m');
     const link = `http://localhost:5051/verify-email?token=${token}`;
     //const verificationLink = `http://10.9.5.157:5051/verify-email?token=${token}`;
     try {
@@ -88,7 +79,7 @@ async function sendFindIdEmail(email) {
 }
 
 async function sendPasswordResetEmail(email) {
-    const token = generateToken({ email, type: 'resetPassword' });
+    const token = generateToken({ email, type: 'resetPassword' }, '5m');
     const link = `http://localhost:5051/reset-password?token=${token}`;
     //const resetLink = `http://10.9.5.157:5051/reset-password?token=${token}`;
     try {
@@ -110,9 +101,32 @@ async function sendPasswordResetEmail(email) {
     }
 }
 
+async function sendInviteEmail(email, childName) {
+    try {
+        await transporter.sendMail({
+            from: emailConfig.auth.user,
+            to: email,
+            subject: '[BSS] Invitation to Register Your Child',
+            html: `
+              <h2>Your Child Has Been Successfully Registered</h2>
+              <p>The account for your child <strong>${childName}</strong> has been successfully registered in the BSS system.</p>
+              <p>You can now log in to manage your child's information and view updates.</p>
+              
+              <p>If you have any questions or concerns, please contact our support team.</p>
+              <p>Thank you,<br/>BSS Team</p>
+            `
+        });
+        return true;
+    } catch (err) {
+        console.error('Email sending failed:', err);
+        throw new Error('Failed to send email');
+    }
+}
+
 module.exports = {
     sendEmail,
     sendFindIdEmail,
     sendPasswordResetEmail,
-    verifyToken
+    sendInviteEmail,
+    verifyToken,
 };

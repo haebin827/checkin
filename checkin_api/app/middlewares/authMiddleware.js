@@ -24,7 +24,6 @@ exports.checkRole = (requiredRole) => {
                 message: "Access denied."
             });
         }
-
         next();
     };
 };

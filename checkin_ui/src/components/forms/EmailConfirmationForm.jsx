@@ -1,15 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { FaSpinner, FaCheck, FaEnvelope } from 'react-icons/fa';
 import '../../assets/styles/pages/EmailConfirmationPage.css';
+import AuthService from "../../services/AuthService.js";
 
-const EmailConfirmationForm = () => {
+const EmailConfirmationForm = ({user}) => {
   const navigate = useNavigate();
-  const location = useLocation();
-  
-  // Get email from location state or use a default email if none is provided
-  const email = location.state?.email || 'user@example.com';
-  
+
   // State for OTP digits
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [isVerifying, setIsVerifying] = useState(false);
@@ -17,12 +14,24 @@ const EmailConfirmationForm = () => {
   const [verificationSuccess, setVerificationSuccess] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [resendCountdown, setResendCountdown] = useState(0);
+  const [code, setCode] = useState('');
   
   // References for input fields
   const inputRefs = useRef([]);
   
   // Focus first input when component mounts
   useEffect(() => {
+    const fetchOTP = async () => {
+      try {
+        const response = await AuthService.sendOTPEmail(user.email);
+        setCode(response.data.code);
+        console.log(response);
+      } catch (err) {
+        console.error("Failed to send OTP email", err);
+      }
+    };
+
+    fetchOTP();
     if (inputRefs.current[0]) {
       inputRefs.current[0].focus();
     }
@@ -108,14 +117,13 @@ const EmailConfirmationForm = () => {
     setVerificationError('');
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // For demonstration purposes, we'll consider 123456 as the correct OTP
+      await new Promise(resolve => setTimeout(resolve, 500));
+
       const enteredOtp = otp.join('');
-      if (enteredOtp === '123456') {
+      if (enteredOtp === code) {
         setVerificationSuccess(true);
-        
+
+        await AuthService.register(user);
         // Navigate to login page after a delay to show success state
         setTimeout(() => {
           navigate('/');
@@ -125,6 +133,7 @@ const EmailConfirmationForm = () => {
       }
     } catch (error) {
       setVerificationError('Verification failed. Please try again later.');
+      setOpt(['', '', '', '', '', '']);
     } finally {
       setIsVerifying(false);
     }
@@ -138,8 +147,8 @@ const EmailConfirmationForm = () => {
     setVerificationError('');
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await AuthService.sendOTPEmail(user.email);
+      setCode(response.data.code);
       
       // Reset OTP fields
       setOtp(['', '', '', '', '', '']);
@@ -162,12 +171,12 @@ const EmailConfirmationForm = () => {
         <div className="confirmation-header">
           <h1>Email Verification</h1>
           <p>We've sent a verification code to your email</p>
-          <div className="email-display">{email}</div>
+          <div className="email-display">{user.email}</div>
         </div>
-        
+
         <div className="confirmation-body">
           <p>Enter the 6-digit verification code below to verify your email address.</p>
-          
+
           <div className="otp-container">
             {otp.map((digit, index) => (
               <input
@@ -183,23 +192,23 @@ const EmailConfirmationForm = () => {
               />
             ))}
           </div>
-          
+
           {verificationError && (
             <div className="error-message">
               {verificationError}
             </div>
           )}
-          
+
           {verificationSuccess && (
             <div className="success-message">
               <FaCheck />
               Email verified successfully!
             </div>
           )}
-          
+
           <div className="button-container">
-            <button 
-              className="resend-button" 
+            <button
+              className="resend-button"
               onClick={handleResendCode}
               disabled={resendCountdown > 0 || isResending || verificationSuccess}
             >
@@ -214,9 +223,9 @@ const EmailConfirmationForm = () => {
                 'Resend Code'
               )}
             </button>
-            
-            <button 
-              className="verify-button" 
+
+            <button
+              className="verify-button"
               onClick={handleVerify}
               disabled={otp.some(digit => digit === '') || isVerifying || verificationSuccess}
             >
@@ -235,7 +244,7 @@ const EmailConfirmationForm = () => {
               )}
             </button>
           </div>
-          
+
           <div className="helper-text">
             Didn't receive the code? Check your spam folder or request a new code.
           </div>

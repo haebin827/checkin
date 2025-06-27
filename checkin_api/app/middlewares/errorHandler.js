@@ -1,9 +1,9 @@
 module.exports = (err, req, res, next) => {
 
     if (process.env.NODE_ENV === 'development') {
-        console.error("🚨 에러 발생:", err.stack);
+        console.error("🚨 Error:", err.stack);
     } else {
-        console.error("🚨 에러 발생:", err.message);
+        console.error("🚨 Error:", err.message);
     }
 
     const statusCode = err.statusCode || 500;

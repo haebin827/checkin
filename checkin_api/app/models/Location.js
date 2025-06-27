@@ -19,8 +19,22 @@ module.exports = (sequelize, Sequelize) => {
             address: {
                 type: Sequelize.STRING,
             },
-            qrSecret: {
-                type: Sequelize.STRING
+            phone: {
+                type: Sequelize.STRING,
+                defaultValue: null,
+                validate: {
+                    //notEmpty: true,
+                    len: [10, 12],
+                    is: /^\d{10,12}$/,
+                },
+            },
+            uuid: {
+                type: Sequelize.STRING,
+            },
+            status: {
+                type: Sequelize.ENUM('0', '1'),
+                defaultValue: '1',
+                comment: '1: active, 0: deleted'
             }
         },
         {

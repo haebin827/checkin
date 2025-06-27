@@ -6,14 +6,14 @@ module.exports = (sequelize, Sequelize) => {
                 primaryKey: true,
                 autoIncrement: true,
             },
-            userId: {
+            /*userId: {
                 type: Sequelize.INTEGER,
                 allowNull: false
             },
             childId: {
                 type: Sequelize.INTEGER,
                 allowNull: false
-            },
+            },*/
             relationship: {
                 type: Sequelize.STRING,
                 allowNull: false,
@@ -22,10 +22,10 @@ module.exports = (sequelize, Sequelize) => {
                     len: [1, 20],
                 },
             },
-            locationId: {
+            /*locationId: {
                 type: Sequelize.INTEGER,
                 allowNull: true
-            },
+            },*/
         },
         {
             timestamps: true,

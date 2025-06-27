@@ -14,6 +14,9 @@ import Error403 from "./pages/errors/403.jsx";
 import React from "react";
 import {AuthProvider} from "./hooks/useAuth.jsx";
 import AdditionalInfoPage from './pages/auth/AdditionalInfoPage';
+import PrivateRoute from "./routes/PrivateRoute.jsx";
+import DataPage from "./pages/DataPage.jsx";
+import {ToastContainer} from "react-toastify";
 
 function App() {
 
@@ -27,20 +30,50 @@ function App() {
                     <Route path={'/register'} element={<RegisterPage/>} />
                     <Route path={'/additional-info'} element={<AdditionalInfoPage/>} />
 
-                    <Route path={'/main'} element={<MainPage/>} />
-                    <Route path={'/history'} element={<HistoryPage/>} />
-                    <Route path={'/new'} element={<NewPage/>} />
-                    <Route path={'/profile'} element={<ProfilePage/>} />
+                    <Route path={'/main'} element=
+                        {
+                            <PrivateRoute>
+                                <MainPage/>
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route path={'/history'} element=
+                        {
+                            <PrivateRoute>
+                                <HistoryPage/>
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route path={'/new'} element=
+                        {
+                            <PrivateRoute>
+                                <NewPage/>
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route path={'/data'} element=
+                        {
+                            <PrivateRoute>
+                                <DataPage/>
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route path={'/profile'} element=
+                        {
+                            <PrivateRoute>
+                                <ProfilePage/>
+                            </PrivateRoute>
+                        }
+                    />
 
                     {/* Error Pages */}
                     <Route path={'/error/500'} element={<Error500/>} />
                     <Route path={'/error/401'} element={<Error401/>} />
                     <Route path={'/error/403'} element={<Error403/>} />
-
-                    {/* Not Found Page - Must be the last route */}
                     <Route path={'*'} element={<Error404/>} />
                 </Routes>
               </AuthProvider>
+          <ToastContainer />
       </>
   )
 }
