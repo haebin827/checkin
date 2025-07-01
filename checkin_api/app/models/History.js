@@ -1,46 +1,43 @@
 module.exports = (sequelize, Sequelize) => {
-    const History = sequelize.define("history",
-        {
-            id: {
-                type: Sequelize.INTEGER,
-                primaryKey: true,
-                autoIncrement: true,
-            },
-            childId: {
+  const History = sequelize.define(
+    'history',
+    {
+      id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      status: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: 1,
+      },
+      /*
+      childId: {
                 type: Sequelize.INTEGER,
                 allowNull: false
             },
-            /*status: {
-                type: Sequelize.BOOLEAN,
-                defaultValue: 1,
-            },*/
-            checkinDatetime: {
-                type: Sequelize.DATE,
-                allowNull: false,
-                defaultValue: Sequelize.NOW,
-            },
-            /*checkoutDatetime: {
+      checkoutDatetime: {
                 type: Sequelize.DATE,
             },*/
-            checkinBy: {
+      /*checkinBy: {
                 type: Sequelize.INTEGER,
                 allowNull: false
-            },
-            /*checkoutBy: {
+            },*/
+      /*checkoutBy: {
                 type: Sequelize.INTEGER,
             },*/
-            locationId: {
+      /*locationId: {
                 type: Sequelize.INTEGER,
                 allowNull: false
-            },
-        },
-        {
-            timestamps: true,
-            underscored: true,
-            tableName: 'history',
-            freezeTableName: true
-        }
-    );
+            },*/
+    },
+    {
+      timestamps: true,
+      underscored: true,
+      tableName: 'history',
+      freezeTableName: true,
+    },
+  );
 
-    return History;
+  return History;
 };

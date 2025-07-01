@@ -13,8 +13,7 @@ export default defineConfig(({ mode }) => {
       port: env.VITE_APP_CORS_PORT || 8081,
       host: true, //test
       allowedHosts: [
-        // ngrok domain
-        '8dab-2600-1700-1c00-7310-7cb3-62d-74f8-f828.ngrok-free.app'
+        'all', '.ngrok-free.app'
       ]
     },
     plugins: [react()],

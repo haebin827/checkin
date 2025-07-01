@@ -5,8 +5,13 @@ import { FaSort, FaSortUp, FaSortDown, FaCalendarAlt, FaSearch, FaMapMarkerAlt, 
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../assets/styles/pages/History.css';
+import {useAuth} from "../hooks/useAuth.jsx";
+import HistoryService from "../services/HistoryService.js";
 
 const HistoryPage = () => {
+
+  const {user} = useAuth();
+
   // 필터 상태
   const [locationFilter, setLocationFilter] = useState('');
   const [dateFilter, setDateFilter] = useState(null);
@@ -33,64 +38,50 @@ const HistoryPage = () => {
     setIsFilterExpanded(!isFilterExpanded);
   };
 
-  // 위치 목록 가져오기 (예시 데이터)
   useEffect(() => {
-    // 실제 구현에서는 API 호출
-    setTimeout(() => {
-      setLocations([
-        { id: 1, name: 'Suwanee Center' },
-        { id: 2, name: 'Duluth Center' },
-        { id: 3, name: 'Buford Center' },
-        { id: 4, name: 'Alpharetta Center' },
-        { id: 5, name: 'Johns Creek Center' }
-      ]);
-    }, 300);
-  }, []);
+    const fetchDatas = async () => {
+      try {
+        setIsLoading(true);
+        if (!user?.id) return;
 
-  // 초기 데이터 로드 (예시 데이터)
-  useEffect(() => {
-    setIsLoading(true);
-    
-    // 실제 구현에서는 API 호출
-    setTimeout(() => {
-      const mockData = [
-        { id: 1, childName: 'Haebin Noh', date: '2023-05-15', time: '09:30 AM', location: 'Suwanee Center', checkedInBy: 'Admin Lee' },
-        { id: 2, childName: 'Jaeyull Noh', date: '2023-05-15', time: '09:35 AM', location: 'Suwanee Center', checkedInBy: 'Admin Lee' },
-        { id: 3, childName: 'Sophia Johnson', date: '2023-05-14', time: '10:15 AM', location: 'Duluth Center', checkedInBy: 'Admin Kim' },
-        { id: 4, childName: 'Ethan Smith', date: '2023-05-14', time: '09:45 AM', location: 'Buford Center', checkedInBy: 'Admin Park' },
-        { id: 5, childName: 'Olivia Parker', date: '2023-05-13', time: '08:55 AM', location: 'Duluth Center', checkedInBy: 'Admin Lee' },
-        { id: 6, childName: 'Haebin Noh', date: '2023-05-13', time: '09:10 AM', location: 'Suwanee Center', checkedInBy: 'Admin Kim' },
-        { id: 7, childName: 'William Turner', date: '2023-05-12', time: '10:05 AM', location: 'Buford Center', checkedInBy: 'Admin Park' },
-        { id: 8, childName: 'Emma Davis', date: '2023-05-12', time: '09:20 AM', location: 'Duluth Center', checkedInBy: 'Admin Lee' },
-        { id: 9, childName: 'Jaeyull Noh', date: '2023-05-11', time: '08:50 AM', location: 'Suwanee Center', checkedInBy: 'Admin Park' },
-        { id: 10, childName: 'Noah Wilson', date: '2023-05-11', time: '09:40 AM', location: 'Buford Center', checkedInBy: 'Admin Kim' },
-        { id: 11, childName: 'Ava Brown', date: '2023-05-10', time: '08:45 AM', location: 'Alpharetta Center', checkedInBy: 'Admin Taylor' },
-        { id: 12, childName: 'James Garcia', date: '2023-05-10', time: '09:15 AM', location: 'Johns Creek Center', checkedInBy: 'Admin Rodriguez' },
-        { id: 13, childName: 'Isabella Martin', date: '2023-05-10', time: '10:30 AM', location: 'Suwanee Center', checkedInBy: 'Admin Lee' },
-        { id: 14, childName: 'Lucas Adams', date: '2023-05-09', time: '08:30 AM', location: 'Duluth Center', checkedInBy: 'Admin Kim' },
-        { id: 15, childName: 'Mia Campbell', date: '2023-05-09', time: '09:50 AM', location: 'Buford Center', checkedInBy: 'Admin Park' },
-        { id: 16, childName: 'Haebin Noh', date: '2023-05-08', time: '09:05 AM', location: 'Suwanee Center', checkedInBy: 'Admin Lee' },
-        { id: 17, childName: 'Benjamin Wright', date: '2023-05-08', time: '10:10 AM', location: 'Alpharetta Center', checkedInBy: 'Admin Taylor' },
-        { id: 18, childName: 'Charlotte Evans', date: '2023-05-08', time: '08:40 AM', location: 'Johns Creek Center', checkedInBy: 'Admin Rodriguez' },
-        { id: 19, childName: 'Henry Roberts', date: '2023-05-07', time: '09:25 AM', location: 'Duluth Center', checkedInBy: 'Admin Kim' },
-        { id: 20, childName: 'Amelia Morgan', date: '2023-05-07', time: '10:20 AM', location: 'Buford Center', checkedInBy: 'Admin Park' },
-        { id: 21, childName: 'Jaeyull Noh', date: '2023-05-06', time: '08:35 AM', location: 'Suwanee Center', checkedInBy: 'Admin Lee' },
-        { id: 22, childName: 'Elijah Collins', date: '2023-05-06', time: '09:15 AM', location: 'Alpharetta Center', checkedInBy: 'Admin Taylor' },
-        { id: 23, childName: 'Harper Murphy', date: '2023-05-06', time: '10:25 AM', location: 'Johns Creek Center', checkedInBy: 'Admin Rodriguez' },
-        { id: 24, childName: 'Abigail Rivera', date: '2023-05-05', time: '08:50 AM', location: 'Duluth Center', checkedInBy: 'Admin Kim' },
-        { id: 25, childName: 'Daniel Morris', date: '2023-05-05', time: '09:40 AM', location: 'Buford Center', checkedInBy: 'Admin Park' },
-        { id: 26, childName: 'Haebin Noh', date: '2023-05-04', time: '10:15 AM', location: 'Suwanee Center', checkedInBy: 'Admin Lee' },
-        { id: 27, childName: 'Sofia Gonzalez', date: '2023-05-04', time: '08:45 AM', location: 'Alpharetta Center', checkedInBy: 'Admin Taylor' },
-        { id: 28, childName: 'Matthew Clark', date: '2023-05-04', time: '09:30 AM', location: 'Johns Creek Center', checkedInBy: 'Admin Rodriguez' },
-        { id: 29, childName: 'Scarlett Lewis', date: '2023-05-03', time: '10:10 AM', location: 'Duluth Center', checkedInBy: 'Admin Kim' },
-        { id: 30, childName: 'Jaeyull Noh', date: '2023-05-03', time: '08:55 AM', location: 'Buford Center', checkedInBy: 'Admin Park' },
-      ];
-      
-      setRecords(mockData);
-      setFilteredRecords(mockData);
-      setIsLoading(false);
-    }, 800);
-  }, []);
+        const response = await HistoryService.showHistoriesAndLocationList(user.id);
+        console.log("DATA", response.data)
+
+        if(response.data.success) {
+          // locations 설정
+          const locationsList = response.data.response.locations;
+          setLocations(locationsList);  // 이미 배열 형태로 오는 locations 데이터를 그대로 설정
+
+          console.log("LOCATIONS: ", locationsList)
+          // histories 데이터 변환
+          const transformedHistories = response.data.response.histories.map(history => {
+            const date = new Date(history.createdAt);
+            return {
+              ...history,
+              date: date.toLocaleDateString(),
+              time: date.toLocaleTimeString(),
+              location: history.location?.name,
+              childName: history.child?.engName,
+              checkedInBy: history.checkedInBy?.engName,
+              checkedInByRole: history.checkedInBy?.role
+            };
+          });
+
+          setRecords(transformedHistories);
+          setFilteredRecords(transformedHistories);
+        }
+      } catch (error) {
+        console.error('Error fetching history data:', error);
+        // 에러 처리를 위한 상태 추가가 필요하다면 추가
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDatas();
+    console.log(records)
+    console.log(locations)
+  }, [user]);
 
   // 날짜 변환 유틸리티 함수
   const formatDateToString = (date) => {
@@ -327,9 +318,9 @@ const HistoryPage = () => {
                   onChange={(e) => setLocationFilter(e.target.value)}
                   className="filter-select"
                 >
-                  <option value="">All Locations</option>
-                  {locations.map(location => (
-                    <option key={location.id} value={location.name}>
+                  <option key="all" value="">All Locations</option>
+                  {Array.isArray(locations) && locations.map((location) => (
+                    <option key={location.id || 'default'} value={location.name}>
                       {location.name}
                     </option>
                   ))}
@@ -380,6 +371,9 @@ const HistoryPage = () => {
                 <table className="history-table">
                   <thead>
                     <tr>
+                      <th>
+                        <span>No</span>
+                      </th>
                       <th onClick={() => handleSort('childName')}>
                         <span>Child Name</span>
                         {renderSortIcon('childName')}
@@ -403,13 +397,18 @@ const HistoryPage = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {paginatedRecords.map(record => (
+                    {paginatedRecords.map((record, index) => (
                       <tr key={record.id}>
+                        <td>{(currentPage - 1) * recordsPerPage + index + 1}</td>
                         <td>{record.childName}</td>
                         <td>{record.date}</td>
                         <td>{record.time}</td>
                         <td>{record.location}</td>
-                        <td>{record.checkedInBy}</td>
+                        <td>
+                          {record.checkedInBy}
+                          {record.checkedInByRole === 'admin' && <span style={{ color: 'red', marginLeft: '4px', fontSize: '12px' }}>(Admin)</span>}
+                          {record.checkedInByRole === 'manager' && <span style={{ color: 'red', marginLeft: '4px', fontSize: '12px' }}>(Manager)</span>}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -442,9 +441,6 @@ const HistoryPage = () => {
           ) : (
             <div className="no-records">
               <p>No check-in records found matching your filters.</p>
-              <button className="clear-filters" onClick={clearFilters}>
-                Clear Filters
-              </button>
             </div>
           )}
         </div>
