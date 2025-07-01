@@ -1,111 +1,121 @@
-const ChildService = require("../services/ChildService");
+const ChildService = require('../services/ChildService');
 
-exports.getAllChildren = async(req, res) => {
-    try {
-        const response = await ChildService.findAllChildren();
-        res.status(200).json({
-            success: true,
-            children: response
-        });
-    } catch(err) {
-        console.error("ChildController/getAllChildren: ", err);
-        res.status(500).json({
-            success: false,
-            message: err.message || "Failed to fetch children"
-        });
-    }
+exports.getAllChildren = async (req, res) => {
+  const response = await ChildService.findAllChildren();
+  res.status(200).json({
+    success: true,
+    children: response,
+  });
 };
 
-exports.getChildrenByLocation = async(req, res) => {
-    try {
-        const locationId = req.params.locationId;
-        
-        if (!locationId) {
-            return res.status(400).json({
-                success: false,
-                message: "Location ID is required"
-            });
-        }
+exports.getChildrenByLocation = async (req, res) => {
+  const locationId = req.params.locationId;
 
-        const response = await ChildService.findChildrenByLocation(locationId);
-        res.status(200).json({
-            success: true,
-            children: response
-        });
-    } catch(err) {
-        console.error("ChildController/findChildrenByLocation: ", err);
-        res.status(500).json({
-            success: false,
-            message: err.message || "Failed to fetch children"
-        });
-    }
+  if (!locationId) {
+    return res.status(400).json({
+      success: false,
+      message: 'Location ID is required',
+    });
+  }
+
+  const response = await ChildService.findChildrenByLocation(locationId);
+  res.status(200).json({
+    success: true,
+    children: response,
+  });
 };
 
-exports.createChild = async(req, res) => {
-    try {
-        if (!req.body) {
-            return res.status(400).json({
-                success: false,
-                message: "Request body cannot be empty"
-            });
-        }
+exports.createChild = async (req, res) => {
+  const { locationId, ...rest } = req.body;
 
-        const response = await ChildService.createChild(req.body);
-        res.status(201).json({
-            success: true,
-            child: response
-        });
-    } catch(err) {
-        console.error("ChildController/createChild: ", err);
-        res.status(500).json({
-            success: false,
-            message: err.message || "Failed to create child"
-        });
-    }
+  if (!req.body) {
+    return res.status(400).json({
+      success: false,
+      message: 'Request body cannot be empty',
+    });
+  }
+
+  const response = await ChildService.createChild({ ...rest, location_id: locationId });
+  res.status(201).json({
+    success: true,
+    child: response,
+  });
 };
 
-exports.updateChild = async(req, res) => {
-    try {
-        const response = await ChildService.updateChild(req.params.id, req.body);
-        res.status(200).json({
-            success: true,
-            child: response
-        });
-    } catch(err) {
-        console.error("ChildController/updateChild: ", err);
-        res.status(500).json({
-            success: false,
-            message: err.message || "Failed to update child"
-        });
-    }
+exports.updateChild = async (req, res) => {
+  const response = await ChildService.updateChild(req.params.id, req.body);
+  res.status(200).json({
+    success: true,
+    child: response,
+  });
 };
 
-exports.deleteChild = async(req, res) => {
-    try {
-        await ChildService.deleteChild(req.params.id);
-        res.status(200).json({
-            success: true,
-            message: "Child deleted successfully"
-        });
-    } catch(err) {
-        console.error("ChildController/deleteChild: ", err);
-        res.status(500).json({
-            success: false,
-            message: err.message || "Failed to delete child"
-        });
-    }
+exports.deleteChild = async (req, res) => {
+  await ChildService.deleteChild(req.params.id);
+  res.status(200).json({
+    success: true,
+    message: 'Child deleted successfully',
+  });
 };
 
-exports.sendInviteEmail = async(req, res) => {
-    const {guardianEmail, childId, locationId} = req.body;
-    try {
-        await ChildService.sendInviteEmail(guardianEmail, childId, locationId);
-        res.status(200).json({success: true})
-    } catch(err) {
-        console.error("ChildController/sendInviteEmail: ", err);
-        res.status(500).json({
-            success: false,
-            message: err.message || "Failed to send an invitation"
-        });
-    }
-}
+exports.sendInviteEmail = async (req, res) => {
+  const { guardianEmail, childId, locationId } = req.body;
+  await ChildService.sendInviteEmail(guardianEmail, childId, locationId);
+  res.status(200).json({ success: true });
+};
+
+exports.showChildrenAndLocationList = async (req, res) => {
+  const userId = req.query.id;
+
+  if (!userId) {
+    return res.status(400).json({
+      success: false,
+      message: 'User ID is required as a query parameter',
+    });
+  }
+
+  const response = await ChildService.showChildrenAndLocationList(userId);
+
+  res.status(200).json({
+    success: true,
+    data: response,
+  });
+};
+
+exports.forceCheckin = async (req, res) => {
+  const { locationId, childId, userId, ...otherData } = req.body;
+
+  if (!locationId || !childId || !userId) {
+    return res.status(400).json({
+      success: false,
+      message: 'LocationId, childId, and userId are all required',
+    });
+  }
+
+  const history = await ChildService.forceCheckin({
+    locationId,
+    childId,
+    userId,
+    ...otherData,
+  });
+
+  res.status(201).json({
+    success: true,
+    history,
+  });
+};
+
+exports.updateGuardianSettings = async (req, res) => {
+  const { childId } = req.params;
+  const { userId, relationship, isSms } = req.body;
+
+  const result = await ChildService.updateGuardianSettings(childId, userId, {
+    relationship,
+    isSms,
+  });
+
+  res.status(200).json({
+    success: true,
+    data: result,
+  });
+};

@@ -1,12 +1,13 @@
 module.exports = (sequelize, Sequelize) => {
-    const UserChild = sequelize.define("user_child",
-        {
-            id: {
-                type: Sequelize.INTEGER,
-                primaryKey: true,
-                autoIncrement: true,
-            },
-            /*userId: {
+  const UserChild = sequelize.define(
+    'user_child',
+    {
+      id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      /*userId: {
                 type: Sequelize.INTEGER,
                 allowNull: false
             },
@@ -14,26 +15,31 @@ module.exports = (sequelize, Sequelize) => {
                 type: Sequelize.INTEGER,
                 allowNull: false
             },*/
-            relationship: {
-                type: Sequelize.STRING,
-                allowNull: false,
-                validate: {
-                    notEmpty: true,
-                    len: [1, 20],
-                },
-            },
-            /*locationId: {
+      relationship: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: true,
+          len: [1, 20],
+        },
+      },
+      isSms: {
+        type: Sequelize.ENUM('0', '1'),
+        defaultValue: '1',
+        comment: '1: yes, 0: no',
+      },
+      /*locationId: {
                 type: Sequelize.INTEGER,
                 allowNull: true
             },*/
-        },
-        {
-            timestamps: true,
-            underscored: true,
-            tableName: 'user_child',
-            freezeTableName: true
-        }
-    );
+    },
+    {
+      timestamps: true,
+      underscored: true,
+      tableName: 'user_child',
+      freezeTableName: true,
+    },
+  );
 
-    return UserChild;
+  return UserChild;
 };

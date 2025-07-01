@@ -251,7 +251,6 @@
 
 .register-button:hover {
   background-color: var(--secondary-color);
-  transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -524,7 +523,3 @@
     transform: translateY(0);
   }
 }
-
-.register-form {
-  animation: fadeIn 0.5s ease-out;
-} 
