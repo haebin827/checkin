@@ -15,10 +15,9 @@ const HistoryService = {
       }
 
       switch (user.role) {
-      case 'guardian':
-          // 1. UserChild 테이블에서 해당 guardian의 모든 childId와 locationId 가져오기
-        const userChildRecords = await UserChild.findAll({
-          where: { userId: userId },
+        case 'guardian':
+          const userChildRecords = await UserChild.findAll({
+            where: { userId: userId },
             attributes: ['child_id', 'location_id'],
             include: [
               {
@@ -31,10 +30,8 @@ const HistoryService = {
           });
 
           console.log(userChildRecords);
-          // 2. childId 배열 생성
           const childIds = userChildRecords.map(record => record.child_id);
 
-          // 4. History 테이블에서 해당 childId들의 기록 가져오기
           const histories = await History.findAll({
             where: {
               childId: {
@@ -63,10 +60,8 @@ const HistoryService = {
             order: [['createdAt', 'DESC']],
           });
 
-          // 5. History에서 사용된 모든 location_id 추출
           const historyLocationIds = [...new Set(histories.map(history => history.location_id))];
 
-          // 6. 모든 필요한 Location 정보 가져오기
           const userLocations = await Location.findAll({
             where: {
               id: {
@@ -116,7 +111,6 @@ const HistoryService = {
           };
 
         case 'admin':
-          // 관리자의 경우도 동일한 조인 적용
           const [allHistories, allLocations] = await Promise.all([
             History.findAll({
               where: {

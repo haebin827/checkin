@@ -1,4 +1,5 @@
 const LocationService = require('../services/LocationService');
+const jwt = require('jsonwebtoken');
 
 exports.getAllLocations = async (req, res) => {
   const response = await LocationService.findAllLocations();
@@ -61,5 +62,25 @@ exports.generateQr = async (req, res) => {
     success: true,
     qrCode: result.qrCode,
     url: result.url,
+  });
+};
+
+exports.verifyQR = async (req, res) => {
+  const { uuid } = req.params;
+  const { token } = req.query;
+  const { userId, childId } = req.body;
+
+  if (!token || !uuid || !userId || !childId) {
+    res.status(401).json({
+      success: false,
+      message: 'Token or uuid or userId or childId is missing.',
+    });
+  }
+
+  const verifiedQr = await LocationService.verifyQR(uuid, token, userId, childId);
+
+  res.status(200).json({
+    success: true,
+    history: verifiedQr,
   });
 };

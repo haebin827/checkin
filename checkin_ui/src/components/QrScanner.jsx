@@ -1,49 +1,107 @@
 import React, { useEffect, useState } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
-import { FaArrowLeft } from 'react-icons/fa';
+import { FaArrowLeft, FaCamera, FaCheckCircle } from 'react-icons/fa';
 import '../assets/styles/components/QrScanner.css';
+import {useAuth} from "../hooks/useAuth.jsx";
+import LocationService from '../services/LocationService';
 
-const QrScanner = ({ childId, childName, onBack }) => {
+const QrScanner = ({ child, onBack }) => {
+
+  const {user} = useAuth();
+
   const [isScanning, setIsScanning] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [scannerInstance, setScannerInstance] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
+  const [cameras, setCameras] = useState([]);
+  const [selectedCamera, setSelectedCamera] = useState('');
+  const [isCameraSelectorOpen, setIsCameraSelectorOpen] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [scanComplete, setScanComplete] = useState(false);
+
+  // 사용 가능한 카메라 목록 가져오기
+  useEffect(() => {
+    const getCameras = async () => {
+      try {
+        const devices = await Html5Qrcode.getCameras();
+        if (devices && devices.length) {
+          setCameras(devices);
+          setSelectedCamera(devices[0].id); // 기본값으로 첫 번째 카메라 선택
+        } else {
+          setErrorMessage('No cameras found on your device.');
+        }
+      } catch (error) {
+        console.error('Error getting cameras:', error);
+        setErrorMessage('Failed to get cameras. Please check camera permissions.');
+      }
+    };
+
+    getCameras();
+  }, []);
 
   const qrCodeSuccessCallback = async (decodedText) => {
-    console.log(`QR Code decoded: ${decodedText}`);
+    // 이미 처리 중이거나 스캔이 완료된 경우 무시
+    if (isProcessing || scanComplete) {
+      return;
+    }
 
+    setIsProcessing(true);
     try {
-      // QR 코드 스캔 결과를 콘솔에 기록 (실제로는 API 호출)
-      console.log(`아이 ID: ${childId}, QR 코드: ${decodedText}`);
+      const url = new URL(decodedText);
+      const uuid = url.pathname.split('/').pop();
+      const token = url.searchParams.get('token');
 
-      // 실제 구현 시 API 호출
-      // const response = await API.post('/qr/verify', {
-      //   qrCode: decodedText,
-      //   childId: childId
-      // });
+      if (!uuid || !token) {
+        throw new Error('잘못된 QR 코드입니다.');
+      }
 
-      // 성공 메시지
-      console.log("QR 코드 스캔 성공");
-
-      // 스캐너 정지
+      // 스캐너 즉시 중지
       await stopScanner();
+      
+      const result = await LocationService.verifyQr(uuid, token, user.id, child.id);
+      
+      if (result.success) {
+        setScanComplete(true);
+        setShowSuccessModal(true);
+        
+        setTimeout(() => {
+          setShowSuccessModal(false);
+          onBack();
+        }, 3000);
+      } else {
+        setErrorMessage(result.error);
 
-      // 뒤로 가기 (체크인 완료 후)
-      setTimeout(() => {
-        onBack();
-      }, 1000);
-
+        if (!scanComplete) {
+          await startScanner();
+        }
+      }
     } catch (error) {
       console.error("QR 검증 오류:", error);
-      setErrorMessage("QR 코드 검증 중 오류가 발생했습니다.");
+      setErrorMessage(error.message || "QR 코드 검증 중 오류가 발생했습니다.");
+
+      if (!scanComplete) {
+        await startScanner();
+      }
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   // 카메라 스캐너 시작
   const startScanner = async () => {
     try {
-      // 아이가 선택되었는지 확인
-      if (!childId) {
+      if (!child) {
         setErrorMessage("QR 코드를 스캔하기 전에 아이를 선택해주세요.");
+        return;
+      }
+
+      if (!selectedCamera) {
+        setErrorMessage("Please select a camera first.");
+        return;
+      }
+
+      // 이미 스캔이 완료된 경우 시작하지 않음
+      if (scanComplete) {
         return;
       }
 
@@ -51,9 +109,8 @@ const QrScanner = ({ childId, childName, onBack }) => {
       
       const config = { fps: 10, qrbox: { width: 250, height: 250 } };
       
-      // 첫 번째 카메라 장치로 스캐너 시작
       await html5QrCode.start(
-        { facingMode: "environment" },
+        selectedCamera,
         config,
         qrCodeSuccessCallback
       );
@@ -92,6 +149,22 @@ const QrScanner = ({ childId, childName, onBack }) => {
     };
   }, [scannerInstance]);
 
+  // 카메라 변경 핸들러
+  const handleCameraChange = (e) => {
+    if (isScanning) {
+      stopScanner().then(() => {
+        setSelectedCamera(e.target.value);
+      });
+    } else {
+      setSelectedCamera(e.target.value);
+    }
+  };
+
+  // 카메라 선택기 토글 핸들러
+  const toggleCameraSelector = () => {
+    setIsCameraSelectorOpen(!isCameraSelectorOpen);
+  };
+
   return (
     <div className="qr-scanner-container">
       <div className="qr-scanner-header">
@@ -102,18 +175,44 @@ const QrScanner = ({ childId, childName, onBack }) => {
         >
           <FaArrowLeft />
         </button>
-        <h2>Check-In: {childName}</h2>
+        <h2>Check-In: {child.engName}</h2>
       </div>
 
       <div className="qr-scanner-content">
+        <div className="camera-selection">
+          <button 
+            onClick={toggleCameraSelector}
+            className="camera-toggle-button"
+            disabled={isScanning || scanComplete}
+          >
+            <FaCamera /> Select Camera
+          </button>
+          {isCameraSelectorOpen && (
+            <select
+              id="camera-select"
+              value={selectedCamera}
+              onChange={handleCameraChange}
+              disabled={isScanning || scanComplete}
+              className="camera-select"
+            >
+              <option value="">-- Select a camera --</option>
+              {cameras.map((camera) => (
+                <option key={camera.id} value={camera.id}>
+                  {camera.label}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+
         <div id="reader" className="qr-reader-element"></div>
         
         <div className="scanner-controls">
-          {!isScanning ? (
+          {!isScanning && !scanComplete ? (
             <button 
               onClick={startScanner} 
               className="start-scan-button"
-              disabled={!childId}
+              disabled={!child.id || !selectedCamera || scanComplete}
             >
               Open camera
             </button>
@@ -121,6 +220,7 @@ const QrScanner = ({ childId, childName, onBack }) => {
             <button 
               onClick={stopScanner} 
               className="stop-scan-button"
+              disabled={scanComplete}
             >
               Stop Scanner
             </button>
@@ -129,6 +229,16 @@ const QrScanner = ({ childId, childName, onBack }) => {
           {errorMessage && <p className="error-message">{errorMessage}</p>}
         </div>
       </div>
+
+      {/* 성공 모달 */}
+      {showSuccessModal && (
+        <div className="success-modal">
+          <div className="success-modal-content">
+            <FaCheckCircle className="success-icon" />
+            <p>{child.engName} 체크인이 완료되었습니다.</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
