@@ -35,7 +35,7 @@ async function sendEmail(email) {
   const info = await transporter.sendMail({
     from: emailConfig.auth.user,
     to: email,
-    subject: '[BSS] Signup Verification Code',
+    subject: 'Signup Verification Code',
     html: htmlContent,
   });
 
@@ -55,7 +55,7 @@ async function sendFindIdEmail(email) {
     await transporter.sendMail({
       from: emailConfig.auth.user,
       to: email,
-      subject: '[BSS] Your Account ID',
+      subject: 'Your Account ID',
       html: `
                 <h1>Find Your Account ID</h1>
                 <p>Click the link below to view your account ID:</p>
@@ -78,7 +78,7 @@ async function sendPasswordResetEmail(email) {
     await transporter.sendMail({
       from: emailConfig.auth.user,
       to: email,
-      subject: '[BSS] Password Reset Request',
+      subject: 'Password Reset Request',
       html: `
                 <h1>Password Reset</h1>
                 <p>Click the link below to reset your password:</p>
@@ -98,14 +98,14 @@ async function sendInviteEmail(email, childName) {
     await transporter.sendMail({
       from: emailConfig.auth.user,
       to: email,
-      subject: '[BSS] Invitation to Register Your Child',
+      subject: 'Invitation to Register Your Child',
       html: `
               <h2>Your Child Has Been Successfully Registered</h2>
-              <p>The account for your child <strong>${childName}</strong> has been successfully registered in the BSS system.</p>
+              <p>The account for your child <strong>${childName}</strong> has been successfully registered in the system.</p>
               <p>You can now log in to manage your child's information and view updates.</p>
               
               <p>If you have any questions or concerns, please contact our support team.</p>
-              <p>Thank you,<br/>BSS Team</p>
+              <p>Thank you,</p>
             `,
     });
     return true;
@@ -133,7 +133,7 @@ async function sendCheckinEmail({
     await transporter.sendMail({
       from: emailConfig.auth.user,
       to: email,
-      subject: `[BSS]❗ ${childName} has checked in at ${locationName}`,
+      subject: `❗ ${childName} has checked in at ${locationName}`,
       html: `
               <div style="font-family: Arial, sans-serif; color: #333; padding: 20px;">
                 <h2 style="color: #d9534f;">Check-in Notification</h2>
@@ -150,10 +150,10 @@ async function sendCheckinEmail({
                 <hr style="margin: 30px 0; border: none; border-top: 1px solid #ccc;" />
                 
                 <p style="margin-top: 20px;">
-                  If you wish to stop receiving SMS notifications, please log in to the BSS Check-in portal and uncheck the SMS setting for this child.
+                  If you wish to stop receiving SMS notifications, please log in to the Check-in portal and uncheck the SMS setting for this child.
                 </p>
             
-                <p style="margin-top: 20px;">Thank you,<br/><strong>BSS Team</strong></p>
+                <p style="margin-top: 20px;">Thank you,</p>
               </div>
             `,
     });

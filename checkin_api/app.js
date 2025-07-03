@@ -12,14 +12,18 @@ const errorHandler = require('./app/middlewares/errorHandler');
 
 const app = express();
 
+//app.set('trust proxy', 1);
+
 app.use(logger('dev'));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(
   cors({
     origin: `${process.env.CORS_ORIGIN_URL}` || 'http://localhost:8081',
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
+    exposedHeaders: ['Set-Cookie'],
     credentials: true,
   }),
 );
@@ -46,9 +50,9 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === 'production',
-      httpOnly: true, // 자바스크립트에서 쿠키 접근 방지 (XSS 방어)
-      sameSite: 'lax', // CSRF 보호 강화
+      secure: process.env.NODE_ENV === 'production', //true
+      httpOnly: true,
+      sameSite: 'lax', //'none
       maxAge: 24 * 60 * 60 * 1000,
     },
   }),
@@ -59,6 +63,15 @@ app.use(passport.session());
 
 // db
 const db = require('./app/models');
+
+/*db.sequelize
+  .authenticate()
+  .then(() => {
+    console.log('✅ Database connection has been established successfully.');
+  })
+  .catch(err => {
+    console.error('❌ Unable to connect to the database');
+  });*/
 
 db.sequelize
   .sync()
@@ -79,6 +92,8 @@ db.sequelize.sync({ force: true }).then(() => {
 require('./app/routes')(app);
 
 app.use(errorHandler);
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 const port = process.env.PORT || 8080;
 app.listen(port, () => {
