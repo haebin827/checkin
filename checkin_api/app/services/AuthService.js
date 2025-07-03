@@ -10,6 +10,7 @@ const AuthService = {
     try {
       const user = await User.findOne({
         where: { username: username },
+        attributes: ['id', 'username', 'engName', 'korName', 'role', 'location_id'],
         include: [
           {
             model: db.location,

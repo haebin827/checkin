@@ -1,55 +1,42 @@
-import React, { useEffect, useState } from 'react';
-import '../../assets/styles/components/Toast.css';
+import { Toaster } from 'react-hot-toast';
 
-const ToastItem = ({ toast, removeToast }) => {
-  const [exit, setExit] = useState(false);
-  
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setExit(true);
-    }, toast.duration - 500);
-    
-    return () => clearTimeout(timer);
-  }, [toast.duration]);
-  
-  useEffect(() => {
-    if (exit) {
-      const timer = setTimeout(() => {
-        removeToast(toast.id);
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [exit, removeToast, toast.id]);
-
-  return (
-    <div 
-      className={`toast ${toast.type === 'error' ? 'toast-error' : 'toast-success'}`}
-      style={{
-        animation: exit ? 'slideOut 0.5s forwards' : 'slideIn 0.3s forwards'
-      }}
-    >
-      <div className="toast-message">{toast.message}</div>
-      <button 
-        className="toast-close" 
-        onClick={() => setExit(true)}
-      >
-        &times;
-      </button>
-    </div>
-  );
+const defaultStyle = {
+  background: '#fff',
+  color: '#333',
+  padding: '16px',
+  borderRadius: '8px',
+  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)',
 };
 
-const Toast = ({ toasts, removeToast }) => {
+/**
+ * Toast component for displaying notifications
+ * @param {Object} props
+ * @param {'top-left'|'top-center'|'top-right'|'bottom-left'|'bottom-center'|'bottom-right'} [props.position='top-right'] - Toast position
+ * @param {number} [props.duration=3000] - Duration in milliseconds
+ * @param {Object} [props.style] - Custom style to override default style
+ * @param {boolean} [props.reverseOrder=false] - Whether to reverse the order of multiple toasts
+ * @param {number} [props.gutter=8] - Space between toasts
+ */
+const Toast = ({ 
+  position = 'top-right',
+  duration = 3000,
+  style = {},
+  reverseOrder = false,
+  gutter = 8,
+}) => {
   return (
-    <div className="toast-container">
-      {toasts.map((toast) => (
-        <ToastItem 
-          key={toast.id} 
-          toast={toast} 
-          removeToast={removeToast} 
-        />
-      ))}
-    </div>
+    <Toaster
+      position={position}
+      reverseOrder={reverseOrder}
+      gutter={gutter}
+      toastOptions={{
+        duration,
+        style: {
+          ...defaultStyle,
+          ...style,
+        },
+      }}
+    />
   );
 };
 
