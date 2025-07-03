@@ -3,7 +3,9 @@ import axios from "axios";
 const instance = axios.create({
     baseURL: `${import.meta.env.VITE_APP_API_PORT}/api`,
     headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        /*"Accept": "application/json",
+        "X-Requested-With": "XMLHttpRequest"*/
     },
     withCredentials: true
 });

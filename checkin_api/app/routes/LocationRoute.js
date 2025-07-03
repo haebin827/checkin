@@ -15,5 +15,7 @@ module.exports = app => {
 
   router.get('/create-qr', location.generateQr);
 
+  router.post('/:uuid/verify', location.verifyQR);
+
   app.use('/api/location', router);
 };

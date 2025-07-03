@@ -1,5 +1,6 @@
 .env
 eslint.config.js
+MainPage_dump.txt
 
 # Logs
 logs

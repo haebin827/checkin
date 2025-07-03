@@ -9,7 +9,9 @@ import '../assets/styles/pages/MainPage.css';
 import {useAuth} from "../hooks/useAuth.jsx";
 import LocationService from "../services/LocationService.js";
 import Modal from "../components/common/Modal.jsx";
+import Toast from "../components/common/Toast.jsx";
 import { toast } from 'react-hot-toast';
+import ChildService from "../services/ChildService.js";
 
 const MainPage = () => {
 
@@ -24,6 +26,9 @@ const MainPage = () => {
   const [eventUrl, setEventUrl] = useState('');
   const [currentQrCode, setCurrentQrCode] = useState('');
 
+  // -----------------------------------------------------
+  // QR APIs
+  // -----------------------------------------------------
   const handleQrClick = async (e) => {
     e.stopPropagation();
     setLoadingQr(true);
@@ -31,23 +36,15 @@ const MainPage = () => {
     setEventUrl('');
     setCurrentQrCode('');
 
-    try {
-      const response = await LocationService.getQr(user.locationId);
-      if (response.data && response.data.success) {
-        setCurrentQrCode(response.data.qrCode);
-        if (response.data.url) {
-          setEventUrl(response.data.url);
-        }
-      } else {
-        console.error('QR code generation failed:', response.data.message);
-        toast.error('Failed to generate QR code');
+    const result = await LocationService.getQr(user.locationId);
+    
+    if (result.success) {
+      setCurrentQrCode(result.qrCode);
+      if (result.url) {
+        setEventUrl(result.url);
       }
-    } catch (err) {
-      console.error('QR code generation failed:', err);
-      toast.error('Failed to generate QR code. Please try again.');
-    } finally {
-      setLoadingQr(false);
     }
+    setLoadingQr(false);
   };
 
   const handleDownload = () => {
@@ -62,13 +59,6 @@ const MainPage = () => {
     document.body.removeChild(link);
   };
 
-  // 아이 선택 핸들러
-  const handleChildSelect = (child) => {
-    console.log('아이 선택됨:', child);
-    setSelectedChild(child);
-  };
-
-  // QR 스캔 성공 핸들러 (추후 구현)
   const handleQrScanSuccess = (childId, qrData) => {
     console.log(`체크인 성공 - 아이 ID: ${childId}, QR 데이터: ${qrData}`);
     
@@ -87,32 +77,43 @@ const MainPage = () => {
     setSelectedChild(null);
   };
 
-  // Admin handler - Send invite email
+  // -----------------------------------------------------
+  // Send Invite Email APIs
+  // -----------------------------------------------------
   const handleSendInvite = () => {
-    console.log('Send child invite email clicked');
     setIsInviteModalOpen(true);
   };
 
-  // Invite form submit handler
-  const handleSendInviteSubmit = (data) => {
-    console.log('Sending invite email:', data);
-    // Implement API call to send invite email
-    alert(`Invite email sent to ${data.email} for child ${data.childName}`);
+  const handleSendInviteSubmit = async(data) => {
+    try {
+      const response = await ChildService.sendInviteEmail(data);
+
+              if (response.data.success) {
+          toast.success(`Invitation email sent successfully to ${data.guardianEmail} for ${data.childName}!`);
+          setIsInviteModalOpen(false);
+      } else {
+        toast.error(response.data.message || 'Failed to send invitation');
+      }
+    } catch (error) {
+      console.error('Error sending invite:', error);
+      toast.error(error.response?.data?.message || 'Failed to send invitation. Please try again later.');
+    }
   };
 
-  // 조건부 렌더링 로직
+  const handleChildSelect = (child) => {
+    setSelectedChild(child);
+  };
+
   const renderContent = () => {
     if (selectedChild) {
       console.log('QR 스캐너 렌더링:', selectedChild);
       return (
         <QrScanner 
-          childId={selectedChild.id}
-          childName={selectedChild.name}
+          child={selectedChild}
           onBack={handleBackFromQrScan}
         />
       );
     } else {
-      console.log('아이 목록 렌더링');
       return (
         <CheckinChildList 
           ref={childListRef}
@@ -125,6 +126,7 @@ const MainPage = () => {
   return (
     <>
       <Navbar />
+      <Toast />
       <div className="main-page">
         <main className="main-content">
           <div className="content-container">
