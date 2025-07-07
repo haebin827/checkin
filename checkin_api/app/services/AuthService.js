@@ -7,10 +7,10 @@ const AppError = require('../middlewares/AppError');
 
 const AuthService = {
   async login(username, password, req) {
-    try {
+   try {
       const user = await User.findOne({
         where: { username: username },
-        attributes: ['id', 'username', 'engName', 'korName', 'role', 'location_id'],
+        attributes: ['id', 'username', 'password', 'engName', 'korName', 'role', 'location_id'],
         include: [
           {
             model: db.location,

@@ -147,14 +147,20 @@
 
 .profile-title h2 {
   margin: 0;
-  color: #333;
   font-size: 1.5rem;
+  color: #333;
 }
 
 .profile-title p {
   margin: 0.3rem 0 0;
   color: var(--text-secondary);
   font-size: 0.8rem;
+}
+
+.role-tag {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: normal;
 }
 
 .manager-location {

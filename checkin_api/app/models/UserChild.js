@@ -18,6 +18,7 @@ module.exports = (sequelize, Sequelize) => {
       relationship: {
         type: Sequelize.STRING,
         allowNull: false,
+        defaultValue: 'guardian',
         validate: {
           notEmpty: true,
           len: [1, 20],

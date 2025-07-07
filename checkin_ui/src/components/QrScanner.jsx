@@ -235,7 +235,7 @@ const QrScanner = ({ child, onBack }) => {
         <div className="success-modal">
           <div className="success-modal-content">
             <FaCheckCircle className="success-icon" />
-            <p>{child.engName} 체크인이 완료되었습니다.</p>
+            <p>{child.engName} is checked-in successfully!</p>
           </div>
         </div>
       )}

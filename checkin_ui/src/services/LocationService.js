@@ -61,16 +61,16 @@ const verifyQr = async (uuid, token, userId, childId) => {
         console.log('QR verification response:', response.data);
         
         if (response.data && response.data.success) {
-            toast.success('체크인이 완료되었습니다.');
+            toast.success('Check-in successful');
             return {
                 success: true,
                 data: response.data
             };
         } else {
-            toast.error('체크인에 실패했습니다.');
+            toast.error('Check-in failed');
             return {
                 success: false,
-                error: response.data.message || '체크인에 실패했습니다.'
+                error: response.data.message || 'Check-in failed'
             };
         }
     } catch (error) {
