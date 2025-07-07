@@ -12,18 +12,29 @@ const errorHandler = require('./app/middlewares/errorHandler');
 
 const app = express();
 
-//app.set('trust proxy', 1);
+if (process.env.NODE_ENV === 'ngrok') {
+  app.set('trust proxy', 1);
+}
 
 app.use(logger('dev'));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+let corsOrigin;
+if (process.env.NODE_ENV === 'ngrok') {
+  corsOrigin = process.env.CORS_NGROK_URL;
+} else if (process.env.NODE_ENV === 'development') {
+  corsOrigin = process.env.CORS_ORIGIN_URL;
+} else {
+  corsOrigin = 'http://localhost:8081';
+}
+
 app.use(
   cors({
-    origin: `${process.env.CORS_ORIGIN_URL}` || 'http://localhost:8081',
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
-    exposedHeaders: ['Set-Cookie'],
+    origin: corsOrigin,
+    //allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
+    //exposedHeaders: ['Set-Cookie'],
     credentials: true,
   }),
 );
@@ -50,9 +61,9 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === 'production', //true
+      secure: process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'ngrok',
       httpOnly: true,
-      sameSite: 'lax', //'none
+      sameSite: process.env.NODE_ENV === 'ngrok' ? 'none' : 'lax',
       maxAge: 24 * 60 * 60 * 1000,
     },
   }),
@@ -92,7 +103,6 @@ db.sequelize.sync({ force: true }).then(() => {
 require('./app/routes')(app);
 
 app.use(errorHandler);
-
 app.use(express.static(path.join(__dirname, 'public')));
 
 const port = process.env.PORT || 8080;

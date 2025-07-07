@@ -1,11 +1,20 @@
 import axios from "axios";
 
+let baseURL;
+if (import.meta.env.VITE_APP_NODE_ENV === 'ngrok') {
+    baseURL = `${import.meta.env.VITE_APP_NGROK_API_PORT}/api`;
+} else if (import.meta.env.VITE_APP_NODE_ENV === 'development') {
+    baseURL = `${import.meta.env.VITE_APP_API_PORT}/api`;
+} else {
+    baseURL = 'https://localhost:8080/api';
+}
+
 const instance = axios.create({
-    baseURL: `${import.meta.env.VITE_APP_API_PORT}/api`,
+    baseURL,
     headers: {
         "Content-Type": "application/json",
-        /*"Accept": "application/json",
-        "X-Requested-With": "XMLHttpRequest"*/
+        "Accept": "application/json",
+        "X-Requested-With": "XMLHttpRequest"
     },
     withCredentials: true
 });

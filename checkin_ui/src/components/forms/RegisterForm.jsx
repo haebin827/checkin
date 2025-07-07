@@ -202,7 +202,7 @@ const RegisterForm = ({initialValues = {}, handleRegistrationSuccess}) => {
                       type={showConfirmPassword ? "text" : "password"}
                       id="confirmPassword"
                       name="confirmPassword"
-                      placeholder="Re-enter password"
+                      placeholder="Confirm Password"
                       className={errors.confirmPassword && touched.confirmPassword ? 'error' : ''}
                     />
                     <div

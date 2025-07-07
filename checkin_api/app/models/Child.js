@@ -41,6 +41,11 @@ module.exports = (sequelize, Sequelize) => {
           is: /^\d{10,12}$/,
         },
       },
+      status: {
+        type: Sequelize.ENUM('0', '1'),
+        defaultValue: '1',
+        comment: '1: active, 0: deleted',
+      },
       /*hospital_name: {
                 type: Sequelize.STRING,
                 validate: {

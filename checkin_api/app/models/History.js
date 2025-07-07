@@ -7,10 +7,11 @@ module.exports = (sequelize, Sequelize) => {
         primaryKey: true,
         autoIncrement: true,
       },
-      status: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: 1,
-      },
+        status: {
+            type: Sequelize.ENUM('-1', '0', '1'),
+            defaultValue: '1',
+            comment: '1: checked-in, 0: checked-out, -1: hidden',
+        },
       /*
       childId: {
                 type: Sequelize.INTEGER,

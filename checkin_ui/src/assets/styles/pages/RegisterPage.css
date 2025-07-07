@@ -162,6 +162,12 @@
 
 .input-group .input-icon-wrapper {
   position: relative;
+  width: 100%;
+}
+
+.input-group .input-icon-wrapper input {
+  width: 100%;
+  padding-right: 40px; /* Make space for the icon */
 }
 
 .input-group .input-icon {
@@ -171,6 +177,10 @@
   transform: translateY(-50%);
   color: var(--text-light);
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
 }
 
 .agreement-section {

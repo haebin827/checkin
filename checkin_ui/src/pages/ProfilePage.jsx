@@ -135,12 +135,15 @@ const ProfilePage = () => {
                   <FaUser />
                 </div>
                 <div className="profile-title">
-                  <h2>{currUser?.engName || user?.engName}</h2>
-                  {(currUser?.role === 'manager' || user?.role === 'manager') && (
-                    <p className="manager-location">
-                      {currUser?.location?.name || user?.location?.name || 'Location not assigned'}
-                    </p>
-                  )}
+                  <h2>
+                    {currUser?.engName || user?.engName}
+                    {(currUser?.role === 'manager' || user?.role === 'manager') && (
+                      <span className="role-tag"> (Manager for {currUser?.location?.name || user?.location?.name})</span>
+                    )}
+                    {(currUser?.role === 'admin' || user?.role === 'admin') && (
+                      <span className="role-tag"> (Admin)</span>
+                    )}
+                  </h2>
                 </div>
               </div>
               

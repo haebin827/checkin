@@ -7,6 +7,7 @@ const EmailService = require('./EmailService');
 const Location = db.location;
 const History = db.history;
 const Child = db.child;
+const User = db.user;
 const UserChild = db.userChild;
 const { Op } = db.Sequelize;
 
