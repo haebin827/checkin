@@ -263,7 +263,7 @@ npx sequelize-cli db:seed --seed 20250707132956-demo-history.js
   ![History Page](checkin_ui/src/assets/ui/history/historyPage.png)
 
 ### 7. Profile Management
-- **Role-specific Profile Pages**
+- **Role-specific Profile Pages** 
   - User profile
   ![User Profile](checkin_ui/src/assets/ui/profile/profilePage_user.png)
   - Manager profile
