@@ -1,4 +1,7 @@
 const ChildService = require('../services/ChildService');
+const {updateUserValidation, childValidation} = require("../validations/validations");
+const {validationResult} = require("express-validator");
+const AuthService = require("../services/AuthService");
 
 exports.getAllChildren = async (req, res) => {
   const response = await ChildService.findAllChildren();
@@ -25,22 +28,35 @@ exports.getChildrenByLocation = async (req, res) => {
   });
 };
 
-exports.createChild = async (req, res) => {
-  const { locationId, ...rest } = req.body;
 
-  if (!req.body) {
-    return res.status(400).json({
-      success: false,
-      message: 'Request body cannot be empty',
-    });
-  }
+exports.createChild = [
+  childValidation,
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const formattedErrors = errors.array().reduce((acc, error) => {
+        const [field, message] = error.msg.split(': ');
+        const fieldName = field.toLowerCase();
+        acc[fieldName] = message || error.msg;
+        return acc;
+      }, {});
 
-  const response = await ChildService.createChild({ ...rest, location_id: locationId });
-  res.status(201).json({
-    success: true,
-    child: response,
-  });
-};
+      return res.status(400).json({
+        success: false,
+        errors: formattedErrors,
+      });
+    }
+    const { locationId, ...rest } = req.body;
+
+    if (!req.body) {
+      return res.status(400).json({
+        success: false,
+      });
+    }
+    const response = await ChildService.createChild({ ...rest, location_id: locationId });
+    res.status(201).json({ success: true, child: response });
+  },
+];
 
 exports.updateChild = async (req, res) => {
   const response = await ChildService.updateChild(req.params.id, req.body);

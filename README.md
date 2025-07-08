@@ -170,6 +170,7 @@ npx sequelize-cli db:seed --seed 20250626220647-demo-location.js
 npx sequelize-cli db:seed --seed 20250626220226-demo-user.js
 npx sequelize-cli db:seed --seed 20250626220855-demo-child.js
 npx sequelize-cli db:seed --seed 20250626221248-demo-userChild.js
+npx sequelize-cli db:seed --seed 20250707132956-demo-history.js 
 ```
 
 ---
@@ -187,9 +188,19 @@ npx sequelize-cli db:seed --seed 20250626221248-demo-userChild.js
   ![Registration Validation](checkin_ui/src/assets/ui/auth/registerPage_validation.png)
   - Email verification
   ![Email Verification](checkin_ui/src/assets/ui/auth/registerPage_email_validation.png)
+  - Completed registration Page
+  ![Registration Completed](checkin_ui/src/assets/ui/auth/completedRegistrationPage.png)
 - **Account Recovery**
   - ID/Password recovery page
   ![Account Recovery](checkin_ui/src/assets/ui/auth/forgotIdPwPage.png)
+  - Find ID email
+  ![Find ID Email](checkin_ui/src/assets/ui/auth/findId_email.png)
+  - Find ID Page
+  ![Find ID Page](checkin_ui/src/assets/ui/auth/findIdPage.png)
+  - Reset PW email
+    ![Reset PW Email](checkin_ui/src/assets/ui/auth/resetPw_email.png)
+  - Reset PW Page
+    ![Reset PW Page](checkin_ui/src/assets/ui/auth/resetPwPage.png)
 
 ### 2. Main Dashboard
 - **User Dashboard**

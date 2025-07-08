@@ -1,5 +1,6 @@
 const LocationService = require('../services/LocationService');
 const jwt = require('jsonwebtoken');
+const AppError = require('../middlewares/AppError');
 
 exports.getAllLocations = async (req, res) => {
   const response = await LocationService.findAllLocations();
@@ -8,10 +9,7 @@ exports.getAllLocations = async (req, res) => {
 
 exports.createLocation = async (req, res) => {
   if (!req.body) {
-    res.status(400).json({
-      success: false,
-      message: 'Request body cannot be empty',
-    });
+    throw new AppError('Request body cannot be empty', 400);
   }
 
   const response = await LocationService.createLocation(req.body);

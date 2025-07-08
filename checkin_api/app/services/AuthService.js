@@ -7,8 +7,7 @@ const AppError = require('../middlewares/AppError');
 
 const AuthService = {
   async login(username, password, req) {
-   try {
-      const user = await User.findOne({
+    const user = await User.findOne({
         where: { username: username },
         attributes: ['id', 'username', 'password', 'engName', 'korName', 'role', 'location_id'],
         include: [
@@ -21,7 +20,7 @@ const AuthService = {
       });
 
       if (!user) {
-        throw new AppError('User not found', 404);
+        throw new AppError('Invalid credentials', 401);
       }
 
       const isMatch = await bcrypt.compare(password, user.password);
@@ -31,7 +30,7 @@ const AuthService = {
           req.rateLimit.current = (req.rateLimit.current || 0) + 1;
           req.rateLimit.remaining = Math.max(0, 5 - req.rateLimit.current);
         }
-        throw new AppError('Invalid password', 404);
+        throw new AppError('Invalid credentials', 401);
       }
 
       /*await new Promise((resolve, reject) => {
@@ -55,28 +54,20 @@ const AuthService = {
       }
 
       return req.session.user;
-    } catch (err) {
-      console.error('AuthService/login: ', err);
-      throw err;
-    }
   },
 
   async logout(session, res) {
-    try {
-      await new Promise((resolve, reject) => {
-        session.destroy(err => {
-          if (err) {
-            return reject(new Error('Failed to delete session'));
-          }
-          if (res && res.clearCookie) {
-            res.clearCookie('sessionId');
-          }
-          resolve();
-        });
+    await new Promise((resolve, reject) => {
+      session.destroy(err => {
+        if (err) {
+          return reject(new AppError('Internal server error', 500));
+        }
+        if (res && res.clearCookie) {
+          res.clearCookie('sessionId');
+        }
+        resolve();
       });
-    } catch (err) {
-      throw err;
-    }
+    });
   },
 
   async findCurrentSession(session) {
@@ -88,7 +79,7 @@ const AuthService = {
       const user = await User.findByPk(session.user.id);
 
       if (!user) {
-        throw new AppError('User not found', 404);
+        throw new AppError('Invalid credentials', 401);
       }
 
       const authProvider = user.googleId ? 'google' : user.kakaoId ? 'kakao' : 'local';
@@ -123,7 +114,7 @@ const AuthService = {
           username: data.username,
           password: hashedPassword,
           email: data.email,
-          phone: data.phone || '',
+          phone: data.phone,
           role: data.role || 'guardian',
         },
         { transaction },
@@ -131,7 +122,6 @@ const AuthService = {
 
       await transaction.commit();
       return {
-        id: newUser.id,
         engName: newUser.engName,
         korName: newUser.korName,
         username: newUser.username,
@@ -153,7 +143,6 @@ const AuthService = {
 
       return user ? user : null;
     } catch (err) {
-      console.error('Username check error:', err);
       throw err;
     }
   },
@@ -190,25 +179,19 @@ const AuthService = {
     try {
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      const user = await User.findOne({
-        where: { email: email },
-        transaction,
-      });
-
-      if (!user) {
-        await transaction.rollback();
-        throw new Error('User not found');
-      }
-
       const result = await User.update(
         { password: hashedPassword },
-        {
-          where: { email: email },
+          {
+            where: { email },
           transaction,
-        },
+          }
       );
 
       await transaction.commit();
+
+      if (result[0] === 0) {
+        throw new AppError('Invalid credentials', 401);
+      }
 
       return { affected: result[0] };
     } catch (error) {
@@ -220,28 +203,21 @@ const AuthService = {
 
   async handleFindRequest(email, searchType) {
     try {
-      const user = await User.findOne({
-        where: { email: email },
-      });
+      const exists = await User.count({ where: { email } });
 
-      if (searchType === 'id') {
-        if (!user) {
-          return { message: 'ID recovery email sent successfully' };
+      if (exists) {
+        if (searchType === 'id') {
+          await EmailService.sendFindIdEmail(email);
+        } else if (searchType === 'pw') {
+          await EmailService.sendPasswordResetEmail(email);
+        } else {
+          console.warn(`Invalid searchType: ${searchType}`);
         }
-        await EmailService.sendFindIdEmail(email);
-        return { message: 'ID recovery email sent successfully' };
-      } else if (searchType === 'pw') {
-        await EmailService.sendPasswordResetEmail(email);
-        if (!user) {
-          return { message: 'Password reset email sent successfully' };
-        }
-        return { message: 'Password reset email sent successfully' };
-      } else {
-        throw new Error('Invalid search type');
       }
+      return;
     } catch (err) {
       console.error('Find ID/PW error:', err);
-      throw err;
+      return;
     }
   },
 
@@ -250,32 +226,25 @@ const AuthService = {
 
     try {
       const user = await User.findByPk(userId, {
-        attributes: ['password'],
+        attributes: ['id', 'password'],
       });
 
       if (!user) {
-        throw new Error('User not found');
+        throw new AppError('Invalid credentials', 401);
       }
 
       const isMatch = await bcrypt.compare(currentPassword, user.password);
       if (!isMatch) {
-        throw new Error('Current password is incorrect');
+        throw new AppError('Invalid credentials', 401);
       }
 
       const hashedPassword = await bcrypt.hash(newPassword, 10);
-      await User.update(
-        { password: hashedPassword },
-        {
-          where: { id: userId },
-          transaction,
-        },
-      );
+      await user.update({ password: hashedPassword }, { transaction });
 
       await transaction.commit();
       return { success: true };
     } catch (error) {
       await transaction.rollback();
-      console.error('Password change error:', error);
       throw error;
     }
   },
@@ -283,11 +252,12 @@ const AuthService = {
   async getUser(id) {
     try {
       const user = await User.findByPk(id, {
+        attributes: ['id', 'username', 'password', 'eng_name', 'kor_name', 'phone', 'email', 'role'],
         include: [
           {
             model: db.location,
             as: 'location',
-            attributes: ['id', 'name'],
+            attributes: ['name'],
           },
         ],
       });
@@ -307,31 +277,22 @@ const AuthService = {
     const transaction = await db.sequelize.transaction();
 
     try {
-      const user = await User.findByPk(data.id, { transaction });
-
-      if (!user) {
-        await transaction.rollback();
-        throw new Error('User not found');
-      }
-
-      const updateData = {
-        engName: data.engName,
-        korName: data.korName,
-        username: data.username,
-        phone: data.phone,
-      };
-
-      await User.update(updateData, {
+      const updateData = await User.update(
+        { ...data },
+        {
         where: { id: data.id },
         transaction,
       });
 
+      if (updateData[0] === 0) {
+        throw new AppError('Invalid credentials', 401);
+      }
       await transaction.commit();
       return updateData;
     } catch (error) {
-      if (transaction) await transaction.rollback();
+      if (transaction) { await transaction.rollback(); }
       console.error('Update user error:', error);
-      throw error;
+      throw new AppError('Invalid credentials', 401);
     }
   },
 
@@ -339,17 +300,13 @@ const AuthService = {
     const tempUser = req.session.tempUser;
 
     if (!tempUser || !tempUser.isTemporary) {
-      throw new AppError('No temporary user found', 400);
+      throw new AppError('Invalid credentials', 400);
     }
 
     const { engName, korName, phone } = req.body;
 
     if (!engName || !phone) {
       throw new AppError('English name and phone number are required', 400);
-    }
-
-    if (!/^\d{10,12}$/.test(phone)) {
-      throw new AppError('Invalid phone number format', 400);
     }
 
     const transaction = await db.sequelize.transaction();
@@ -382,7 +339,7 @@ const AuthService = {
       return req.session.user;
     } catch (err) {
       await transaction.rollback();
-      throw new AppError('User creation error', 400);
+      throw new AppError('Invalid credentials', 400);
     }
   },
 };

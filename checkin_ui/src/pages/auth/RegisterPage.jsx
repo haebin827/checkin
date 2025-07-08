@@ -1,8 +1,9 @@
 import React, {useState} from 'react';
 import { Link } from 'react-router-dom';
 import RegisterForm from '../../components/forms/RegisterForm.jsx';
-import '../../assets/styles/pages/RegisterPage.css';
+import '../../assets/styles/pages/auth/RegisterPage.css';
 import EmailConfirmationForm from "../../components/forms/EmailConfirmationForm.jsx";
+import RegisterCompleted from "../../components/forms/RegisterCompleted.jsx";
 
 const RegisterPage = () => {
 
@@ -18,16 +19,22 @@ const RegisterPage = () => {
     });
 
     const [isValidated, setIsValidated] = useState(false);
+    const [isCompleted, setIsCompleted] = useState(false);
 
     const handleRegistrationSuccess = (values) => {
-        console.log(values)
         setUserData(values);
         setIsValidated(true);
     };
 
+    const handleRegistrationCompleted = () => {
+        setIsCompleted(true);
+    };
+
     return (
         <>
-            {!isValidated ? (
+            {isCompleted ? (
+                <RegisterCompleted engName={userData.engName} />
+            ) : !isValidated ? (
                 <RegisterForm
                     initialValues={userData}
                     handleRegistrationSuccess={handleRegistrationSuccess}
@@ -35,9 +42,9 @@ const RegisterPage = () => {
             ) : (
                 <EmailConfirmationForm
                     user={userData}
+                    onRegistrationComplete={handleRegistrationCompleted}
                 />
             )}
-            );
         </>
     );
 };

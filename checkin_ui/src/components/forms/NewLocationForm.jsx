@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import LocationService from "../../services/LocationService.js";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Toast from "../common/Toast.jsx";
 
 const NewLocationForm = () => {
   const [formData, setFormData] = useState({
@@ -46,8 +47,6 @@ const NewLocationForm = () => {
         error.response.data.errors.forEach(err => {
           setFieldError(err.field, err.message);
         });
-      } else {
-        setFieldError('general', 'Registration failed. Please try again.');
       }
     } finally {
       setSubmitting(false);
@@ -56,7 +55,7 @@ const NewLocationForm = () => {
 
   return (
       <div className="new-location-form">
-        <ToastContainer position="top-right" autoClose={3000} />
+        <Toast/>
         <h2>Register New Location</h2>
 
         <Formik
@@ -76,11 +75,6 @@ const NewLocationForm = () => {
 
             return (
                 <Form>
-                  {errors.general && (
-                      <div className="error-message general">{errors.general}</div>
-                  )}
-
-                  {/* Name */}
                   <div className="form-group">
                     <label htmlFor="name">
                       Location Name <span className="required">*</span>
@@ -95,7 +89,6 @@ const NewLocationForm = () => {
                     <ErrorMessage name="name" component="div" className="error-text" />
                   </div>
 
-                  {/* Phone */}
                   <div className="form-group">
                     <label htmlFor="phone">
                       Phone Number <span className="required">*</span>

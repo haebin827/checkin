@@ -2,6 +2,7 @@ const nodemailer = require('nodemailer');
 const emailConfig = require('../configs/emailConfig');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
+const AppError = require("../middlewares/AppError");
 
 const transporter = nodemailer.createTransport(emailConfig);
 
@@ -32,12 +33,17 @@ async function sendEmail(email) {
     </div>
   `;
 
-  const info = await transporter.sendMail({
-    from: emailConfig.auth.user,
-    to: email,
-    subject: 'Signup Verification Code',
-    html: htmlContent,
-  });
+  try {
+    const info = await transporter.sendMail({
+      from: emailConfig.auth.user,
+      to: email,
+      subject: 'Signup Verification Code',
+      html: htmlContent,
+    });
+  } catch (err) {
+    console.error('Email sending failed:', err);
+    throw new AppError('Internal Server Error', 500);
+  }
 
   return {
     info,
@@ -66,7 +72,7 @@ async function sendFindIdEmail(email) {
     return true;
   } catch (err) {
     console.error('Email sending failed:', err);
-    throw new Error('Failed to send email');
+    throw new AppError('Internal Server Error', 500);
   }
 }
 
@@ -89,7 +95,7 @@ async function sendPasswordResetEmail(email) {
     return true;
   } catch (err) {
     console.error('Email sending failed:', err);
-    throw new Error('Failed to send email');
+    throw new AppError('Internal Server Error', 500);
   }
 }
 

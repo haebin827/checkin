@@ -68,3 +68,12 @@ export const profileEditSchema = Yup.object({
         .email('Invalid email format')
         .required('Email: Email is required.')
 });
+
+export const additionalInfoSchema = Yup.object({
+    engName: Yup.string()
+        .required('English Name: This field is required.')
+        .matches(/^[A-Za-z\s]+$/, 'English Name: Must contain only English letters'),
+    phone: Yup.string()
+        .matches(/^\d{10}$/, 'Phone: Must be exactly 10 digits.')
+        .required('Phone: Phone is required.'),
+});

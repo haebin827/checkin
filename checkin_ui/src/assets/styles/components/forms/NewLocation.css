@@ -2,9 +2,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap');
 
 .new-location-form {
-  max-width: 800px;
+  max-width: 600px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 20px;
   background-color: #ffffff;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -12,7 +12,7 @@
 
 .new-location-form h2 {
   font-family: 'Rubik', sans-serif;
-  font-size: 25px;
+  font-size: 23px;
   font-weight: 500;
   color: #1b5e20;
   margin-bottom: 1.5rem;
@@ -54,10 +54,32 @@
   border-color: #f56c6c;
 }
 
-.error-message {
-  color: #f56c6c;
-  font-size: 0.875rem;
-  margin-top: 0.5rem;
+.error-text {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 4px;
+  margin-bottom: 0;
+  padding-left: 2px;
+  font-weight: 400;
+}
+
+.error-message.general {
+  margin: 0 0 16px;
+  padding: 8px 12px;
+  background-color: #fff5f5;
+  border: 1px solid #ffebeb;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.form-input.error {
+  border-color: #dc3545;
+  background-color: #fff;
+}
+
+.form-input.error:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 1px #dc3545;
 }
 
 .form-row {
@@ -117,28 +139,31 @@
 }
 
 .submit-button {
-  padding: 0.75rem 2rem;
-  background-color: #409eff;
+  width: 100%;
+  padding: 12px;
+  background-color: #4CAF50;
   color: white;
   border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  font-weight: bold;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: 500;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .submit-button:hover {
-  background-color: #66b1ff;
-}
-
-.submit-button:active {
-  background-color: #3a8ee6;
+  background-color: #45a049;
 }
 
 .submit-button:disabled {
-  background-color: #a0cfff;
+  background-color: #cccccc;
   cursor: not-allowed;
+}
+
+.submit-button.loading {
+  opacity: 0.8;
+  cursor: wait;
 }
 
 .address-subtitle {

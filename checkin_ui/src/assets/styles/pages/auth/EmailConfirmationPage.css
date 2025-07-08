@@ -196,7 +196,6 @@
 
 .verify-button:hover:not(:disabled) {
   background-color: var(--secondary-color);
-  transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 

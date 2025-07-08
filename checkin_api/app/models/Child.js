@@ -33,10 +33,8 @@ module.exports = (sequelize, Sequelize) => {
       },
       phone: {
         type: Sequelize.STRING,
-        allowNull: false,
         unique: true,
         validate: {
-          notEmpty: true,
           len: [10, 12],
           is: /^\d{10,12}$/,
         },
