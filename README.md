@@ -14,7 +14,7 @@ The Check-In Service is designed to enhance child safety and security in educati
 - Comprehensive tracking of all check-in/out activities
 
 ### Target Users
-- Educational Facilities (Kindergartens, Schools, Academies)
+- Educational Facilities (Kindergartens, Schools, Academies) 
 - Parents and Legal Guardians
 - Facility Administrators and Staff
 - Child Safety Organizations
