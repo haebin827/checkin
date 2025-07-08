@@ -1,7 +1,7 @@
 const AuthService = require('../services/AuthService');
 const EmailService = require('../services/EmailService');
 const { validationResult } = require('express-validator');
-const { updateUserValidation } = require('../validations/validations');
+const { updateUserValidation, userValidation, userSocialValidation} = require('../validations/validations');
 
 exports.login = async (req, res) => {
   const { username, password } = req.body;
@@ -30,19 +30,27 @@ exports.logout = async (req, res) => {
   await AuthService.logout(req.session, res);
   res.status(200).json({
     success: true,
-    message: 'Logout successfully',
   });
 };
 
 exports.validateRegistration = [
-  //userValidation,
+  userValidation,
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       console.log('AuthController/register: ', errors.array());
+
+      const formattedErrors = errors.array().reduce((acc, error) => {
+        const [field, message] = error.msg.split(': ');
+        const fieldName = field.toLowerCase();
+
+        acc[fieldName] = message || error.msg;
+        return acc;
+      }, {});
+
       return res.status(400).json({
         success: false,
-        errors: errors.array(),
+        errors: formattedErrors,
       });
     }
     return res.status(200).json({ success: true });
@@ -65,7 +73,6 @@ exports.sendOTPEmail = async (req, res) => {
   if (!email) {
     return res.status(400).json({
       success: false,
-      message: 'No email found',
     });
   }
   const data = await EmailService.sendEmail(email);
@@ -84,14 +91,12 @@ exports.changePassword = async (req, res) => {
   if (!userId || !currentPassword || !newPassword) {
     return res.status(400).json({
       success: false,
-      message: 'Datas are required',
     });
   }
   await AuthService.changePassword(userId, currentPassword, newPassword);
 
   res.status(200).json({
     success: true,
-    message: 'Password changed successfully',
   });
 };
 
@@ -101,7 +106,6 @@ exports.getUser = async (req, res) => {
   if (!id) {
     return res.status(400).json({
       success: false,
-      message: 'User ID is required',
     });
   }
   const user = await AuthService.getUser(id);
@@ -113,13 +117,20 @@ exports.getUser = async (req, res) => {
 };
 
 exports.updateUser = [
-  //updateUserValidation,
+  updateUserValidation,
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      const formattedErrors = errors.array().reduce((acc, error) => {
+        const [field, message] = error.msg.split(': ');
+        const fieldName = field.toLowerCase();
+        acc[fieldName] = message || error.msg;
+        return acc;
+      }, {});
+
       return res.status(400).json({
         success: false,
-        errors: errors.array(),
+        errors: formattedErrors,
       });
     }
     const user = req.body;
@@ -160,19 +171,41 @@ exports.loginFailed = async (req, res) => {
   });
 };
 
-exports.completeRegistration = async (req, res) => {
-  const newUser = await AuthService.completeRegistration(req);
+exports.completeRegistration = [
+  userSocialValidation,
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const formattedErrors = errors.array().reduce((acc, error) => {
+        const [field, message] = error.msg.split(': ');
+        const fieldName = field.toLowerCase();
+        acc[fieldName] = message || error.msg;
+        return acc;
+      }, {});
 
-  res.status(201).json({
-    success: true,
-    user: {
-      id: newUser.id,
-      username: newUser.username,
-      engName: newUser.engName,
-      role: newUser.role,
-    },
-  });
-};
+      return res.status(400).json({
+        success: false,
+        errors: formattedErrors,
+      });
+    }
+
+    if (!req.body) {
+      return res.status(400).json({
+        success: false,
+      });
+    }
+    await AuthService.completeRegistration(req);
+    res.status(201).json({
+      success: true,
+      /*user: {
+        id: newUser.id,
+        username: newUser.username,
+        engName: newUser.engName,
+        role: newUser.role,
+      },*/
+    });
+  },
+];
 
 // ---------------------------------------------------------
 // Find ID/PW
@@ -184,11 +217,10 @@ exports.handleFindRequest = async (req, res) => {
   if (!email || !searchType) {
     res.status(400).json({
       success: false,
-      message: 'Email or searchType is required',
     });
   }
-  const data = await AuthService.handleFindRequest(email, searchType);
-  res.status(200).json({ success: true, message: data.message });
+  await AuthService.handleFindRequest(email, searchType);
+  res.status(200).json({ success: true });
 };
 
 exports.verifyUsername = async (req, res) => {

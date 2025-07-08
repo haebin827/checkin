@@ -1,4 +1,4 @@
-import '../../assets/styles/pages/LoginPage.css';
+import '../../assets/styles/pages/auth/LoginPage.css';
 import {Link, useNavigate} from 'react-router-dom';
 import {useAuth} from "../../hooks/useAuth.jsx";
 import {useEffect, useState} from "react";
@@ -66,16 +66,7 @@ const LoginPage = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
 
-        // 입력 검증
-        let isValid = true;
-
-        if (!loginData.username || !loginData.password) {
-            isValid = false;
-        }
-
-        if (!isValid) return;
-
-        if (lockInfo.isLocked) {
+        if (!loginData.username || !loginData.password || lockInfo.isLocked) {
             return;
         }
 
@@ -84,7 +75,6 @@ const LoginPage = () => {
             const response = await AuthService.login(loginData);
 
             if (response.data.success) {
-                // 로그인 성공 후 세션 체크를 호출하여 user 상태 업데이트
                 await checkSession();
                 nav('/main');
             } else {
@@ -146,28 +136,22 @@ const LoginPage = () => {
         if (lockInfo.isLocked) {
             return (
                 <div className="lock-message">
-                    <p>계정이 일시적으로 잠겼습니다</p>
-                    <p>{formatRemainingTime(countdown)} 후에 다시 시도해주세요</p>
+                    <p>Account Temporarily Locked</p>
+                    <p>For your security, login has been disabled for {formatRemainingTime(countdown)}.</p>
+                    <p>Please try again later or contact support if you need assistance.</p>
                 </div>
             );
         } else if (lockInfo.attempts > 0) {
             return (
                 <div className="attempt-info">
-                    <p>로그인 시도: {lockInfo.attempts}회</p>
-                    <p>남은 시도: {lockInfo.remaining}회</p>
+                    <p>Login Attempt Warning</p>
+                    <p>Failed attempts: {lockInfo.attempts} of 5</p>
+                    {/*<p>Remaining attempts: {lockInfo.remaining}</p>*/}
                 </div>
             );
         }
         return null;
     };
-
-    if (loading) {
-        return (
-            <div className="loading-container">
-                <div className="loading-spinner"></div>
-            </div>
-        );
-    }
 
     return (
         <div className="login-container">
@@ -190,7 +174,6 @@ const LoginPage = () => {
                             onKeyPress={handleKeyPress}
                             placeholder="Username"
                             disabled={isLoading || lockInfo.isLocked}
-                            required
                         />
                     </div>
 
@@ -204,12 +187,11 @@ const LoginPage = () => {
                             onKeyPress={handleKeyPress}
                             placeholder="Password"
                             disabled={isLoading || lockInfo.isLocked}
-                            required
                         />
                     </div>
 
                     <div className="login-options">
-                        <Link to="/forgot" className="forgot-password">Forgot password?</Link>
+                        <Link to="/forgot" className="forgot-password">Forgot username or password?</Link>
                     </div>
 
                     <button

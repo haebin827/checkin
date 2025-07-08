@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { FaKey, FaEye, FaEyeSlash, FaTimes, FaQuestionCircle } from 'react-icons/fa';
-import { toast } from 'react-toastify';
-import './ChangePasswordModal.css';
+import '../../assets/styles/components/modals/ChangePasswordModal.css';
+import AuthService from "../../services/AuthService.js";
 
-const ChangePasswordModal = ({ isOpen, onClose, onSubmit, user }) => {
+const ChangePasswordModal = ({ isOpen, onClose, user, onSubmit }) => {
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
     newPassword: '',
@@ -40,11 +40,11 @@ const ChangePasswordModal = ({ isOpen, onClose, onSubmit, user }) => {
 
   const validatePasswordForm = () => {
     const errors = {};
-    
+
     if (!passwordForm.currentPassword) {
       errors.currentPassword = 'Current password is required';
     }
-    
+
     if (!passwordForm.newPassword) {
       errors.newPassword = 'New password is required';
     } else if (passwordForm.newPassword.length < 8) {
@@ -58,33 +58,42 @@ const ChangePasswordModal = ({ isOpen, onClose, onSubmit, user }) => {
     } else if (!/[!@#$%^&*]/.test(passwordForm.newPassword)) {
       errors.newPassword = 'Password must contain at least one special character (!@#$%^&*)';
     }
-    
+
     if (!passwordForm.confirmPassword) {
       errors.confirmPassword = 'Please confirm your new password';
     } else if (passwordForm.newPassword !== passwordForm.confirmPassword) {
       errors.confirmPassword = 'Passwords do not match';
     }
-    
+
     setPasswordErrors(errors);
     return Object.keys(errors).length === 0;
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (validatePasswordForm()) {
       setIsSubmitting(true);
       try {
-        await onSubmit(passwordForm);
-        setPasswordForm({
-          currentPassword: '',
-          newPassword: '',
-          confirmPassword: ''
+        const response = await AuthService.changePassword({
+          userId: user.id,
+          currentPassword: passwordForm.currentPassword,
+          newPassword: passwordForm.newPassword
         });
+
+        if (response.data.success) {
+          setPasswordForm({
+            currentPassword: '',
+            newPassword: '',
+            confirmPassword: ''
+          });
+          onSubmit(true);
+        } else {
+          onSubmit(false);
+        }
       } catch (error) {
-        console.error('Password change failed:', error);
-        const errorMessage = error.response?.data?.message || 'Failed to change password';
-        toast.error(errorMessage);
+        console.error('Password update failed:', error);
+        onSubmit(false);
       } finally {
         setIsSubmitting(false);
       }
@@ -112,7 +121,7 @@ const ChangePasswordModal = ({ isOpen, onClose, onSubmit, user }) => {
             <FaTimes />
           </button>
         </div>
-        
+
         <form className="password-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="currentPassword">Current Password</label>
@@ -126,8 +135,8 @@ const ChangePasswordModal = ({ isOpen, onClose, onSubmit, user }) => {
                 className={passwordErrors.currentPassword ? 'error' : ''}
                 autoComplete="current-password"
               />
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="toggle-password"
                 onClick={() => togglePasswordVisibility('current')}
               >
@@ -135,10 +144,10 @@ const ChangePasswordModal = ({ isOpen, onClose, onSubmit, user }) => {
               </button>
             </div>
             {passwordErrors.currentPassword && (
-              <div className="error-message">{passwordErrors.currentPassword}</div>
+              <div className="error-text">{passwordErrors.currentPassword}</div>
             )}
           </div>
-          
+
           <div className="form-group">
             <div className="label-with-tooltip">
               <label htmlFor="newPassword">New Password</label>
@@ -166,8 +175,8 @@ const ChangePasswordModal = ({ isOpen, onClose, onSubmit, user }) => {
                 className={passwordErrors.newPassword ? 'error' : ''}
                 autoComplete="new-password"
               />
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="toggle-password"
                 onClick={() => togglePasswordVisibility('new')}
               >
@@ -175,10 +184,10 @@ const ChangePasswordModal = ({ isOpen, onClose, onSubmit, user }) => {
               </button>
             </div>
             {passwordErrors.newPassword && (
-              <div className="error-message">{passwordErrors.newPassword}</div>
+              <div className="error-text">{passwordErrors.newPassword}</div>
             )}
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="confirmPassword">Confirm New Password</label>
             <input
@@ -191,13 +200,13 @@ const ChangePasswordModal = ({ isOpen, onClose, onSubmit, user }) => {
               autoComplete="new-password"
             />
             {passwordErrors.confirmPassword && (
-              <div className="error-message">{passwordErrors.confirmPassword}</div>
+              <div className="error-text">{passwordErrors.confirmPassword}</div>
             )}
           </div>
-          
+
           <div className="form-actions">
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="send-button"
               disabled={isSubmitting}
             >
@@ -210,4 +219,4 @@ const ChangePasswordModal = ({ isOpen, onClose, onSubmit, user }) => {
   );
 };
 
-export default ChangePasswordModal; 
+export default ChangePasswordModal;

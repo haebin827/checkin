@@ -10,11 +10,13 @@
   --text-color: #37474F;        /* 진한 청록색 */
   --text-light: #607D8B;        /* 중간 청록색 */
   --error-color: #F44336;
+  --error-light: #FFEBEE;       /* 연한 빨간색 배경 */
+  --warning-color: #FF9800;     /* 경고색 */
+  --warning-light: #FFF3E0;     /* 연한 주황색 배경 */
   --success-color: #4CAF50;
   --border-color: #DCEDC8;      /* 연한 녹색 테두리 */
   --kakao-color: #FEE500;
   --google-color: #FFFFFF;
-  --highlight-color: #FFEB3B;   /* 안전 강조색(노란색) */
   --shadow-color: rgba(76, 175, 80, 0.2); /* 녹색 그림자 */
 }
 
@@ -158,41 +160,6 @@ body {
   margin-top: -8px;
 }
 
-.remember-me {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.remember-me input[type="checkbox"] {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
-  border: 2px solid var(--border-color);
-  border-radius: 4px;
-  outline: none;
-  cursor: pointer;
-  position: relative;
-  background-color: white;
-}
-
-.remember-me input[type="checkbox"]:checked {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-}
-
-.remember-me input[type="checkbox"]:checked::before {
-  content: '✓';
-  position: absolute;
-  color: white;
-  font-size: 12px;
-  font-weight: bold;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
 .forgot-password {
   color: var(--primary-color);
   text-decoration: none;
@@ -215,20 +182,12 @@ body {
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
   font-family: 'Rubik', sans-serif;
 }
 
-.login-button:hover {
-  background-color: var(--secondary-color);
-  box-shadow: 0 6px 12px rgba(56, 142, 60, 0.2);
-}
-
-.login-button:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(56, 142, 60, 0.2);
+.login-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .login-divider {
@@ -269,8 +228,6 @@ body {
   font-weight: 500;
   cursor: pointer;
   border: 2px solid var(--border-color);
-  position: relative;
-  overflow: hidden;
   font-family: 'Rubik', sans-serif;
 }
 
@@ -305,29 +262,11 @@ body {
   text-decoration: none;
   font-weight: 600;
   transition: all 0.2s;
-  position: relative;
-}
-
-.register-link a::after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 2px;
-  background-color: var(--primary-color);
-  bottom: -2px;
-  left: 0;
-  transform: scaleX(0);
-  transform-origin: bottom right;
-  transition: transform 0.3s;
 }
 
 .register-link a:hover {
   color: var(--secondary-color);
-}
-
-.register-link a:hover::after {
-  transform: scaleX(1);
-  transform-origin: bottom left;
+  text-decoration: underline;
 }
 
 .safety-message {
@@ -352,6 +291,53 @@ body {
   content: '🔒';
   margin-right: 8px;
   font-size: 16px;
+}
+
+/* 로그인 시도 관련 메시지 스타일 */
+.lock-message {
+  background-color: var(--error-light);
+  border-left: 4px solid var(--error-color);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  font-size: 12px;
+  color: var(--text-color);
+  text-align: left;
+}
+
+.lock-message p {
+  margin: 0;
+  line-height: 1.4;
+}
+
+.lock-message p:first-child {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--error-color);
+  margin-bottom: 3px;
+}
+
+.attempt-info {
+  background-color: var(--warning-light);
+  border-left: 4px solid var(--warning-color);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  font-size: 12px;
+  color: var(--text-color);
+  text-align: left;
+}
+
+.attempt-info p {
+  margin: 0;
+  line-height: 1.4;
+}
+
+.attempt-info p:first-child {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--warning-color);
+  margin-bottom: 3px;
 }
 
 /* 반응형 디자인 */
@@ -392,6 +378,18 @@ body {
   .safety-message {
     font-size: 12px;
     padding: 8px;
+  }
+  
+  .lock-message,
+  .attempt-info {
+    padding: 10px 12px;
+    font-size: 11px;
+    margin-bottom: 16px;
+  }
+
+  .lock-message p:first-child,
+  .attempt-info p:first-child {
+    font-size: 12px;
   }
 }
 

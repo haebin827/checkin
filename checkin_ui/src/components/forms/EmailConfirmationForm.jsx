@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaSpinner, FaCheck, FaEnvelope } from 'react-icons/fa';
-import '../../assets/styles/pages/EmailConfirmationPage.css';
+import '../../assets/styles/pages/auth/EmailConfirmationPage.css';
 import AuthService from "../../services/AuthService.js";
 
-const EmailConfirmationForm = ({user}) => {
+const EmailConfirmationForm = ({user, onRegistrationComplete}) => {
   const navigate = useNavigate();
 
   // State for OTP digits
@@ -124,9 +124,9 @@ const EmailConfirmationForm = ({user}) => {
         setVerificationSuccess(true);
 
         await AuthService.register(user);
-        // Navigate to login page after a delay to show success state
+        // Call onRegistrationComplete instead of navigating
         setTimeout(() => {
-          navigate('/');
+          onRegistrationComplete();
         }, 1500);
       } else {
         setVerificationError('Invalid verification code. Please try again.');
@@ -171,7 +171,7 @@ const EmailConfirmationForm = ({user}) => {
         <div className="confirmation-header">
           <h1>Email Verification</h1>
           <p>We've sent a verification code to your email</p>
-          <div className="email-display">{user.email}</div>
+                    <div className="email-display">{user.email}</div>
         </div>
 
         <div className="confirmation-body">

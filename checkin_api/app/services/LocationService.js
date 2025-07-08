@@ -28,12 +28,10 @@ const LocationService = {
 
     const transaction = await db.sequelize.transaction();
     try {
-      const newUuid = uuidv4();
       const location = await Location.create(
         {
           ...locationData,
-          uuid: newUuid,
-          status: '1',
+          uuid: uuidv4(),
         },
         { transaction },
       );
@@ -41,8 +39,9 @@ const LocationService = {
       await transaction.commit();
       return location;
     } catch (err) {
-      await transaction.rollback();
-      console.error('LocationService/createLocation:', err);
+      if (!transaction.finished) {
+        await transaction.rollback();
+      }
       throw err;
     }
   },

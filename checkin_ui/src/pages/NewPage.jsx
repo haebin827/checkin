@@ -15,9 +15,8 @@ const NewPage = () => {
   const [formType, setFormType] = useState('child');
   
   useEffect(() => {
-    if (!user || (user.role !== 'manager' && user.role !== 'admin')) {
+    if (user.role !== 'manager' && user.role !== 'admin') {
       nav('/403');
-      return;
     }
   }, [user, nav]);
 

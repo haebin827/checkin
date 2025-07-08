@@ -1,5 +1,6 @@
 const { body } = require('express-validator');
 const AuthService = require('../services/AuthService');
+const ChildService = require('../services/ChildService');
 
 const userValidation = [
   body('username').custom(async username => {
@@ -14,6 +15,15 @@ const userValidation = [
       return Promise.reject('Email: Email already exists.');
     }
   }),
+  body('phone').custom(async phone => {
+    const existingPhone = await AuthService.findUserByPhone(phone);
+    if (existingPhone) {
+      return Promise.reject('Phone: Phone number already exists.');
+    }
+  }),
+];
+
+const userSocialValidation = [
   body('phone').custom(async phone => {
     const existingPhone = await AuthService.findUserByPhone(phone);
     if (existingPhone) {
@@ -37,7 +47,18 @@ const updateUserValidation = [
   }),
 ];
 
+const childValidation = [
+  body('phone').custom(async (phone, { req }) => {
+    const existingPhone = await ChildService.findChildByPhone(phone);
+    if (existingPhone) {
+      return Promise.reject('Phone: Phone number already exists.');
+    }
+  }),
+];
+
 module.exports = {
   userValidation,
   updateUserValidation,
+  childValidation,
+  userSocialValidation
 };

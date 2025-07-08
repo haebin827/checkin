@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const cors = require('cors');
 const logger = require('morgan');
 const helmet = require('helmet');
@@ -16,8 +17,11 @@ if (process.env.NODE_ENV === 'ngrok') {
   app.set('trust proxy', 1);
 }
 
-app.use(logger('dev'));
+if (!fs.existsSync('./logs')) {
+    fs.mkdirSync('./logs');
+}
 
+app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

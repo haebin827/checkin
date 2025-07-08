@@ -1,6 +1,7 @@
 const db = require('../models');
 const { v4: uuidv4 } = require('uuid');
 const EmailService = require('./EmailService');
+const AppError = require("../middlewares/AppError");
 const Child = db.child;
 const User = db.user;
 const Location = db.location;
@@ -34,10 +35,12 @@ const ChildService = {
   },
 
   async createChild(childData) {
-    console.log('Child Data:', childData);
     if (!childData.engName || !childData.location_id) {
-      throw new Error('English name and location are required');
+      throw new AppError('Invalid credentials', 400);
     }
+
+    childData.phone = childData.phone === '' ? null : childData.phone;
+    childData.korName = childData.korName === '' ? null : childData.korName;
 
     try {
       const child = await Child.create(childData);
@@ -327,6 +330,20 @@ const ChildService = {
       await transaction.rollback();
       console.error('ChildService/updateGuardianSettings:', error);
       throw error;
+    }
+  },
+
+  async findChildByPhone(phone) {
+    try {
+      const count = await Child.count({
+        where: { phone },
+      });
+
+      console.log("COUNT: ", count)
+      return count > 0;
+    } catch (err) {
+      console.error('Phone check error:', err);
+      throw err;
     }
   },
 };

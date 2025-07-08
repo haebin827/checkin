@@ -4,6 +4,7 @@ import Error404 from "./pages/errors/404.jsx";
 import ForgotIdOrPwPage from "./pages/auth/ForgotIdOrPwPage.jsx";
 import RegisterPage from "./pages/auth/RegisterPage.jsx";
 import MainPage from "./pages/MainPage.jsx";
+import FindUsernamePage from "./pages/auth/FindUsernamePage.jsx";
 import {Route, Routes} from "react-router-dom";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import HistoryPage from "./pages/HistoryPage.jsx";
@@ -17,6 +18,7 @@ import AdditionalInfoPage from './pages/auth/AdditionalInfoPage';
 import PrivateRoute from "./routes/PrivateRoute.jsx";
 import DataPage from "./pages/DataPage.jsx";
 import {ToastContainer} from "react-toastify";
+import ResetPasswordPage from "./pages/auth/ResetPasswordPage.jsx";
 
 function App() {
 
@@ -65,7 +67,8 @@ function App() {
                             </PrivateRoute>
                         }
                     />
-
+                    <Route path={'/verify-email'} element={<FindUsernamePage/>}/>
+                    <Route path={'/reset-password'} element={<ResetPasswordPage/>}/>
                     {/* Error Pages */}
                     <Route path={'/error/500'} element={<Error500/>} />
                     <Route path={'/error/401'} element={<Error401/>} />

@@ -1,32 +1,37 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import '../../assets/styles/pages/ForgotIdOrPw.css';
+import '../../assets/styles/pages/auth/ForgotIdOrPw.css';
+import AuthService from "../../services/AuthService.js";
+import Toast from "../../components/common/Toast.jsx";
+import { toast } from 'react-hot-toast';
 
 const ForgotIdOrPwPage = () => {
     const [searchType, setSearchType] = useState('id');
     const [email, setEmail] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsSubmitting(true);
-        
-        // 여기에서 API 호출 로직을 구현할 예정
-        console.log(`Sending ${searchType} recovery request to ${email}`);
-        
-        // 요청 완료 후 상태 리셋 (실제로는 API 응답 후 처리)
-        setTimeout(() => {
-            setIsSubmitting(false);
-            alert(`Recovery email sent to ${email}`);
-        }, 1500);
+        setIsSubmitting(true)
+        try {
+            await AuthService.findAccount({
+                email,
+                searchType
+            });
+            toast.success('If an account exists with that email, you will receive an email shortly.');
+        } catch (err) {
+            toast.error('Something went wrong. Please try again later.');
+        } finally {
+            setIsSubmitting(false)
+        }
     };
 
     return (
         <div className="forgot-container">
+            <Toast />
             <div className="forgot-card">
                 <div className="forgot-header">
                     <h1>Account Recovery</h1>
-                    <p>Select an option to recover your account information</p>
                 </div>
                 
                 <form className="forgot-form" onSubmit={handleSubmit}>

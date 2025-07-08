@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { FaCalendarAlt, FaUser, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
 import '../../assets/styles/components/forms/NewChild.css';
 import { useAuth } from "../../hooks/useAuth.jsx";
 import LocationService from "../../services/LocationService.js";
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import ChildService from "../../services/ChildService.js";
 import { childSchema } from "../../validations/validations.js";
 import { ErrorMessage, Field, Form, Formik } from "formik";
+import Toast from "../common/Toast.jsx";
 
 const NewChildForm = () => {
   const { user } = useAuth();
@@ -19,7 +19,7 @@ const NewChildForm = () => {
       setIsLoading(true);
       try {
         const response = await LocationService.getAllLocations();
-        if (response.data && response.data.success) {
+        if (response.data.success) {
           setLocations(response.data.locations);
         }
       } catch (err) {
@@ -28,7 +28,6 @@ const NewChildForm = () => {
         setIsLoading(false);
       }
     };
-
     fetchLocations();
   }, []);
 
@@ -50,17 +49,23 @@ const NewChildForm = () => {
     try {
       setSubmitting(true);
       const response = await ChildService.createChild(newChild);
-      if (response.data && response.data.success) {
+      if (response.data.success) {
         toast.success('Child information registered successfully!');
         setTimeout(() => resetForm(), 100);
       }
     } catch (error) {
+      console.error('Child registration failed:', error);
       if (error.response?.data?.errors) {
-        error.response.data.errors.forEach(err => {
-          setFieldError(err.field, err.message);
+        const backendErrors = error.response.data.errors;
+        Object.keys(backendErrors).forEach(field => {
+          // Convert backend field names to frontend field names if needed
+          const frontendField = field === 'eng_name' ? 'engName' : 
+                               field === 'kor_name' ? 'korName' : 
+                               field === 'location_id' ? 'locationId' : field;
+          setFieldError(frontendField, backendErrors[field]);
         });
       } else {
-        setFieldError('general', 'Registration failed. Please try again.');
+        toast.error('Registration failed. Please try again.');
       }
     } finally {
       setSubmitting(false);
@@ -69,7 +74,7 @@ const NewChildForm = () => {
 
   return (
       <div className="new-child-form">
-        <ToastContainer position="top-right" autoClose={3000} />
+        <Toast/>
         <h2>Register New Child</h2>
 
         <Formik
@@ -79,10 +84,6 @@ const NewChildForm = () => {
         >
           {({ isSubmitting, errors, touched }) => (
               <Form>
-                {errors.general && (
-                    <div className="error-message general">{errors.general}</div>
-                )}
-
                 <div className="form-group">
                   <label htmlFor="engName">
                     English Name <span className="required">*</span>
