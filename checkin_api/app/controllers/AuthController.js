@@ -1,7 +1,11 @@
 const AuthService = require('../services/AuthService');
 const EmailService = require('../services/EmailService');
 const { validationResult } = require('express-validator');
-const { updateUserValidation, userValidation, userSocialValidation} = require('../validations/validations');
+const {
+  updateUserValidation,
+  userValidation,
+  userSocialValidation,
+} = require('../validations/validations');
 
 exports.login = async (req, res) => {
   const { username, password } = req.body;

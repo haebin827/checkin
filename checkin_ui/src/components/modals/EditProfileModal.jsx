@@ -12,7 +12,7 @@ const EditProfileModal = ({ isOpen, onClose, onSubmit, initialData, updateUserDa
     korName: initialData.kor_name || '',
     username: initialData.username || '',
     phone: initialData.phone || '',
-    email: initialData.email || ''
+    email: initialData.email || '',
   };
 
   const handleSubmit = async (values, { setSubmitting, setFieldError, setErrors }) => {
@@ -20,7 +20,7 @@ const EditProfileModal = ({ isOpen, onClose, onSubmit, initialData, updateUserDa
       setSubmitting(true);
       const response = await AuthService.updateUser({
         ...values,
-        id: initialData.id
+        id: initialData.id,
       });
 
       if (response.data.success) {
@@ -56,7 +56,7 @@ const EditProfileModal = ({ isOpen, onClose, onSubmit, initialData, updateUserDa
             <FaTimes />
           </button>
         </div>
-        
+
         <Formik
           initialValues={initialValues}
           validationSchema={profileEditSchema}
@@ -66,9 +66,7 @@ const EditProfileModal = ({ isOpen, onClose, onSubmit, initialData, updateUserDa
         >
           {({ isSubmitting, errors, touched, values }) => (
             <Form className="password-form">
-              {errors.general && (
-                <div className="error-text general">{errors.general}</div>
-              )}
+              {errors.general && <div className="error-text general">{errors.general}</div>}
 
               <div className="form-group">
                 <label htmlFor="engName">
@@ -83,11 +81,9 @@ const EditProfileModal = ({ isOpen, onClose, onSubmit, initialData, updateUserDa
                 />
                 <ErrorMessage name="engName" component="div" className="error-text" />
               </div>
-              
+
               <div className="form-group">
-                <label htmlFor="korName">
-                  Korean Name
-                </label>
+                <label htmlFor="korName">Korean Name</label>
                 <Field
                   type="text"
                   id="korName"
@@ -97,7 +93,7 @@ const EditProfileModal = ({ isOpen, onClose, onSubmit, initialData, updateUserDa
                 />
                 <ErrorMessage name="korName" component="div" className="error-text" />
               </div>
-              
+
               <div className="form-group">
                 <label htmlFor="username">
                   Username <span className="required">*</span>
@@ -111,7 +107,7 @@ const EditProfileModal = ({ isOpen, onClose, onSubmit, initialData, updateUserDa
                 />
                 <ErrorMessage name="username" component="div" className="error-text" />
               </div>
-              
+
               <div className="form-group">
                 <label htmlFor="phone">
                   Phone Number <span className="required">*</span>
@@ -129,13 +125,9 @@ const EditProfileModal = ({ isOpen, onClose, onSubmit, initialData, updateUserDa
               <div className="email-notice">
                 <p>To change your email address, please contact the administrator.</p>
               </div>
-              
+
               <div className="form-actions">
-                <button 
-                  type="submit" 
-                  className="send-button"
-                  disabled={isSubmitting}
-                >
+                <button type="submit" className="send-button" disabled={isSubmitting}>
                   {isSubmitting ? 'Updating...' : 'Update Profile'}
                 </button>
               </div>
@@ -147,4 +139,4 @@ const EditProfileModal = ({ isOpen, onClose, onSubmit, initialData, updateUserDa
   );
 };
 
-export default EditProfileModal; 
+export default EditProfileModal;

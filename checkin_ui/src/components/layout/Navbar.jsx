@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import {Link, useLocation, useNavigate} from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FaUser, FaBell, FaSignOutAlt, FaCog, FaChevronDown, FaBars } from 'react-icons/fa';
 import '../../assets/styles/components/Navbar.css';
-import AuthService from "../../services/AuthService.js";
-import {useAuth} from "../../hooks/useAuth.jsx";
+import AuthService from '../../services/AuthService.js';
+import { useAuth } from '../../hooks/useAuth.jsx';
 
 const Navbar = () => {
   const [profileOpen, setProfileOpen] = useState(false);
@@ -11,7 +11,7 @@ const Navbar = () => {
   const location = useLocation();
   const { user, checkSession } = useAuth();
   const nav = useNavigate();
-  
+
   const toggleProfile = () => {
     setProfileOpen(!profileOpen);
   };
@@ -21,7 +21,7 @@ const Navbar = () => {
   };
 
   // 현재 경로가 주어진 경로와 일치하는지 확인하는 함수
-  const isActive = (path) => {
+  const isActive = path => {
     return location.pathname === path;
   };
 
@@ -33,7 +33,7 @@ const Navbar = () => {
         nav('/');
       }
     } catch (err) {
-      console.error("Logout error:", err);
+      console.error('Logout error:', err);
       await checkSession();
       nav('/');
     }
@@ -53,18 +53,25 @@ const Navbar = () => {
         </div>
 
         <div className={`navbar-menu ${menuOpen ? 'open' : ''}`}>
-          <Link to="/main" className={`menu-item ${isActive('/main') ? 'active' : ''}`}>Dashboard</Link>
-          <Link to="/history" className={`menu-item ${isActive('/history') ? 'active' : ''}`}>History</Link>
-          {user.role !== 'guardian' &&
-              <Link to="/data" className={`menu-item ${isActive('/data') ? 'active' : ''}`}>Data</Link>
-          }
-          {user.role !== 'guardian' &&
-            <Link to="/new" className={`menu-item ${isActive('/new') ? 'active' : ''}`}>Registration</Link>
-          }
+          <Link to="/main" className={`menu-item ${isActive('/main') ? 'active' : ''}`}>
+            Dashboard
+          </Link>
+          <Link to="/history" className={`menu-item ${isActive('/history') ? 'active' : ''}`}>
+            History
+          </Link>
+          {user.role !== 'guardian' && (
+            <Link to="/data" className={`menu-item ${isActive('/data') ? 'active' : ''}`}>
+              Data
+            </Link>
+          )}
+          {user.role !== 'guardian' && (
+            <Link to="/new" className={`menu-item ${isActive('/new') ? 'active' : ''}`}>
+              Registration
+            </Link>
+          )}
         </div>
 
         <div className="navbar-right">
-
           <div className="profile-dropdown">
             <div className="profile-toggle" onClick={toggleProfile}>
               <div className="avatar">
@@ -76,7 +83,10 @@ const Navbar = () => {
 
             {profileOpen && (
               <div className="dropdown-menu">
-                <Link to="/profile" className={`dropdown-item ${isActive('/profile') ? 'active' : ''}`}>
+                <Link
+                  to="/profile"
+                  className={`dropdown-item ${isActive('/profile') ? 'active' : ''}`}
+                >
                   <FaUser className="dropdown-icon" />
                   <span>Profile</span>
                 </Link>
@@ -94,4 +104,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar; 
+export default Navbar;

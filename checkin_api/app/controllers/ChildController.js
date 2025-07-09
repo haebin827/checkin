@@ -1,7 +1,7 @@
 const ChildService = require('../services/ChildService');
-const {updateUserValidation, childValidation} = require("../validations/validations");
-const {validationResult} = require("express-validator");
-const AuthService = require("../services/AuthService");
+const { updateUserValidation, childValidation } = require('../validations/validations');
+const { validationResult } = require('express-validator');
+const AuthService = require('../services/AuthService');
 
 exports.getAllChildren = async (req, res) => {
   const response = await ChildService.findAllChildren();
@@ -17,7 +17,6 @@ exports.getChildrenByLocation = async (req, res) => {
   if (!locationId) {
     return res.status(400).json({
       success: false,
-      message: 'Location ID is required',
     });
   }
 
@@ -27,7 +26,6 @@ exports.getChildrenByLocation = async (req, res) => {
     children: response,
   });
 };
-
 
 exports.createChild = [
   childValidation,
@@ -86,7 +84,7 @@ exports.showChildrenAndLocationList = async (req, res) => {
   if (!userId) {
     return res.status(400).json({
       success: false,
-      message: 'User ID is required as a query parameter',
+      message: 'Invalid request',
     });
   }
 
@@ -104,10 +102,11 @@ exports.forceCheckin = async (req, res) => {
   if (!locationId || !childId || !userId) {
     return res.status(400).json({
       success: false,
-      message: 'LocationId, childId, and userId are all required',
+      message: 'Invalid request',
     });
   }
 
+  console.log('🔥🔥');
   const history = await ChildService.forceCheckin({
     locationId,
     childId,

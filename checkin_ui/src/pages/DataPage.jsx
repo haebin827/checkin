@@ -1,10 +1,9 @@
 import React from 'react';
-import {useAuth} from "../hooks/useAuth.jsx";
+import { useAuth } from '../hooks/useAuth.jsx';
 
 const DataPage = () => {
+  const { user } = useAuth();
 
-  const {user} = useAuth();
-
-  return (<></>);
-}
+  return <></>;
+};
 export default DataPage;

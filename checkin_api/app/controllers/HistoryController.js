@@ -6,7 +6,6 @@ exports.showHistoriesAndLocationList = async (req, res) => {
   if (!userId) {
     res.status(400).json({
       success: false,
-      message: 'User ID is required as a query parameter',
     });
   }
 

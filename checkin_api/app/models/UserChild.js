@@ -18,10 +18,9 @@ module.exports = (sequelize, Sequelize) => {
       relationship: {
         type: Sequelize.STRING,
         allowNull: false,
-        defaultValue: 'guardian',
+        defaultValue: 'Guardian (Please set the relationship)',
         validate: {
           notEmpty: true,
-          len: [1, 20],
         },
       },
       isSms: {
@@ -29,6 +28,11 @@ module.exports = (sequelize, Sequelize) => {
         defaultValue: '1',
         comment: '1: yes, 0: no',
       },
+        status: {
+            type: Sequelize.ENUM('0', '1'),
+            defaultValue: '1',
+            comment: '1: active, 0: deleted',
+        },
       /*locationId: {
                 type: Sequelize.INTEGER,
                 allowNull: true

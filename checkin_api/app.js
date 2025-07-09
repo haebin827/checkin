@@ -18,7 +18,7 @@ if (process.env.NODE_ENV === 'ngrok') {
 }
 
 if (!fs.existsSync('./logs')) {
-    fs.mkdirSync('./logs');
+  fs.mkdirSync('./logs');
 }
 
 app.use(logger('dev'));

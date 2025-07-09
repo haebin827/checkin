@@ -1,5 +1,4 @@
 const LocationService = require('../services/LocationService');
-const jwt = require('jsonwebtoken');
 const AppError = require('../middlewares/AppError');
 
 exports.getAllLocations = async (req, res) => {

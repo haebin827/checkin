@@ -17,8 +17,6 @@ module.exports = app => {
 
   router.post('/invite-email', child.sendInviteEmail);
 
-  router.get('/show-child-location', child.showChildrenAndLocationList);
-
   router.get('/list', child.showChildrenAndLocationList);
 
   router.post('/force-checkin', child.forceCheckin);

@@ -1,33 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
-import { FaSort, FaSortUp, FaSortDown, FaCalendarAlt, FaSearch, FaMapMarkerAlt, FaFilter, FaChevronDown, FaChevronUp, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import {
+  FaSort,
+  FaSortUp,
+  FaSortDown,
+  FaCalendarAlt,
+  FaSearch,
+  FaMapMarkerAlt,
+  FaFilter,
+  FaChevronDown,
+  FaChevronUp,
+  FaTimes,
+  FaChevronLeft,
+  FaChevronRight,
+} from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../assets/styles/pages/History.css';
-import {useAuth} from "../hooks/useAuth.jsx";
-import HistoryService from "../services/HistoryService.js";
+import { useAuth } from '../hooks/useAuth.jsx';
+import HistoryService from '../services/HistoryService.js';
 
 const HistoryPage = () => {
-
-  const {user} = useAuth();
+  const { user } = useAuth();
 
   // 필터 상태
   const [locationFilter, setLocationFilter] = useState('');
   const [dateFilter, setDateFilter] = useState(null);
   const [nameFilter, setNameFilter] = useState('');
   const [isFilterExpanded, setIsFilterExpanded] = useState(true);
-  
+
   // 정렬 상태
   const [sortField, setSortField] = useState('date');
   const [sortDirection, setSortDirection] = useState('desc');
-  
+
   // 데이터 상태
   const [locations, setLocations] = useState([]);
   const [records, setRecords] = useState([]);
   const [filteredRecords, setFilteredRecords] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // 페이지네이션 상태
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsPerPage, setRecordsPerPage] = useState(10);
@@ -45,14 +57,14 @@ const HistoryPage = () => {
         if (!user?.id) return;
 
         const response = await HistoryService.showHistoriesAndLocationList(user.id);
-        console.log("DATA", response.data)
+        console.log('DATA', response.data);
 
-        if(response.data.success) {
+        if (response.data.success) {
           // locations 설정
           const locationsList = response.data.response.locations;
-          setLocations(locationsList);  // 이미 배열 형태로 오는 locations 데이터를 그대로 설정
+          setLocations(locationsList); // 이미 배열 형태로 오는 locations 데이터를 그대로 설정
 
-          console.log("LOCATIONS: ", locationsList)
+          console.log('LOCATIONS: ', locationsList);
           // histories 데이터 변환
           const transformedHistories = response.data.response.histories.map(history => {
             const date = new Date(history.createdAt);
@@ -63,7 +75,7 @@ const HistoryPage = () => {
               location: history.location?.name,
               childName: history.child?.engName,
               checkedInBy: history.checkedInBy?.engName,
-              checkedInByRole: history.checkedInBy?.role
+              checkedInByRole: history.checkedInBy?.role,
             };
           });
 
@@ -79,12 +91,12 @@ const HistoryPage = () => {
     };
 
     fetchDatas();
-    console.log(records)
-    console.log(locations)
+    console.log(records);
+    console.log(locations);
   }, [user]);
 
   // 날짜 변환 유틸리티 함수
-  const formatDateToString = (date) => {
+  const formatDateToString = date => {
     if (!date) return '';
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -95,34 +107,32 @@ const HistoryPage = () => {
   // 필터 적용
   useEffect(() => {
     let result = [...records];
-    
+
     // 위치 필터
     if (locationFilter) {
       result = result.filter(record => record.location === locationFilter);
     }
-    
+
     // 날짜 필터
     if (dateFilter) {
       const dateString = formatDateToString(dateFilter);
       result = result.filter(record => record.date === dateString);
     }
-    
+
     // 이름 필터
     if (nameFilter) {
       const lowerCaseName = nameFilter.toLowerCase();
-      result = result.filter(record => 
-        record.childName.toLowerCase().includes(lowerCaseName)
-      );
+      result = result.filter(record => record.childName.toLowerCase().includes(lowerCaseName));
     }
-    
+
     // 정렬 적용
     result = sortRecords(result, sortField, sortDirection);
-    
+
     setFilteredRecords(result);
   }, [records, locationFilter, dateFilter, nameFilter, sortField, sortDirection]);
 
   // 정렬 핸들러
-  const handleSort = (field) => {
+  const handleSort = field => {
     if (sortField === field) {
       // 같은 필드를 다시 클릭하면 방향 전환
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -145,7 +155,7 @@ const HistoryPage = () => {
         // 문자열 정렬
         const valueA = a[field].toLowerCase();
         const valueB = b[field].toLowerCase();
-        
+
         if (valueA < valueB) return direction === 'asc' ? -1 : 1;
         if (valueA > valueB) return direction === 'asc' ? 1 : -1;
         return 0;
@@ -154,13 +164,15 @@ const HistoryPage = () => {
   };
 
   // 정렬 아이콘 렌더링
-  const renderSortIcon = (field) => {
+  const renderSortIcon = field => {
     if (sortField !== field) {
       return <FaSort className="sort-icon" />;
     }
-    return sortDirection === 'asc' ? 
-      <FaSortUp className="sort-icon active" /> : 
-      <FaSortDown className="sort-icon active" />;
+    return sortDirection === 'asc' ? (
+      <FaSortUp className="sort-icon active" />
+    ) : (
+      <FaSortDown className="sort-icon active" />
+    );
   };
 
   // 필터 초기화
@@ -178,12 +190,12 @@ const HistoryPage = () => {
   }, [filteredRecords, currentPage, recordsPerPage]);
 
   // 페이지 변경 핸들러
-  const handlePageChange = (pageNumber) => {
+  const handlePageChange = pageNumber => {
     setCurrentPage(pageNumber);
   };
 
   // 레코드 수 변경 핸들러
-  const handleRecordsPerPageChange = (e) => {
+  const handleRecordsPerPageChange = e => {
     setRecordsPerPage(parseInt(e.target.value, 10));
     setCurrentPage(1); // 페이지 당 레코드 수 변경 시 첫 페이지로 이동
   };
@@ -195,19 +207,19 @@ const HistoryPage = () => {
 
     const pageNumbers = [];
     const maxPagesToShow = 5;
-    
+
     let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
     let endPage = startPage + maxPagesToShow - 1;
-    
+
     if (endPage > totalPages) {
       endPage = totalPages;
       startPage = Math.max(1, endPage - maxPagesToShow + 1);
     }
-    
+
     // 이전 페이지 버튼
     const prevButton = (
-      <button 
-        key="prev" 
+      <button
+        key="prev"
         onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage === 1}
         className="pagination-button"
@@ -215,11 +227,11 @@ const HistoryPage = () => {
         <FaChevronLeft />
       </button>
     );
-    
+
     // 다음 페이지 버튼
     const nextButton = (
-      <button 
-        key="next" 
+      <button
+        key="next"
         onClick={() => handlePageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
         className="pagination-button"
@@ -227,44 +239,48 @@ const HistoryPage = () => {
         <FaChevronRight />
       </button>
     );
-    
+
     // 첫 페이지 버튼 (생략 표시가 필요한 경우에만)
-    const firstPageButton = startPage > 1 ? (
-      <button 
-        key="first" 
-        onClick={() => handlePageChange(1)}
-        className="pagination-button"
-      >
-        1
-      </button>
-    ) : null;
-    
+    const firstPageButton =
+      startPage > 1 ? (
+        <button key="first" onClick={() => handlePageChange(1)} className="pagination-button">
+          1
+        </button>
+      ) : null;
+
     // 첫 페이지 생략 표시
-    const firstEllipsis = startPage > 2 ? (
-      <span key="firstEllipsis" className="pagination-ellipsis">...</span>
-    ) : null;
-    
+    const firstEllipsis =
+      startPage > 2 ? (
+        <span key="firstEllipsis" className="pagination-ellipsis">
+          ...
+        </span>
+      ) : null;
+
     // 마지막 페이지 버튼 (생략 표시가 필요한 경우에만)
-    const lastPageButton = endPage < totalPages ? (
-      <button 
-        key="last" 
-        onClick={() => handlePageChange(totalPages)}
-        className="pagination-button"
-      >
-        {totalPages}
-      </button>
-    ) : null;
-    
+    const lastPageButton =
+      endPage < totalPages ? (
+        <button
+          key="last"
+          onClick={() => handlePageChange(totalPages)}
+          className="pagination-button"
+        >
+          {totalPages}
+        </button>
+      ) : null;
+
     // 마지막 페이지 생략 표시
-    const lastEllipsis = endPage < totalPages - 1 ? (
-      <span key="lastEllipsis" className="pagination-ellipsis">...</span>
-    ) : null;
-    
+    const lastEllipsis =
+      endPage < totalPages - 1 ? (
+        <span key="lastEllipsis" className="pagination-ellipsis">
+          ...
+        </span>
+      ) : null;
+
     // 페이지 번호 버튼
     for (let i = startPage; i <= endPage; i++) {
       pageNumbers.push(
-        <button 
-          key={i} 
+        <button
+          key={i}
           onClick={() => handlePageChange(i)}
           className={`pagination-button ${currentPage === i ? 'active' : ''}`}
         >
@@ -272,7 +288,7 @@ const HistoryPage = () => {
         </button>
       );
     }
-    
+
     return (
       <div className="pagination">
         {prevButton}
@@ -291,7 +307,6 @@ const HistoryPage = () => {
       <Navbar />
       <div className="history-page">
         <div className="history-container">
-        
           <div className="filter-header">
             <button className="filter-toggle" onClick={toggleFilter}>
               <FaFilter /> Filters {isFilterExpanded ? <FaChevronUp /> : <FaChevronDown />}
@@ -302,64 +317,69 @@ const HistoryPage = () => {
                 {locationFilter && <span className="filter-badge">{locationFilter}</span>}
                 {dateFilter && <span className="filter-badge">{dateFilter.toDateString()}</span>}
                 {nameFilter && <span className="filter-badge">Name: {nameFilter}</span>}
-                <button className="clear-filters-small" onClick={clearFilters}>Clear</button>
+                <button className="clear-filters-small" onClick={clearFilters}>
+                  Clear
+                </button>
               </div>
             )}
           </div>
-          
+
           {isFilterExpanded && (
             <div className="filters-section">
               <div className="filter-group">
                 <div className="filter-icon">
                   <FaMapMarkerAlt />
                 </div>
-                <select 
+                <select
                   value={locationFilter}
-                  onChange={(e) => setLocationFilter(e.target.value)}
+                  onChange={e => setLocationFilter(e.target.value)}
                   className="filter-select"
                 >
-                  <option key="all" value="">All Locations</option>
-                  {Array.isArray(locations) && locations.map((location) => (
-                    <option key={location.id || 'default'} value={location.name}>
-                      {location.name}
-                    </option>
-                  ))}
+                  <option key="all" value="">
+                    All Locations
+                  </option>
+                  {Array.isArray(locations) &&
+                    locations.map(location => (
+                      <option key={location.id || 'default'} value={location.name}>
+                        {location.name}
+                      </option>
+                    ))}
                 </select>
               </div>
-              
+
               <div className="filter-group">
                 <div className="filter-icon">
                   <FaCalendarAlt />
                 </div>
                 <DatePicker
                   selected={dateFilter}
-                  onChange={(date) => setDateFilter(date)}
+                  onChange={date => setDateFilter(date)}
                   className="filter-input"
                   dateFormat="yyyy-MM-dd"
                   placeholderText="Select date"
                   isClearable
                 />
               </div>
-              
+
               <div className="filter-group">
                 <div className="filter-icon">
                   <FaSearch />
                 </div>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={nameFilter}
-                  onChange={(e) => setNameFilter(e.target.value)}
+                  onChange={e => setNameFilter(e.target.value)}
                   placeholder="Search by name"
                   className="filter-input"
                 />
               </div>
-              
+
               <button className="clear-filters" onClick={clearFilters}>
                 Clear Filters
               </button>
             </div>
           )}
-          
+
           {isLoading ? (
             <div className="loading-container">
               <div className="loading-spinner"></div>
@@ -406,19 +426,27 @@ const HistoryPage = () => {
                         <td>{record.location}</td>
                         <td>
                           {record.checkedInBy}
-                          {record.checkedInByRole === 'admin' && <span style={{ color: 'red', marginLeft: '4px', fontSize: '12px' }}>(Admin)</span>}
-                          {record.checkedInByRole === 'manager' && <span style={{ color: 'red', marginLeft: '4px', fontSize: '12px' }}>(Manager)</span>}
+                          {record.checkedInByRole === 'admin' && (
+                            <span style={{ color: 'red', marginLeft: '4px', fontSize: '12px' }}>
+                              (Admin)
+                            </span>
+                          )}
+                          {record.checkedInByRole === 'manager' && (
+                            <span style={{ color: 'red', marginLeft: '4px', fontSize: '12px' }}>
+                              (Manager)
+                            </span>
+                          )}
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-              
+
               <div className="pagination-container">
                 <div className="records-per-page">
                   <label htmlFor="recordsPerPage">Show:</label>
-                  <select 
+                  <select
                     id="recordsPerPage"
                     value={recordsPerPage}
                     onChange={handleRecordsPerPageChange}
@@ -430,11 +458,13 @@ const HistoryPage = () => {
                     <option value={20}>20</option>
                   </select>
                 </div>
-                
+
                 {renderPagination()}
-                
+
                 <div className="records-summary">
-                  Showing {Math.min(filteredRecords.length, (currentPage - 1) * recordsPerPage + 1)} - {Math.min(currentPage * recordsPerPage, filteredRecords.length)} of {filteredRecords.length} records
+                  Showing {Math.min(filteredRecords.length, (currentPage - 1) * recordsPerPage + 1)}{' '}
+                  - {Math.min(currentPage * recordsPerPage, filteredRecords.length)} of{' '}
+                  {filteredRecords.length} records
                 </div>
               </div>
             </>

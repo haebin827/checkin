@@ -137,7 +137,6 @@
 
 .checkin-button:hover:not(:disabled) {
   background-color: #3a7dca;
-  transform: translateY(-1px);
 }
 
 .checkin-button:active:not(:disabled) {
@@ -608,13 +607,13 @@
 }
 
 .confirm-button {
-  background-color: #4f46e5;
+  background-color: #0c4a1a;
   color: white;
   border: none;
 }
 
 .confirm-button:hover {
-  background-color: #4338ca;
+  background-color: #093312;
 }
 
 /* Responsive adjustments */

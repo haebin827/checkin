@@ -8,52 +8,52 @@ const AppError = require('../middlewares/AppError');
 const AuthService = {
   async login(username, password, req) {
     const user = await User.findOne({
-        where: { username: username },
-        attributes: ['id', 'username', 'password', 'engName', 'korName', 'role', 'location_id'],
-        include: [
-          {
-            model: db.location,
-            as: 'location',
-            attributes: ['id', 'name'],
-          },
-        ],
-      });
+      where: { username: username },
+      attributes: ['id', 'username', 'password', 'engName', 'korName', 'role', 'location_id'],
+      include: [
+        {
+          model: db.location,
+          as: 'location',
+          attributes: ['id', 'name'],
+        },
+      ],
+    });
 
-      if (!user) {
-        throw new AppError('Invalid credentials', 401);
+    if (!user) {
+      throw new AppError('Invalid credentials', 401);
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      if (req.rateLimit) {
+        req.rateLimit.current = (req.rateLimit.current || 0) + 1;
+        req.rateLimit.remaining = Math.max(0, 5 - req.rateLimit.current);
       }
+      throw new AppError('Invalid credentials', 401);
+    }
 
-      const isMatch = await bcrypt.compare(password, user.password);
-
-      if (!isMatch) {
-        if (req.rateLimit) {
-          req.rateLimit.current = (req.rateLimit.current || 0) + 1;
-          req.rateLimit.remaining = Math.max(0, 5 - req.rateLimit.current);
-        }
-        throw new AppError('Invalid credentials', 401);
-      }
-
-      /*await new Promise((resolve, reject) => {
+    /*await new Promise((resolve, reject) => {
                 session.regenerate((err) => {
                     if (err) return reject(new Error("Session regeneration failed"));
                     resolve();
                 });
             });*/
 
-      req.session.user = {
-        id: user.id,
-        username: user.username,
-        engName: user.engName,
-        korName: user.korName,
-        role: user.role,
-        locationId: user.location_id,
-      };
+    req.session.user = {
+      id: user.id,
+      username: user.username,
+      engName: user.engName,
+      korName: user.korName,
+      role: user.role,
+      locationId: user.location_id,
+    };
 
-      if (req.rateLimit) {
-        req.rateLimit.current = 0;
-      }
+    if (req.rateLimit) {
+      req.rateLimit.current = 0;
+    }
 
-      return req.session.user;
+    return req.session.user;
   },
 
   async logout(session, res) {
@@ -96,7 +96,6 @@ const AuthService = {
         locationId: user.location_id,
       };
     } catch (err) {
-      console.error('Session find error:', err);
       throw err;
     }
   },
@@ -130,7 +129,6 @@ const AuthService = {
       };
     } catch (err) {
       if (transaction) await transaction.rollback();
-      console.error('Register error:', err);
       throw err;
     }
   },
@@ -155,7 +153,6 @@ const AuthService = {
 
       return user ? user : null;
     } catch (err) {
-      console.error('Email check error:', err);
       throw err;
     }
   },
@@ -168,7 +165,6 @@ const AuthService = {
 
       return user ? user : null;
     } catch (err) {
-      console.error('Phone check error:', err);
       throw err;
     }
   },
@@ -181,10 +177,10 @@ const AuthService = {
 
       const result = await User.update(
         { password: hashedPassword },
-          {
-            where: { email },
+        {
+          where: { email },
           transaction,
-          }
+        },
       );
 
       await transaction.commit();
@@ -196,7 +192,6 @@ const AuthService = {
       return { affected: result[0] };
     } catch (error) {
       if (transaction) await transaction.rollback();
-      console.error('Password update error:', error);
       throw error;
     }
   },
@@ -211,12 +206,11 @@ const AuthService = {
         } else if (searchType === 'pw') {
           await EmailService.sendPasswordResetEmail(email);
         } else {
-          console.warn(`Invalid searchType: ${searchType}`);
+          throw new AppError('This action is not allowed.', 404);
         }
       }
       return;
     } catch (err) {
-      console.error('Find ID/PW error:', err);
       return;
     }
   },
@@ -252,7 +246,16 @@ const AuthService = {
   async getUser(id) {
     try {
       const user = await User.findByPk(id, {
-        attributes: ['id', 'username', 'password', 'eng_name', 'kor_name', 'phone', 'email', 'role'],
+        attributes: [
+          'id',
+          'username',
+          'password',
+          'eng_name',
+          'kor_name',
+          'phone',
+          'email',
+          'role',
+        ],
         include: [
           {
             model: db.location,
@@ -268,7 +271,6 @@ const AuthService = {
 
       return user;
     } catch (err) {
-      console.error('Get user error:', err);
       throw new Error('Failed to fetch user data');
     }
   },
@@ -280,9 +282,10 @@ const AuthService = {
       const updateData = await User.update(
         { ...data },
         {
-        where: { id: data.id },
-        transaction,
-      });
+          where: { id: data.id },
+          transaction,
+        },
+      );
 
       if (updateData[0] === 0) {
         throw new AppError('Invalid credentials', 401);
@@ -290,8 +293,9 @@ const AuthService = {
       await transaction.commit();
       return updateData;
     } catch (error) {
-      if (transaction) { await transaction.rollback(); }
-      console.error('Update user error:', error);
+      if (transaction) {
+        await transaction.rollback();
+      }
       throw new AppError('Invalid credentials', 401);
     }
   },

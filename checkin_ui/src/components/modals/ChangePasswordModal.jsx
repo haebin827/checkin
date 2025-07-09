@@ -1,36 +1,36 @@
 import React, { useState } from 'react';
 import { FaKey, FaEye, FaEyeSlash, FaTimes, FaQuestionCircle } from 'react-icons/fa';
 import '../../assets/styles/components/modals/ChangePasswordModal.css';
-import AuthService from "../../services/AuthService.js";
+import AuthService from '../../services/AuthService.js';
 
 const ChangePasswordModal = ({ isOpen, onClose, user, onSubmit }) => {
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
     newPassword: '',
-    confirmPassword: ''
+    confirmPassword: '',
   });
   const [passwordErrors, setPasswordErrors] = useState({});
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     const { name, value } = e.target;
     setPasswordForm(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
 
     // Clear errors when typing
     if (passwordErrors[name]) {
       setPasswordErrors(prev => ({
         ...prev,
-        [name]: ''
+        [name]: '',
       }));
     }
   };
 
-  const togglePasswordVisibility = (field) => {
+  const togglePasswordVisibility = field => {
     if (field === 'current') {
       setShowCurrentPassword(!showCurrentPassword);
     } else if (field === 'new') {
@@ -69,7 +69,7 @@ const ChangePasswordModal = ({ isOpen, onClose, user, onSubmit }) => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
 
     if (validatePasswordForm()) {
@@ -78,14 +78,14 @@ const ChangePasswordModal = ({ isOpen, onClose, user, onSubmit }) => {
         const response = await AuthService.changePassword({
           userId: user.id,
           currentPassword: passwordForm.currentPassword,
-          newPassword: passwordForm.newPassword
+          newPassword: passwordForm.newPassword,
         });
 
         if (response.data.success) {
           setPasswordForm({
             currentPassword: '',
             newPassword: '',
-            confirmPassword: ''
+            confirmPassword: '',
           });
           onSubmit(true);
         } else {
@@ -104,7 +104,7 @@ const ChangePasswordModal = ({ isOpen, onClose, user, onSubmit }) => {
     setPasswordForm({
       currentPassword: '',
       newPassword: '',
-      confirmPassword: ''
+      confirmPassword: '',
     });
     setPasswordErrors({});
     onClose();
@@ -127,7 +127,7 @@ const ChangePasswordModal = ({ isOpen, onClose, user, onSubmit }) => {
             <label htmlFor="currentPassword">Current Password</label>
             <div className="password-input-wrapper">
               <input
-                type={showCurrentPassword ? "text" : "password"}
+                type={showCurrentPassword ? 'text' : 'password'}
                 id="currentPassword"
                 name="currentPassword"
                 value={passwordForm.currentPassword}
@@ -144,7 +144,7 @@ const ChangePasswordModal = ({ isOpen, onClose, user, onSubmit }) => {
               </button>
             </div>
             {passwordErrors.currentPassword && (
-              <div className="error-text">{passwordErrors.currentPassword}</div>
+              <div className="error-message">{passwordErrors.currentPassword}</div>
             )}
           </div>
 
@@ -167,7 +167,7 @@ const ChangePasswordModal = ({ isOpen, onClose, user, onSubmit }) => {
             </div>
             <div className="password-input-wrapper">
               <input
-                type={showNewPassword ? "text" : "password"}
+                type={showNewPassword ? 'text' : 'password'}
                 id="newPassword"
                 name="newPassword"
                 value={passwordForm.newPassword}
@@ -184,7 +184,7 @@ const ChangePasswordModal = ({ isOpen, onClose, user, onSubmit }) => {
               </button>
             </div>
             {passwordErrors.newPassword && (
-              <div className="error-text">{passwordErrors.newPassword}</div>
+              <div className="error-message">{passwordErrors.newPassword}</div>
             )}
           </div>
 
@@ -200,16 +200,12 @@ const ChangePasswordModal = ({ isOpen, onClose, user, onSubmit }) => {
               autoComplete="new-password"
             />
             {passwordErrors.confirmPassword && (
-              <div className="error-text">{passwordErrors.confirmPassword}</div>
+              <div className="error-message">{passwordErrors.confirmPassword}</div>
             )}
           </div>
 
           <div className="form-actions">
-            <button
-              type="submit"
-              className="send-button"
-              disabled={isSubmitting}
-            >
+            <button type="submit" className="send-button" disabled={isSubmitting}>
               {isSubmitting ? 'Updating...' : 'Update Password'}
             </button>
           </div>

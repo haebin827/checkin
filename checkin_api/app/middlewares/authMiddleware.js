@@ -1,12 +1,11 @@
 exports.isAuthenticated = (req, res, next) => {
-  if (req.session && req.session.user) {
-    next();
-  } else {
-    res.status(401).json({
+  if (!req.session || !req.session.user) {
+    return res.status(401).json({
       success: false,
       message: 'Login is required.',
     });
   }
+  next();
 };
 
 exports.checkRole = requiredRole => {

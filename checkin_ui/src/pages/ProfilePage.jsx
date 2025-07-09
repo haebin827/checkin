@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
@@ -6,13 +6,13 @@ import { FaUser } from 'react-icons/fa';
 import ChangePasswordModal from '../components/modals/ChangePasswordModal';
 import EditProfileModal from '../components/modals/EditProfileModal';
 import '../assets/styles/pages/MyInfo.css';
-import {useAuth} from "../hooks/useAuth.jsx";
+import { useAuth } from '../hooks/useAuth.jsx';
 import AuthService from '../services/AuthService';
 import { toast } from 'react-hot-toast';
-import Toast from "../components/common/Toast.jsx";
+import Toast from '../components/common/Toast.jsx';
 
 const ProfilePage = () => {
-  const {user} = useAuth();
+  const { user } = useAuth();
   const nav = useNavigate();
 
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
@@ -21,7 +21,7 @@ const ProfilePage = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUser = async() => {
+    const fetchUser = async () => {
       if (!user.id) return;
 
       try {
@@ -60,7 +60,7 @@ const ProfilePage = () => {
     setIsPasswordModalOpen(false);
   };
 
-  const handlePasswordSubmit = async (success) => {
+  const handlePasswordSubmit = async success => {
     if (success) {
       closePasswordModal();
       toast.success('Password updated successfully!');
@@ -80,7 +80,7 @@ const ProfilePage = () => {
     setIsProfileModalOpen(false);
   };
 
-  const handleProfileSubmit = async (success) => {
+  const handleProfileSubmit = async success => {
     if (success) {
       closeProfileModal();
       toast.success('Profile updated successfully!');
@@ -92,7 +92,7 @@ const ProfilePage = () => {
   return (
     <>
       <Navbar />
-      <Toast/>
+      <Toast />
       <div className="myinfo-page">
         <div className="myinfo-container">
           <div className="page-header">
@@ -120,7 +120,10 @@ const ProfilePage = () => {
                   <h2>
                     {currUser?.engName || user?.engName}
                     {(currUser?.role === 'manager' || user?.role === 'manager') && (
-                      <span className="role-tag"> (Manager for {currUser?.location?.name || user?.location?.name})</span>
+                      <span className="role-tag">
+                        {' '}
+                        (Manager for {currUser?.location?.name || user?.location?.name})
+                      </span>
                     )}
                     {(currUser?.role === 'admin' || user?.role === 'admin') && (
                       <span className="role-tag"> (Admin)</span>
@@ -169,7 +172,7 @@ const ProfilePage = () => {
         onClose={closeProfileModal}
         onSubmit={handleProfileSubmit}
         initialData={currUser || user}
-        updateUserData={(userData) => setCurrUser(userData)}
+        updateUserData={userData => setCurrUser(userData)}
       />
     </>
   );

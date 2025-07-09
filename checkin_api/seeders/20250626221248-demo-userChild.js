@@ -9,19 +9,19 @@ const relationships = [
   'Grandfather',
   'Uncle',
   'Aunt',
-  'Guardian'
+  'Guardian',
 ];
 
 module.exports = {
   async up(queryInterface, Sequelize) {
     const children = await queryInterface.sequelize.query(
       'SELECT id, locationId FROM child ORDER BY id',
-      { type: queryInterface.sequelize.QueryTypes.SELECT }
+      { type: queryInterface.sequelize.QueryTypes.SELECT },
     );
 
     const users = await queryInterface.sequelize.query(
       'SELECT id FROM User WHERE role = "guardian" ORDER BY id',
-      { type: queryInterface.sequelize.QueryTypes.SELECT }
+      { type: queryInterface.sequelize.QueryTypes.SELECT },
     );
 
     const userChildRecords = [];
@@ -31,7 +31,7 @@ module.exports = {
 
       const usedRelationships = new Set();
       const usedGuardians = new Set();
-      
+
       for (let i = 0; i < numGuardians; i++) {
         let selectedUser;
         let attempts = 0;
@@ -70,5 +70,5 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     await queryInterface.bulkDelete('user_child', null, {});
-  }
+  },
 };

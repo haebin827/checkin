@@ -31,4 +31,4 @@ const Error500 = () => {
   );
 };
 
-export default Error500; 
+export default Error500;

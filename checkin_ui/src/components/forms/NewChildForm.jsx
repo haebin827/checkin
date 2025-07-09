@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import '../../assets/styles/components/forms/NewChild.css';
-import { useAuth } from "../../hooks/useAuth.jsx";
-import LocationService from "../../services/LocationService.js";
+import { useAuth } from '../../hooks/useAuth.jsx';
+import LocationService from '../../services/LocationService.js';
 import { toast } from 'react-hot-toast';
-import ChildService from "../../services/ChildService.js";
-import { childSchema } from "../../validations/validations.js";
-import { ErrorMessage, Field, Form, Formik } from "formik";
-import Toast from "../common/Toast.jsx";
+import ChildService from '../../services/ChildService.js';
+import { childSchema } from '../../validations/validations.js';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
+import Toast from '../common/Toast.jsx';
 
 const NewChildForm = () => {
   const { user } = useAuth();
@@ -36,7 +36,7 @@ const NewChildForm = () => {
     korName: '',
     birth: '',
     phone: '',
-    locationId: user.role === 'manager' ? user.locationId : ''
+    locationId: user.role === 'manager' ? user.locationId : '',
   };
 
   const handleSubmit = async (values, { setSubmitting, setFieldError, resetForm }) => {
@@ -59,9 +59,14 @@ const NewChildForm = () => {
         const backendErrors = error.response.data.errors;
         Object.keys(backendErrors).forEach(field => {
           // Convert backend field names to frontend field names if needed
-          const frontendField = field === 'eng_name' ? 'engName' : 
-                               field === 'kor_name' ? 'korName' : 
-                               field === 'location_id' ? 'locationId' : field;
+          const frontendField =
+            field === 'eng_name'
+              ? 'engName'
+              : field === 'kor_name'
+                ? 'korName'
+                : field === 'location_id'
+                  ? 'locationId'
+                  : field;
           setFieldError(frontendField, backendErrors[field]);
         });
       } else {
@@ -73,107 +78,99 @@ const NewChildForm = () => {
   };
 
   return (
-      <div className="new-child-form">
-        <Toast/>
-        <h2>Register New Child</h2>
+    <div className="new-child-form">
+      <Toast />
+      <h2>Register New Child</h2>
 
-        <Formik
-            initialValues={initialValues}
-            validationSchema={childSchema}
-            onSubmit={handleSubmit}
-        >
-          {({ isSubmitting, errors, touched }) => (
-              <Form>
-                <div className="form-group">
-                  <label htmlFor="engName">
-                    English Name <span className="required">*</span>
-                  </label>
+      <Formik initialValues={initialValues} validationSchema={childSchema} onSubmit={handleSubmit}>
+        {({ isSubmitting, errors, touched }) => (
+          <Form>
+            <div className="form-group">
+              <label htmlFor="engName">
+                English Name <span className="required">*</span>
+              </label>
+              <Field
+                type="text"
+                id="engName"
+                name="engName"
+                placeholder="Enter English name"
+                className={`form-input ${errors.engName && touched.engName ? 'error' : ''}`}
+              />
+              <ErrorMessage name="engName" component="div" className="error-text" />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="korName">Korean Name</label>
+              <Field
+                type="text"
+                id="korName"
+                name="korName"
+                placeholder="Enter Korean name"
+                className={`form-input ${errors.korName && touched.korName ? 'error' : ''}`}
+              />
+              <ErrorMessage name="korName" component="div" className="error-text" />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="birth">
+                Birthday <span className="required">*</span>
+              </label>
+              <Field
+                type="date"
+                id="birth"
+                name="birth"
+                className={`form-input ${errors.birth && touched.birth ? 'error' : ''}`}
+              />
+              <ErrorMessage name="birth" component="div" className="error-text" />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="phone">Phone</label>
+              <Field
+                type="tel"
+                id="phone"
+                name="phone"
+                placeholder="Enter phone number"
+                className={`form-input ${errors.phone && touched.phone ? 'error' : ''}`}
+              />
+              <ErrorMessage name="phone" component="div" className="error-text" />
+            </div>
+
+            {user.role !== 'manager' && (
+              <div className="form-group">
+                <label htmlFor="locationId">
+                  Location <span className="required">*</span>
+                </label>
+                {isLoading ? (
+                  <div className="loading-indicator">Loading locations...</div>
+                ) : (
                   <Field
-                      type="text"
-                      id="engName"
-                      name="engName"
-                      placeholder="Enter English name"
-                      className={`form-input ${errors.engName && touched.engName ? 'error' : ''}`}
-                  />
-                  <ErrorMessage name="engName" component="div" className="error-text" />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="korName">Korean Name</label>
-                  <Field
-                      type="text"
-                      id="korName"
-                      name="korName"
-                      placeholder="Enter Korean name"
-                      className={`form-input ${errors.korName && touched.korName ? 'error' : ''}`}
-                  />
-                  <ErrorMessage name="korName" component="div" className="error-text" />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="birth">
-                    Birthday <span className="required">*</span>
-                  </label>
-                  <Field
-                      type="date"
-                      id="birth"
-                      name="birth"
-                      className={`form-input ${errors.birth && touched.birth ? 'error' : ''}`}
-                  />
-                  <ErrorMessage name="birth" component="div" className="error-text" />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="phone">Phone</label>
-                  <Field
-                      type="tel"
-                      id="phone"
-                      name="phone"
-                      placeholder="Enter phone number"
-                      className={`form-input ${errors.phone && touched.phone ? 'error' : ''}`}
-                  />
-                  <ErrorMessage name="phone" component="div" className="error-text" />
-                </div>
-
-                {user.role !== 'manager' && (
-                    <div className="form-group">
-                      <label htmlFor="locationId">
-                        Location <span className="required">*</span>
-                      </label>
-                      {isLoading ? (
-                          <div className="loading-indicator">Loading locations...</div>
-                      ) : (
-                          <Field
-                              as="select"
-                              id="locationId"
-                              name="locationId"
-                              className={`form-input ${errors.locationId && touched.locationId ? 'error' : ''}`}
-                          >
-                            <option value="">-- Select location --</option>
-                            {locations.map(location => (
-                                <option key={location.id} value={location.id}>
-                                  {location.name}
-                                </option>
-                            ))}
-                          </Field>
-                      )}
-                      <ErrorMessage name="locationId" component="div" className="error-text" />
-                    </div>
-                )}
-
-                <div className="form-actions">
-                  <button
-                      type="submit"
-                      className="submit-button"
-                      disabled={isSubmitting}
+                    as="select"
+                    id="locationId"
+                    name="locationId"
+                    className={`form-input ${errors.locationId && touched.locationId ? 'error' : ''}`}
                   >
-                    {isSubmitting ? 'Registering...' : 'Register'}
-                  </button>
-                </div>
-              </Form>
-          )}
-        </Formik>
-      </div>
+                    <option value="">-- Select location --</option>
+                    {locations.map(location => (
+                      <option key={location.id} value={location.id}>
+                        {location.name}
+                      </option>
+                    ))}
+                  </Field>
+                )}
+                <ErrorMessage name="locationId" component="div" className="error-text" />
+              </div>
+            )}
+
+            <div className="form-actions">
+              <button type="submit" className="submit-button" disabled={isSubmitting}>
+                {isSubmitting ? 'Registering...' : 'Register'}
+              </button>
+            </div>
+          </Form>
+        )}
+      </Formik>
+    </div>
   );
 };
 

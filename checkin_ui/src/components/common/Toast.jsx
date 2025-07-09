@@ -17,7 +17,7 @@ const defaultStyle = {
  * @param {boolean} [props.reverseOrder=false] - Whether to reverse the order of multiple toasts
  * @param {number} [props.gutter=8] - Space between toasts
  */
-const Toast = ({ 
+const Toast = ({
   position = 'top-right',
   duration = 3000,
   style = {},
@@ -40,4 +40,4 @@ const Toast = ({
   );
 };
 
-export default Toast; 
+export default Toast;

@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaSpinner, FaCheck, FaEnvelope } from 'react-icons/fa';
 import '../../assets/styles/pages/auth/EmailConfirmationPage.css';
-import AuthService from "../../services/AuthService.js";
+import AuthService from '../../services/AuthService.js';
 
-const EmailConfirmationForm = ({user, onRegistrationComplete}) => {
+const EmailConfirmationForm = ({ user, onRegistrationComplete }) => {
   const navigate = useNavigate();
 
   // State for OTP digits
@@ -15,10 +15,10 @@ const EmailConfirmationForm = ({user, onRegistrationComplete}) => {
   const [isResending, setIsResending] = useState(false);
   const [resendCountdown, setResendCountdown] = useState(0);
   const [code, setCode] = useState('');
-  
+
   // References for input fields
   const inputRefs = useRef([]);
-  
+
   // Focus first input when component mounts
   useEffect(() => {
     const fetchOTP = async () => {
@@ -27,7 +27,7 @@ const EmailConfirmationForm = ({user, onRegistrationComplete}) => {
         setCode(response.data.code);
         console.log(response);
       } catch (err) {
-        console.error("Failed to send OTP email", err);
+        console.error('Failed to send OTP email', err);
       }
     };
 
@@ -36,7 +36,7 @@ const EmailConfirmationForm = ({user, onRegistrationComplete}) => {
       inputRefs.current[0].focus();
     }
   }, []);
-  
+
   // Handle resend countdown
   useEffect(() => {
     if (resendCountdown > 0) {
@@ -46,19 +46,19 @@ const EmailConfirmationForm = ({user, onRegistrationComplete}) => {
       return () => clearTimeout(timer);
     }
   }, [resendCountdown]);
-  
+
   // Handle input change
   const handleChange = (index, e) => {
     const value = e.target.value;
-    
+
     // Allow only numbers
     if (value && !/^\d+$/.test(value)) {
       return;
     }
-    
+
     // Create a new array to maintain immutability
     const newOtp = [...otp];
-    
+
     // Handle paste event (for entire OTP)
     if (value.length > 1) {
       // If pasted content has exactly 6 digits
@@ -72,39 +72,39 @@ const EmailConfirmationForm = ({user, onRegistrationComplete}) => {
       }
       return;
     }
-    
+
     // Update the specific digit
     newOtp[index] = value;
     setOtp(newOtp);
-    
+
     // Clear any previous errors when typing
     if (verificationError) {
       setVerificationError('');
     }
-    
+
     // Auto-focus to next input if current field is filled
     if (value && index < 5) {
       inputRefs.current[index + 1].focus();
     }
   };
-  
+
   // Handle key press events
   const handleKeyDown = (index, e) => {
     // Move to previous input on backspace if current input is empty
     if (e.key === 'Backspace' && !otp[index] && index > 0) {
       inputRefs.current[index - 1].focus();
     }
-    
+
     // Handle arrow navigation
     if (e.key === 'ArrowLeft' && index > 0) {
       inputRefs.current[index - 1].focus();
     }
-    
+
     if (e.key === 'ArrowRight' && index < 5) {
       inputRefs.current[index + 1].focus();
     }
   };
-  
+
   // Handle verification
   const handleVerify = async () => {
     // Check if OTP is complete
@@ -112,10 +112,10 @@ const EmailConfirmationForm = ({user, onRegistrationComplete}) => {
       setVerificationError('Please enter the complete 6-digit verification code.');
       return;
     }
-    
+
     setIsVerifying(true);
     setVerificationError('');
-    
+
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -138,24 +138,24 @@ const EmailConfirmationForm = ({user, onRegistrationComplete}) => {
       setIsVerifying(false);
     }
   };
-  
+
   // Handle resend code
   const handleResendCode = async () => {
     if (resendCountdown > 0 || isResending) return;
-    
+
     setIsResending(true);
     setVerificationError('');
-    
+
     try {
       const response = await AuthService.sendOTPEmail(user.email);
       setCode(response.data.code);
-      
+
       // Reset OTP fields
       setOtp(['', '', '', '', '', '']);
       if (inputRefs.current[0]) {
         inputRefs.current[0].focus();
       }
-      
+
       // Set countdown for resend button
       setResendCountdown(60);
     } catch (error) {
@@ -164,14 +164,14 @@ const EmailConfirmationForm = ({user, onRegistrationComplete}) => {
       setIsResending(false);
     }
   };
-  
+
   return (
     <div className="confirmation-container">
       <div className="confirmation-card">
         <div className="confirmation-header">
           <h1>Email Verification</h1>
           <p>We've sent a verification code to your email</p>
-                    <div className="email-display">{user.email}</div>
+          <div className="email-display">{user.email}</div>
         </div>
 
         <div className="confirmation-body">
@@ -181,7 +181,7 @@ const EmailConfirmationForm = ({user, onRegistrationComplete}) => {
             {otp.map((digit, index) => (
               <input
                 key={index}
-                ref={el => inputRefs.current[index] = el}
+                ref={el => (inputRefs.current[index] = el)}
                 type="text"
                 maxLength={6} // Allow paste of 6 digits
                 value={digit}
@@ -193,11 +193,7 @@ const EmailConfirmationForm = ({user, onRegistrationComplete}) => {
             ))}
           </div>
 
-          {verificationError && (
-            <div className="error-message">
-              {verificationError}
-            </div>
-          )}
+          {verificationError && <div className="error-message">{verificationError}</div>}
 
           {verificationSuccess && (
             <div className="success-message">

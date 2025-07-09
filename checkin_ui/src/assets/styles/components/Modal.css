@@ -146,13 +146,12 @@
 }
 
 .qr-download-button {
-  background-color: #1b5e20;
+  background-color: #2e7d32;
   color: white;
 }
 
 .qr-download-button:hover {
-  background-color: #2e7d32;
-  transform: translateY(-2px);
+  background-color: #1b5e20;
 }
 
 .qr-close-button {

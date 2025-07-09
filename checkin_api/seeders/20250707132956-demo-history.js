@@ -4,20 +4,19 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-
     const children = await queryInterface.sequelize.query(
       'SELECT id, locationId FROM child ORDER BY id',
-      { type: queryInterface.sequelize.QueryTypes.SELECT }
+      { type: queryInterface.sequelize.QueryTypes.SELECT },
     );
 
     const userChildMappings = await queryInterface.sequelize.query(
       'SELECT childId, userId FROM user_child',
-      { type: queryInterface.sequelize.QueryTypes.SELECT }
+      { type: queryInterface.sequelize.QueryTypes.SELECT },
     );
 
     const managers = await queryInterface.sequelize.query(
       'SELECT id, locationId FROM User WHERE role = "manager"',
-      { type: queryInterface.sequelize.QueryTypes.SELECT }
+      { type: queryInterface.sequelize.QueryTypes.SELECT },
     );
 
     const locationManagers = {};
@@ -41,7 +40,7 @@ module.exports = {
 
     children.forEach(child => {
       const numRecords = Math.floor(Math.random() * 5) + 3;
-      
+
       for (let i = 0; i < numRecords; i++) {
         let checkinBy;
         if (Math.random() < 0.5 && childGuardians[child.id]?.length > 0) {
@@ -96,5 +95,5 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     await queryInterface.bulkDelete('history', null, {});
-  }
+  },
 };

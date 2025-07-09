@@ -1,7 +1,7 @@
 const db = require('../models');
 const { v4: uuidv4 } = require('uuid');
 const EmailService = require('./EmailService');
-const AppError = require("../middlewares/AppError");
+const AppError = require('../middlewares/AppError');
 const Child = db.child;
 const User = db.user;
 const Location = db.location;
@@ -15,28 +15,27 @@ const ChildService = {
       const children = await Child.findAll();
       return children;
     } catch (err) {
-      console.error('ChildService/findAllChildren:', err);
-      throw err;
+      throw new AppError('Something went wrong');
     }
   },
 
   async findChildrenByLocation(locationId) {
     try {
       const children = await Child.findAll({
+        attributes: ['id', 'engName', 'phone'],
         where: {
           locationId: locationId,
         },
       });
       return children;
     } catch (err) {
-      console.error('ChildService/findChildrenByLocation:', err);
-      throw err;
+      throw new AppError('Something went wrong');
     }
   },
 
   async createChild(childData) {
     if (!childData.engName || !childData.location_id) {
-      throw new AppError('Invalid credentials', 400);
+      throw new AppError('Invalid request', 400);
     }
 
     childData.phone = childData.phone === '' ? null : childData.phone;
@@ -46,8 +45,7 @@ const ChildService = {
       const child = await Child.create(childData);
       return child;
     } catch (err) {
-      console.error('ChildService/createChild:', err);
-      throw err;
+      throw new AppError('Failed to add a new child. Please contact to the system team.', 500);
     }
   },
 
@@ -56,16 +54,14 @@ const ChildService = {
     try {
       const child = await Child.findByPk(childId);
       if (!child) {
-        throw new Error('Child not found');
+        throw new AppError('Invalid request', 400);
       }
-
       await child.update(childData, { transaction });
       await transaction.commit();
       return child;
     } catch (err) {
       await transaction.rollback();
-      console.error('ChildService/updateChild:', err);
-      throw err;
+      throw new AppError('Failed to update a child information. Please contact to the system team.', 400);
     }
   },
 
@@ -74,29 +70,26 @@ const ChildService = {
     try {
       const child = await Child.findByPk(childId);
       if (!child) {
-        throw new Error('Child not found');
+        throw new AppError('Invalid request', 400);
       }
-
-      // Soft delete by updating status
       await child.update({ status: '0' }, { transaction });
       await transaction.commit();
     } catch (err) {
       await transaction.rollback();
-      console.error('ChildService/deleteChild:', err);
-      throw err;
+      throw new AppError('Failed to delete a child information. Please contact to the system team.', 400);
     }
   },
 
   async sendInviteEmail(guardianEmail, childId, locationId) {
-    console.log('Data: ', guardianEmail, childId, locationId);
     const transaction = await db.sequelize.transaction();
     try {
       const child = await Child.findByPk(childId);
       if (!child) {
-        throw new Error('Child not found');
+        throw new AppError('Failed to send invitation. Please contact to the system team.', 404);
       }
 
       const guardian = await User.findOne({
+        attributes: ['id'],
         where: {
           email: guardianEmail,
           role: 'guardian',
@@ -104,7 +97,7 @@ const ChildService = {
       });
 
       if (!guardian) {
-        throw new Error('Guardian with this email not found');
+        throw new AppError('No registered guardian found with this email address', 404);
       }
 
       await db.userChild.create(
@@ -112,36 +105,15 @@ const ChildService = {
           user_id: guardian.id,
           child_id: childId,
           location_id: locationId,
-          relationship: 'parent',
         },
         { transaction },
       );
 
       await EmailService.sendInviteEmail(guardianEmail, child.engName);
-
       await transaction.commit();
-
-      return {
-        success: true,
-        message: 'Invitation sent and relationship created successfully',
-      };
-    } catch (error) {
+    } catch (err) {
       await transaction.rollback();
-      console.error('ChildService/sendInviteEmail:', error);
-
-      let errorMessage = 'Failed to send invitation';
-      if (error.message === 'Guardian with this email not found') {
-        errorMessage = 'No registered guardian found with this email address';
-      } else if (error.message === 'Child not found') {
-        errorMessage = 'Selected child not found';
-      } else if (error.message === 'Child does not belong to this location') {
-        errorMessage = 'Child is not registered to this location';
-      }
-
-      throw {
-        success: false,
-        message: errorMessage,
-      };
+      throw new AppError('Invalid request', 400);
     }
   },
 
@@ -149,29 +121,32 @@ const ChildService = {
     try {
       const user = await User.findByPk(userId);
       if (!user) {
-        throw new Error('User not found');
+        throw new AppError('Invalid request', 400);
       }
 
       switch (user.role) {
         case 'guardian':
-          // 보호자의 경우 자신과 연결된 아이들과 해당 아이들의 모든 위치 정보를 반환
-          const guardianData = await User.findByPk(userId, {
-            include: [
-              {
-                model: Child,
-                as: 'children',
-                through: {
-                  attributes: ['relationship', 'isSms'], // userChild 테이블에서 relationship 필드만 포함
-                },
-                include: [
-                  {
-                    model: Location,
-                    as: 'location',
-                  },
-                ],
+        const guardianData = await User.findByPk(userId, {
+
+          include: [
+            {
+              model: Child,
+              as: 'children',
+              attributes: ['id', 'engName', 'korName', 'birth', 'phone', 'location_id'],
+              where: {status: '1'},
+              through: {
+                attributes: ['relationship', 'isSms'],
               },
-            ],
-          });
+              include: [
+                {
+                  model: Location,
+                  as: 'location',
+                  attributes: ['id', 'name'],
+                },
+              ]
+            },
+          ],
+        });
 
           return {
             children: guardianData.children,
@@ -183,32 +158,42 @@ const ChildService = {
           };
 
         case 'manager':
-          // 매니저의 경우 자신의 위치에 있는 모든 아이들 정보를 반환
           const managerChildren = await Child.findAll({
+            attributes: ['id', 'engName', 'korName', 'birth', 'phone', 'location_id'],
             where: {
               locationId: user.location_id,
+              status: '1'
             },
             include: [
               {
                 model: Location,
                 as: 'location',
+                attributes: ['id', 'name'],
               },
             ],
           });
 
+          const managerLocation = await Location.findByPk(user.location_id);
+          if (!managerLocation) {
+            throw new AppError('Location not found', 404);
+          }
+
           return {
             children: managerChildren,
-            locations: [await Location.findByPk(user.location_id)],
+            locations: [managerLocation],
           };
 
         case 'admin':
           // 관리자의 경우 모든 아이들과 모든 위치 정보를 반환
           const [allChildren, allLocations] = await Promise.all([
             Child.findAll({
+              attributes: ['id', 'engName', 'korName', 'birth', 'phone', 'location_id'],
+              where: {status: '1'},
               include: [
                 {
                   model: Location,
                   as: 'location',
+                  attributes: ['id', 'name'],
                 },
               ],
             }),
@@ -221,11 +206,10 @@ const ChildService = {
           };
 
         default:
-          throw new Error('Invalid user role');
+          throw new AppError('Invalid request.', 404);
       }
     } catch (error) {
-      console.error('ChildService/showChildrenAndLocationList:', error);
-      throw error;
+      throw new AppError('Invalid request.', 404);
     }
   },
 
@@ -242,17 +226,16 @@ const ChildService = {
 
       // SMS 알림을 받기로 한 보호자들의 userId 찾기
       const smsEnabledGuardians = await UserChild.findAll({
+        attributes: ['user_id'],
         where: {
           childId: childId,
           isSms: '1',
+          status: '1',
         },
-        attributes: ['user_id'],
       });
 
       const guardianIds = smsEnabledGuardians.map(guardian => guardian.user_id);
-      console.log('SMS enabled guardian IDs:', guardianIds);
 
-      // 날짜 포맷 변환
       const date = new Date(history.createdAt);
       const formattedDate = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')} ${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}/${date.getFullYear()}`;
 
@@ -263,15 +246,12 @@ const ChildService = {
             where: { id: guardianId },
             attributes: ['email'],
           });
-          return guardian?.email || null; // guardian이 없는 경우 null 반환
+          return guardian?.email || null;
         }),
       );
 
-      // null 값 필터링하여 유효한 이메일만 추출
-      const validEmails = guardianEmails.filter(email => email !== null);
-      console.log('Valid emails:', validEmails, formattedDate);
+      const validEmails = guardianEmails.filter(email => email !== null || email !== '');
 
-      // 유효한 이메일로만 체크인 알림 발송
       await Promise.all(
         validEmails.map(async email => {
           try {
@@ -283,19 +263,17 @@ const ChildService = {
               name,
               attemptMaker,
             });
-          } catch (error) {
-            console.error(`Failed to send email to ${email}:`, error);
-            // 개별 이메일 전송 실패는 전체 프로세스를 중단하지 않음
+          } catch (err) {
+            throw err;
           }
         }),
       );
 
       await transaction.commit();
       return history;
-    } catch (error) {
+    } catch (err) {
       await transaction.rollback();
-      console.error('ChildService/forceCheckin:', error);
-      throw error;
+      throw new AppError('Invalid request', 404);
     }
   },
 
@@ -311,10 +289,9 @@ const ChildService = {
       });
 
       if (!userChild) {
-        throw new Error('Guardian-Child relationship not found');
+        throw new AppError('Invalid request', 404);
       }
 
-      // 설정 업데이트
       await userChild.update(
         {
           relationship,
@@ -324,26 +301,21 @@ const ChildService = {
       );
 
       await transaction.commit();
-
       return userChild;
     } catch (error) {
       await transaction.rollback();
-      console.error('ChildService/updateGuardianSettings:', error);
-      throw error;
+      throw new AppError('Invalid request', 404);
     }
   },
 
   async findChildByPhone(phone) {
     try {
-      const count = await Child.count({
+      const child = await Child.findOne({
         where: { phone },
       });
-
-      console.log("COUNT: ", count)
-      return count > 0;
+      return !!child;
     } catch (err) {
-      console.error('Phone check error:', err);
-      throw err;
+      throw new AppError('Invalid request', 400);
     }
   },
 };

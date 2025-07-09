@@ -60,5 +60,5 @@ module.exports = {
   userValidation,
   updateUserValidation,
   childValidation,
-  userSocialValidation
+  userSocialValidation,
 };

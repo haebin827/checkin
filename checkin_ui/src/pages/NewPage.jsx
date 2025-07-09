@@ -6,21 +6,20 @@ import NewChildForm from '../components/forms/NewChildForm.jsx';
 import NewLocationForm from '../components/forms/NewLocationForm.jsx';
 import { FaUserAlt, FaMapMarkerAlt } from 'react-icons/fa';
 import '../assets/styles/pages/NewPage.css';
-import { useAuth } from "../hooks/useAuth.jsx";
+import { useAuth } from '../hooks/useAuth.jsx';
 
 const NewPage = () => {
-
   const { user } = useAuth();
   const nav = useNavigate();
   const [formType, setFormType] = useState('child');
-  
+
   useEffect(() => {
     if (user.role !== 'manager' && user.role !== 'admin') {
       nav('/403');
     }
   }, [user, nav]);
 
-  const handleFormTypeChange = (type) => {
+  const handleFormTypeChange = type => {
     setFormType(type);
   };
 
@@ -29,18 +28,17 @@ const NewPage = () => {
       <Navbar />
       <div className="new-page">
         <div className="new-container">
-
           {user.role === 'admin' && (
             <div className="form-type-selector">
               <div className="option-tabs">
-                <button 
+                <button
                   className={`option-tab ${formType === 'child' ? 'active' : ''}`}
                   onClick={() => handleFormTypeChange('child')}
                 >
                   <FaUserAlt className="option-icon" />
                   <span>Child</span>
                 </button>
-                <button 
+                <button
                   className={`option-tab ${formType === 'location' ? 'active' : ''}`}
                   onClick={() => handleFormTypeChange('location')}
                 >
@@ -50,12 +48,14 @@ const NewPage = () => {
               </div>
             </div>
           )}
-          
+
           <div className="form-container">
             {user.role === 'manager' ? (
               <NewChildForm />
+            ) : formType === 'child' ? (
+              <NewChildForm />
             ) : (
-              formType === 'child' ? <NewChildForm /> : <NewLocationForm />
+              <NewLocationForm />
             )}
           </div>
         </div>
@@ -65,4 +65,4 @@ const NewPage = () => {
   );
 };
 
-export default NewPage; 
+export default NewPage;

@@ -12,9 +12,7 @@ const Error403 = () => {
         </div>
         <h1 className="error-code">403</h1>
         <h2 className="error-title">Access Forbidden</h2>
-        <p className="error-message">
-          Sorry, you don't have permission to access this page.
-        </p>
+        <p className="error-message">Sorry, you don't have permission to access this page.</p>
         <p className="error-description">
           Please contact your administrator if you believe this is an error.
         </p>
@@ -31,4 +29,4 @@ const Error403 = () => {
   );
 };
 
-export default Error403; 
+export default Error403;

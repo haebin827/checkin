@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { FaEye, FaEyeSlash} from 'react-icons/fa';
-import {Link} from "react-router-dom";
-import AuthService from "../../services/AuthService.js";
-import {Formik, Form, Field, ErrorMessage} from 'formik';
-import {userSchema} from '../../validations/validations.js';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
+import AuthService from '../../services/AuthService.js';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { userSchema } from '../../validations/validations.js';
 
-const RegisterForm = ({initialValues = {}, handleRegistrationSuccess}) => {
+const RegisterForm = ({ initialValues = {}, handleRegistrationSuccess }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [termsError, setTermsError] = useState(false);
@@ -14,11 +14,10 @@ const RegisterForm = ({initialValues = {}, handleRegistrationSuccess}) => {
   const defaultValues = {
     terms: false,
     privacy: false,
-    ...initialValues
+    ...initialValues,
   };
 
   const handleSubmit = async (values, { setSubmitting, setFieldError, setStatus }) => {
-
     let hasError = false;
     if (!values.terms) {
       setTermsError(true);
@@ -40,7 +39,7 @@ const RegisterForm = ({initialValues = {}, handleRegistrationSuccess}) => {
 
     try {
       setSubmitting(true);
-      
+
       const response = await AuthService.validateRegistration(values);
 
       if (response.data.success) {
@@ -72,12 +71,8 @@ const RegisterForm = ({initialValues = {}, handleRegistrationSuccess}) => {
           <h1>Register</h1>
           <p>Create an account to use the check-in service</p>
         </div>
-        
-        <Formik
-          initialValues={defaultValues}
-          validationSchema={userSchema}
-          onSubmit={handleSubmit}
-        >
+
+        <Formik initialValues={defaultValues} validationSchema={userSchema} onSubmit={handleSubmit}>
           {({ isSubmitting, errors, touched, values, setFieldValue, status }) => (
             <Form className="register-form">
               <div className="form-grid">
@@ -96,9 +91,7 @@ const RegisterForm = ({initialValues = {}, handleRegistrationSuccess}) => {
                 </div>
 
                 <div className="input-group">
-                  <label htmlFor="korName">
-                    Korean Name
-                  </label>
+                  <label htmlFor="korName">Korean Name</label>
                   <Field
                     type="text"
                     id="korName"
@@ -157,16 +150,13 @@ const RegisterForm = ({initialValues = {}, handleRegistrationSuccess}) => {
                   </label>
                   <div className="input-icon-wrapper">
                     <Field
-                      type={showPassword ? "text" : "password"}
+                      type={showPassword ? 'text' : 'password'}
                       id="password"
                       name="password"
                       placeholder="Password"
                       className={errors.password && touched.password ? 'error' : ''}
                     />
-                    <div
-                      className="input-icon"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
+                    <div className="input-icon" onClick={() => setShowPassword(!showPassword)}>
                       {showPassword ? <FaEyeSlash /> : <FaEye />}
                     </div>
                   </div>
@@ -179,7 +169,7 @@ const RegisterForm = ({initialValues = {}, handleRegistrationSuccess}) => {
                   </label>
                   <div className="input-icon-wrapper">
                     <Field
-                      type={showConfirmPassword ? "text" : "password"}
+                      type={showConfirmPassword ? 'text' : 'password'}
                       id="confirmPassword"
                       name="confirmPassword"
                       placeholder="Confirm Password"
@@ -198,45 +188,54 @@ const RegisterForm = ({initialValues = {}, handleRegistrationSuccess}) => {
 
               <div className="agreement-section">
                 <h3>Terms Agreement</h3>
-                
+
                 <div className={`agreement-checkbox ${termsError ? 'error' : ''}`}>
                   <input
                     type="checkbox"
                     id="terms"
                     checked={values.terms}
-                    onChange={(e) => handleCheckboxChange(setFieldValue, 'terms', e.target.checked, setTermsError)}
+                    onChange={e =>
+                      handleCheckboxChange(setFieldValue, 'terms', e.target.checked, setTermsError)
+                    }
                   />
                   <label htmlFor="terms">
                     Terms of Service Agreement <span className="required">*</span>
-                    <a href="#" onClick={(e) => e.preventDefault()}>View Terms</a>
+                    <a href="#" onClick={e => e.preventDefault()}>
+                      View Terms
+                    </a>
                   </label>
                 </div>
-                
+
                 <div className={`agreement-checkbox ${privacyError ? 'error' : ''}`}>
                   <input
                     type="checkbox"
                     id="privacy"
                     checked={values.privacy}
-                    onChange={(e) => handleCheckboxChange(setFieldValue, 'privacy', e.target.checked, setPrivacyError)}
+                    onChange={e =>
+                      handleCheckboxChange(
+                        setFieldValue,
+                        'privacy',
+                        e.target.checked,
+                        setPrivacyError
+                      )
+                    }
                   />
                   <label htmlFor="privacy">
                     Privacy Policy Agreement <span className="required">*</span>
-                    <a href="#" onClick={(e) => e.preventDefault()}>View Policy</a>
+                    <a href="#" onClick={e => e.preventDefault()}>
+                      View Policy
+                    </a>
                   </label>
                 </div>
               </div>
 
-              <button
-                type="submit"
-                className="register-button"
-                disabled={isSubmitting}
-              >
+              <button type="submit" className="register-button" disabled={isSubmitting}>
                 {isSubmitting ? 'Processing...' : 'Register'}
               </button>
             </Form>
           )}
         </Formik>
-        
+
         <div className="login-link">
           Already have an account? <Link to="/">Login</Link>
         </div>
@@ -245,4 +244,4 @@ const RegisterForm = ({initialValues = {}, handleRegistrationSuccess}) => {
   );
 };
 
-export default RegisterForm; 
+export default RegisterForm;
