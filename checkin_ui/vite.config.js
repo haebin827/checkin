@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => {
       port: env.VITE_APP_CORS_PORT || 8081,
       host: true,
       //https: true,
-      allowedHosts: ['all', '.ngrok-free.app'],
+      //allowedHosts: ['all', '.ngrok-free.app'],
     },
     plugins: [react()],
   };

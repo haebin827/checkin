@@ -10,15 +10,6 @@ const UserChild = db.userChild;
 const { Op } = db.Sequelize;
 
 const ChildService = {
-  async findAllChildren() {
-    try {
-      const children = await Child.findAll();
-      return children;
-    } catch (err) {
-      throw new AppError('Something went wrong');
-    }
-  },
-
   async findChildrenByLocation(locationId) {
     try {
       const children = await Child.findAll({
@@ -61,7 +52,10 @@ const ChildService = {
       return child;
     } catch (err) {
       await transaction.rollback();
-      throw new AppError('Failed to update a child information. Please contact to the system team.', 400);
+      throw new AppError(
+        'Failed to update a child information. Please contact to the system team.',
+        400,
+      );
     }
   },
 
@@ -76,7 +70,10 @@ const ChildService = {
       await transaction.commit();
     } catch (err) {
       await transaction.rollback();
-      throw new AppError('Failed to delete a child information. Please contact to the system team.', 400);
+      throw new AppError(
+        'Failed to delete a child information. Please contact to the system team.',
+        400,
+      );
     }
   },
 
@@ -109,7 +106,7 @@ const ChildService = {
         { transaction },
       );
 
-      await EmailService.sendInviteEmail(guardianEmail, child.engName);
+      await EmailService.sendGuardianInviteEmail(guardianEmail, child.engName);
       await transaction.commit();
     } catch (err) {
       await transaction.rollback();
@@ -126,27 +123,26 @@ const ChildService = {
 
       switch (user.role) {
         case 'guardian':
-        const guardianData = await User.findByPk(userId, {
-
-          include: [
-            {
-              model: Child,
-              as: 'children',
-              attributes: ['id', 'engName', 'korName', 'birth', 'phone', 'location_id'],
-              where: {status: '1'},
-              through: {
-                attributes: ['relationship', 'isSms'],
-              },
-              include: [
-                {
-                  model: Location,
-                  as: 'location',
-                  attributes: ['id', 'name'],
+          const guardianData = await User.findByPk(userId, {
+            include: [
+              {
+                model: Child,
+                as: 'children',
+                attributes: ['id', 'engName', 'korName', 'birth', 'phone', 'location_id'],
+                where: { status: '1' },
+                through: {
+                  attributes: ['relationship', 'isSms'],
                 },
-              ]
-            },
-          ],
-        });
+                include: [
+                  {
+                    model: Location,
+                    as: 'location',
+                    attributes: ['id', 'name'],
+                  },
+                ],
+              },
+            ],
+          });
 
           return {
             children: guardianData.children,
@@ -162,7 +158,7 @@ const ChildService = {
             attributes: ['id', 'engName', 'korName', 'birth', 'phone', 'location_id'],
             where: {
               locationId: user.location_id,
-              status: '1'
+              status: '1',
             },
             include: [
               {
@@ -188,7 +184,7 @@ const ChildService = {
           const [allChildren, allLocations] = await Promise.all([
             Child.findAll({
               attributes: ['id', 'engName', 'korName', 'birth', 'phone', 'location_id'],
-              where: {status: '1'},
+              where: { status: '1' },
               include: [
                 {
                   model: Location,
@@ -250,7 +246,7 @@ const ChildService = {
         }),
       );
 
-      const validEmails = guardianEmails.filter(email => email !== null || email !== '');
+      const validEmails = guardianEmails.filter(email => email !== null && email !== '');
 
       await Promise.all(
         validEmails.map(async email => {
@@ -273,23 +269,23 @@ const ChildService = {
       return history;
     } catch (err) {
       await transaction.rollback();
-      throw new AppError('Invalid request', 404);
+      //throw new AppError('Invalid request', 404);
+      throw err;
     }
   },
 
-  async updateGuardianSettings(childId, userId, { relationship, isSms }) {
+  async updateGuardianSettings(childId, userId, relationship, isSms) {
     const transaction = await db.sequelize.transaction();
     try {
-      // 해당 user_child 레코드 찾기
       const userChild = await UserChild.findOne({
         where: {
-          childId: childId,
-          userId: userId,
+          childId: parseInt(childId),
+          userId: parseInt(userId),
         },
       });
 
       if (!userChild) {
-        throw new AppError('Invalid request', 404);
+        throw new AppError('Guardian relationship not found', 404);
       }
 
       await userChild.update(
@@ -302,7 +298,7 @@ const ChildService = {
 
       await transaction.commit();
       return userChild;
-    } catch (error) {
+    } catch (err) {
       await transaction.rollback();
       throw new AppError('Invalid request', 404);
     }

@@ -8,7 +8,7 @@ exports.isAuthenticated = (req, res, next) => {
   next();
 };
 
-exports.checkRole = requiredRole => {
+exports.checkRole = (...requiredRoles) => {
   return (req, res, next) => {
     if (!req.session || !req.session.user) {
       return res.status(401).json({
@@ -17,7 +17,9 @@ exports.checkRole = requiredRole => {
       });
     }
 
-    if (req.session.user.role !== requiredRole) {
+    const userRole = req.session.user.role;
+
+    if (!requiredRoles.includes(userRole)) {
       return res.status(403).json({
         success: false,
         message: 'Access denied.',

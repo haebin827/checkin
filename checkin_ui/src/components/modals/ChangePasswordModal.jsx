@@ -92,7 +92,6 @@ const ChangePasswordModal = ({ isOpen, onClose, user, onSubmit }) => {
           onSubmit(false);
         }
       } catch (error) {
-        console.error('Password update failed:', error);
         onSubmit(false);
       } finally {
         setIsSubmitting(false);
@@ -144,7 +143,7 @@ const ChangePasswordModal = ({ isOpen, onClose, user, onSubmit }) => {
               </button>
             </div>
             {passwordErrors.currentPassword && (
-              <div className="error-message">{passwordErrors.currentPassword}</div>
+              <div className="error-text">{passwordErrors.currentPassword}</div>
             )}
           </div>
 
@@ -184,7 +183,7 @@ const ChangePasswordModal = ({ isOpen, onClose, user, onSubmit }) => {
               </button>
             </div>
             {passwordErrors.newPassword && (
-              <div className="error-message">{passwordErrors.newPassword}</div>
+              <div className="error-text">{passwordErrors.newPassword}</div>
             )}
           </div>
 
@@ -200,7 +199,7 @@ const ChangePasswordModal = ({ isOpen, onClose, user, onSubmit }) => {
               autoComplete="new-password"
             />
             {passwordErrors.confirmPassword && (
-              <div className="error-message">{passwordErrors.confirmPassword}</div>
+              <div className="error-text">{passwordErrors.confirmPassword}</div>
             )}
           </div>
 

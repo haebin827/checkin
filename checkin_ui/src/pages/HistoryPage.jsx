@@ -1,3 +1,4 @@
+import { startOfDay, endOfDay } from 'date-fns';
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
@@ -11,7 +12,6 @@ import {
   FaFilter,
   FaChevronDown,
   FaChevronUp,
-  FaTimes,
   FaChevronLeft,
   FaChevronRight,
 } from 'react-icons/fa';
@@ -57,23 +57,21 @@ const HistoryPage = () => {
         if (!user?.id) return;
 
         const response = await HistoryService.showHistoriesAndLocationList(user.id);
-        console.log('DATA', response.data);
 
         if (response.data.success) {
-          // locations 설정
           const locationsList = response.data.response.locations;
-          setLocations(locationsList); // 이미 배열 형태로 오는 locations 데이터를 그대로 설정
+          setLocations(locationsList);
 
-          console.log('LOCATIONS: ', locationsList);
-          // histories 데이터 변환
           const transformedHistories = response.data.response.histories.map(history => {
-            const date = new Date(history.createdAt);
+            const dateObj = new Date(history.createdAt);
             return {
               ...history,
-              date: date.toLocaleDateString(),
-              time: date.toLocaleTimeString(),
+              date: dateObj.toLocaleDateString(),
+              time: dateObj.toLocaleTimeString(),
+              timestamp: dateObj.getTime(),
               location: history.location?.name,
-              childName: history.child?.engName,
+              childEngName: history.child?.engName,
+              childKorName: history.child?.korName,
               checkedInBy: history.checkedInBy?.engName,
               checkedInByRole: history.checkedInBy?.role,
             };
@@ -84,7 +82,6 @@ const HistoryPage = () => {
         }
       } catch (error) {
         console.error('Error fetching history data:', error);
-        // 에러 처리를 위한 상태 추가가 필요하다면 추가
       } finally {
         setIsLoading(false);
       }
@@ -115,14 +112,22 @@ const HistoryPage = () => {
 
     // 날짜 필터
     if (dateFilter) {
-      const dateString = formatDateToString(dateFilter);
-      result = result.filter(record => record.date === dateString);
+      /*const dateString = formatDateToString(dateFilter);
+      result = result.filter(record => record.date === dateString);*/
+      const start = startOfDay(dateFilter).getTime(); // 00:00:00.000
+      const end = endOfDay(dateFilter).getTime(); // 23:59:59.999
+
+      result = result.filter(r => r.timestamp >= start && r.timestamp <= end);
     }
 
     // 이름 필터
     if (nameFilter) {
       const lowerCaseName = nameFilter.toLowerCase();
-      result = result.filter(record => record.childName.toLowerCase().includes(lowerCaseName));
+      result = result.filter(
+        record =>
+          record.childEngName.toLowerCase().includes(lowerCaseName) ||
+          record.childKorName.includes(lowerCaseName),
+      );
     }
 
     // 정렬 적용
@@ -147,10 +152,7 @@ const HistoryPage = () => {
   const sortRecords = (data, field, direction) => {
     return [...data].sort((a, b) => {
       if (field === 'date') {
-        // 날짜와 시간을 함께 고려하여 정렬
-        const dateA = new Date(`${a.date} ${a.time}`);
-        const dateB = new Date(`${b.date} ${b.time}`);
-        return direction === 'asc' ? dateA - dateB : dateB - dateA;
+        return direction === 'asc' ? a.timestamp - b.timestamp : b.timestamp - a.timestamp;
       } else {
         // 문자열 정렬
         const valueA = a[field].toLowerCase();
@@ -285,7 +287,7 @@ const HistoryPage = () => {
           className={`pagination-button ${currentPage === i ? 'active' : ''}`}
         >
           {i}
-        </button>
+        </button>,
       );
     }
 
@@ -381,9 +383,9 @@ const HistoryPage = () => {
           )}
 
           {isLoading ? (
-            <div className="loading-container">
+            <div className="loading-container card-style">
               <div className="loading-spinner"></div>
-              <p>Loading check-in records...</p>
+              <div className="loading-text">Loading check-in records...</div>
             </div>
           ) : filteredRecords.length > 0 ? (
             <>
@@ -394,9 +396,13 @@ const HistoryPage = () => {
                       <th>
                         <span>No</span>
                       </th>
-                      <th onClick={() => handleSort('childName')}>
-                        <span>Child Name</span>
-                        {renderSortIcon('childName')}
+                      <th onClick={() => handleSort('childEngName')}>
+                        <span>English Name</span>
+                        {renderSortIcon('childEngName')}
+                      </th>
+                      <th onClick={() => handleSort('childKorName')}>
+                        <span>Korean Name</span>
+                        {renderSortIcon('childKorName')}
                       </th>
                       <th onClick={() => handleSort('date')}>
                         <span>Date</span>
@@ -420,7 +426,8 @@ const HistoryPage = () => {
                     {paginatedRecords.map((record, index) => (
                       <tr key={record.id}>
                         <td>{(currentPage - 1) * recordsPerPage + index + 1}</td>
-                        <td>{record.childName}</td>
+                        <td>{record.childEngName}</td>
+                        <td>{record.childKorName}</td>
                         <td>{record.date}</td>
                         <td>{record.time}</td>
                         <td>{record.location}</td>
@@ -432,7 +439,7 @@ const HistoryPage = () => {
                             </span>
                           )}
                           {record.checkedInByRole === 'manager' && (
-                            <span style={{ color: 'red', marginLeft: '4px', fontSize: '12px' }}>
+                            <span style={{ color: 'blue', marginLeft: '4px', fontSize: '12px' }}>
                               (Manager)
                             </span>
                           )}

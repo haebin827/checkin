@@ -62,13 +62,28 @@ exports.validateRegistration = [
 ];
 
 exports.register = async (req, res) => {
-  const user = await AuthService.register(req.body);
-  res.status(201).json({ success: true, user });
+  const { user, locationId } = req.body;
+  const response = await AuthService.register(user, locationId);
+  res.status(201).json({ success: true, user: response });
 };
 
 exports.getCurrentSession = async (req, res) => {
-  const user = await AuthService.findCurrentSession(req.session);
-  res.status(200).json({ success: true, user });
+  try {
+    const user = await AuthService.findCurrentSession(req.session);
+    res.status(200).json({ success: true, user });
+  } catch (err) {
+    if (req.session && req.session.tempUser) {
+      return res.status(200).json({
+        success: true,
+        user: null,
+        tempUser: true,
+      });
+    }
+
+    res.status(401).json({
+      success: false,
+    });
+  }
 };
 
 exports.sendOTPEmail = async (req, res) => {

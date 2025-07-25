@@ -88,15 +88,16 @@ const db = require('./app/models');
     console.error('❌ Unable to connect to the database');
   });*/
 
-db.sequelize
-  .sync()
-  .then(() => {
-    console.log('Synced db.');
-  })
-  .catch(err => {
-    console.log('Failed to sync db: ' + err.message);
-  });
-
+if (process.env.NODE_ENV !== 'test') {
+  db.sequelize
+    .sync()
+    .then(() => {
+      console.log('Synced db.');
+    })
+    .catch(err => {
+      console.log('Failed to sync db: ' + err.message);
+    });
+}
 // drop the table if it already exists
 /*
 db.sequelize.sync({ force: true }).then(() => {
@@ -110,8 +111,10 @@ app.use(errorHandler);
 app.use(express.static(path.join(__dirname, 'public')));
 
 const port = process.env.PORT || 8080;
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}.`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(port, () => {
+    console.log(`Server is running on port ${port}.`);
+  });
+}
 
 module.exports = app;

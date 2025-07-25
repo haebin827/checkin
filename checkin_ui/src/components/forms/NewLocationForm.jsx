@@ -2,21 +2,19 @@ import React, { useState } from 'react';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import '../../assets/styles/components/forms/NewLocation.css';
 import { locationSchema } from '../../validations/validations.js';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import LocationService from '../../services/LocationService.js';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import Toast from '../common/Toast.jsx';
 
-const NewLocationForm = () => {
-  const [formData, setFormData] = useState({
+const NewLocationForm = ({ onSuccess, onClose }) => {
+  const initialValues = {
     name: '',
     phone: '',
     streetAddress: '',
     city: '',
     state: '',
     postalCode: '',
-  });
+  };
 
   const handleSubmit = async (values, { setSubmitting, setFieldError, resetForm }) => {
     try {
@@ -35,15 +33,23 @@ const NewLocationForm = () => {
       const response = await LocationService.createLocation(submissionData);
 
       if (response.data && response.data.success) {
+        const createdLocation = response.data.location;
         toast.success('Location registered successfully!');
-        setTimeout(() => resetForm(), 100);
-        resetForm();
+
+        if (onSuccess) {
+          onSuccess(createdLocation);
+        } else {
+          setTimeout(() => resetForm(), 100);
+        }
       }
     } catch (error) {
+      console.error('Location registration failed:', error);
       if (error.response?.data?.errors) {
         error.response.data.errors.forEach(err => {
           setFieldError(err.field, err.message);
         });
+      } else {
+        toast.error('Registration failed. Please try again.');
       }
     } finally {
       setSubmitting(false);
@@ -53,9 +59,13 @@ const NewLocationForm = () => {
   return (
     <div className="new-location-form">
       <Toast />
-      <h2>Register New Location</h2>
+      {/*<h2>Register New Location</h2>*/}
 
-      <Formik initialValues={formData} validationSchema={locationSchema} onSubmit={handleSubmit}>
+      <Formik
+        initialValues={initialValues}
+        validationSchema={locationSchema}
+        onSubmit={handleSubmit}
+      >
         {({ isSubmitting, errors, touched, values }) => {
           const composeAddress = () => {
             return [values.streetAddress, values.city, values.state, values.postalCode]
@@ -169,6 +179,11 @@ const NewLocationForm = () => {
                 <button type="submit" className="submit-button" disabled={isSubmitting}>
                   {isSubmitting ? 'Registering...' : 'Register'}
                 </button>
+                {onClose && (
+                  <button type="button" className="cancel-button" onClick={onClose}>
+                    Cancel
+                  </button>
+                )}
               </div>
             </Form>
           );

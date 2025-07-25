@@ -5,7 +5,7 @@ import { useAuth } from '../../hooks/useAuth.jsx';
 import ChildService from '../../services/ChildService.js';
 import LocationService from '../../services/LocationService.js';
 
-const InviteModal = ({ isOpen, onClose, onSend }) => {
+const GuardianInviteModal = ({ isOpen, onClose, onSend }) => {
   const { user } = useAuth();
   const [email, setEmail] = useState('');
   const [selectedChild, setSelectedChild] = useState('');
@@ -99,14 +99,12 @@ const InviteModal = ({ isOpen, onClose, onSend }) => {
   const handleSubmit = async e => {
     e.preventDefault();
 
-    // Reset errors
     setErrors({
       email: null,
       location: null,
       child: null,
     });
 
-    // Validation checks
     let hasError = false;
     const newErrors = {
       email: null,
@@ -255,4 +253,4 @@ const InviteModal = ({ isOpen, onClose, onSend }) => {
   );
 };
 
-export default InviteModal;
+export default GuardianInviteModal;

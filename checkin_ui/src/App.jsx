@@ -19,6 +19,7 @@ import PrivateRoute from './routes/PrivateRoute.jsx';
 import DataPage from './pages/DataPage.jsx';
 import { ToastContainer } from 'react-toastify';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage.jsx';
+import ManagerRegisterPage from './pages/auth/ManagerRegisterPage.jsx';
 
 function App() {
   return (
@@ -30,6 +31,9 @@ function App() {
           <Route path={'/forgot'} element={<ForgotIdOrPwPage />} />
           <Route path={'/register'} element={<RegisterPage />} />
           <Route path={'/additional-info'} element={<AdditionalInfoPage />} />
+          <Route path={'/verify-email'} element={<FindUsernamePage />} />
+          <Route path={'/reset-password'} element={<ResetPasswordPage />} />
+          <Route path={'/invitation'} element={<ManagerRegisterPage />} />
 
           <Route
             path={'/main'}
@@ -71,8 +75,6 @@ function App() {
               </PrivateRoute>
             }
           />
-          <Route path={'/verify-email'} element={<FindUsernamePage />} />
-          <Route path={'/reset-password'} element={<ResetPasswordPage />} />
           {/* Error Pages */}
           <Route path={'/error/500'} element={<Error500 />} />
           <Route path={'/error/401'} element={<Error401 />} />

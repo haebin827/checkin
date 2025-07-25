@@ -1,22 +1,22 @@
-import axios from "axios";
+import axios from 'axios';
 
 let baseURL;
 if (import.meta.env.VITE_APP_NODE_ENV === 'ngrok') {
-    baseURL = `${import.meta.env.VITE_APP_NGROK_API_PORT}/api`;
+  baseURL = `${import.meta.env.VITE_APP_NGROK_API_PORT}/api`;
 } else if (import.meta.env.VITE_APP_NODE_ENV === 'development') {
-    baseURL = `${import.meta.env.VITE_APP_API_PORT}/api`;
+  baseURL = `${import.meta.env.VITE_APP_API_PORT_URL}/api`;
 } else {
-    baseURL = 'https://localhost:8080/api';
+  baseURL = 'https://localhost:8080/api';
 }
 
 const instance = axios.create({
-    baseURL,
-    headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "X-Requested-With": "XMLHttpRequest"
-    },
-    withCredentials: true
+  baseURL,
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+    'X-Requested-With': 'XMLHttpRequest',
+  },
+  withCredentials: true,
 });
 
 /*instance.interceptors.response.use(

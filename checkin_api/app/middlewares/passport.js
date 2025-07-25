@@ -3,7 +3,6 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const KakaoStrategy = require('passport-kakao').Strategy;
 const db = require('../models');
 const User = db.user;
-require('dotenv').config();
 
 passport.serializeUser((user, done) => {
   // 임시 사용자인 경우 전체 객체를 세션에 저장

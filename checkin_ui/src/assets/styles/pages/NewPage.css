@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --primary-color: #1b5e20;
+  --primary-color: #043a09;
   --secondary-color: #2e7d32;
   --accent-color: #388e3c;
   --background-color: #f9f9f9;
@@ -63,7 +63,7 @@
 .form-type-selector {
   background-color: var(--card-color);
   border-radius: 10px;
-  padding: 1.2rem;
+  padding: 0.8rem;
   margin-bottom: 2rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   max-width: 600px;
@@ -88,12 +88,12 @@
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  padding: 8px 10px;
+  padding: 6px 8px;
   background: none;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: 500;
   color: var(--text-secondary);
   transition: all 0.3s ease;
@@ -110,7 +110,7 @@
 }
 
 .option-icon {
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 
 .form-container {

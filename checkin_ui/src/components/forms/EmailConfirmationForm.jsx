@@ -1,12 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { FaSpinner, FaCheck, FaEnvelope } from 'react-icons/fa';
 import '../../assets/styles/pages/auth/EmailConfirmationPage.css';
 import AuthService from '../../services/AuthService.js';
 
-const EmailConfirmationForm = ({ user, onRegistrationComplete }) => {
-  const navigate = useNavigate();
-
+const EmailConfirmationForm = ({ user, onRegistrationComplete, locationId = null }) => {
   // State for OTP digits
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [isVerifying, setIsVerifying] = useState(false);
@@ -95,7 +92,6 @@ const EmailConfirmationForm = ({ user, onRegistrationComplete }) => {
       inputRefs.current[index - 1].focus();
     }
 
-    // Handle arrow navigation
     if (e.key === 'ArrowLeft' && index > 0) {
       inputRefs.current[index - 1].focus();
     }
@@ -122,8 +118,7 @@ const EmailConfirmationForm = ({ user, onRegistrationComplete }) => {
       const enteredOtp = otp.join('');
       if (enteredOtp === code) {
         setVerificationSuccess(true);
-
-        await AuthService.register(user);
+        await AuthService.register({ user, locationId });
         // Call onRegistrationComplete instead of navigating
         setTimeout(() => {
           onRegistrationComplete();

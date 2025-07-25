@@ -28,11 +28,11 @@ module.exports = (sequelize, Sequelize) => {
         defaultValue: '1',
         comment: '1: yes, 0: no',
       },
-        status: {
-            type: Sequelize.ENUM('0', '1'),
-            defaultValue: '1',
-            comment: '1: active, 0: deleted',
-        },
+      status: {
+        type: Sequelize.ENUM('0', '1'),
+        defaultValue: '1',
+        comment: '1: active, 0: deleted',
+      },
       /*locationId: {
                 type: Sequelize.INTEGER,
                 allowNull: true

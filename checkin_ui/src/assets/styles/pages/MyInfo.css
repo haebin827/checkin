@@ -14,9 +14,9 @@
   --active-color: #c8e6c9;
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --footer-height: 60px;
-  --footer-height-mobile: 45px;
-  --footer-height-small: 40px;
+  --footer-height: 40px;
+  --footer-height-mobile: 35px;
+  --footer-height-small: 30px;
 }
 
 .myinfo-page {
@@ -65,45 +65,7 @@
   border-radius: 2px;
 }
 
-/* Loading state */
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem;
-  background-color: var(--card-color);
-  border-radius: 8px;
-  box-shadow: var(--shadow-md);
-}
-
-.loading-spinner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 200px;
-  width: 100%;
-  background-color: var(--card-color);
-  border-radius: 8px;
-  box-shadow: var(--shadow-md);
-}
-
-.loading-spinner::after {
-  content: '';
-  width: 50px;
-  height: 50px;
-  border: 4px solid var(--hover-color);
-  border-radius: 50%;
-  border-top-color: var(--primary-color);
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
+/* Loading styles moved to common Loading.css */
 
 /* Profile content */
 .profile-content {
@@ -125,6 +87,7 @@
   padding: 1.2rem;
   border-bottom: 1px solid var(--border-color);
   background-color: var(--hover-color);
+  min-height: 80px;
 }
 
 .profile-avatar {
@@ -141,8 +104,11 @@
 }
 
 .profile-title {
-  text-align: center;
-  margin-top: 1rem;
+  text-align: left;
+  margin-top: 0;
+  display: flex;
+  align-items: center;
+  height: 100%;
 }
 
 .profile-title h2 {
@@ -281,6 +247,10 @@
   background-color: var(--primary-color);
 }
 
+.admin-button.manager-invite-button {
+  background-color: #28652a;
+}
+
 .admin-button svg {
   font-size: 16px;
 }
@@ -298,17 +268,18 @@
   }
   
   .profile-header {
-    flex-direction: column;
-    text-align: center;
+    flex-direction: row;
+    text-align: left;
     padding: 1rem;
+    min-height: 70px;
   }
   
   .profile-avatar {
-    width: 56px;
-    height: 56px;
-    margin-right: 0;
-    margin-bottom: 0.8rem;
-    font-size: 1.4rem;
+    width: 40px;
+    height: 40px;
+    margin-right: 1rem;
+    margin-bottom: 0;
+    font-size: 1.2rem;
   }
   
   .profile-title h2 {
@@ -338,6 +309,18 @@
   
   .page-header h1 {
     font-size: 28px;
+  }
+}
+
+@media (min-width: 769px) {
+  .profile-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+
+  .profile-title h2 {
+    font-size: 1.2rem;
   }
 }
 
@@ -381,10 +364,11 @@
   }
   
   .profile-avatar {
-    width: 48px;
-    height: 48px;
-    font-size: 1.2rem;
-    margin-bottom: 0.6rem;
+    width: 25px;
+    height: 25px;
+    font-size: 1rem;
+    margin-right: 0.8rem;
+    margin-bottom: 0;
   }
   
   .profile-title h2 {
@@ -582,7 +566,11 @@
     width: calc(100% - 32px);
     max-width: none;
   }
-  
+
+  .page-header h2 {
+    font-size: 25px;
+  }
+
   .modal-header {
     padding: 12px 16px;
   }

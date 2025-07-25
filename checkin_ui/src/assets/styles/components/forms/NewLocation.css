@@ -2,195 +2,217 @@
 @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap');
 
 .new-location-form {
-  max-width: 600px;
+  max-width: 500px;
   margin: 0 auto;
   padding: 20px;
   background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .new-location-form h2 {
   font-family: 'Rubik', sans-serif;
-  font-size: 23px;
+  font-size: 16px;
   font-weight: 500;
   color: #1b5e20;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   text-align: center;
 }
 
-
-.form-group {
-  margin-bottom: 1.5rem;
+.new-location-form .form-group {
+  margin-bottom: 1rem;
 }
 
-.form-group label {
+.new-location-form .form-group label {
   display: block;
   font-weight: bold;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.3rem;
   color: #424242;
   font-family: 'Rubik', sans-serif;
-  font-size: 0.95rem;
+  font-size: 0.75rem;
 }
 
-.form-group input,
-.form-group select {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #dcdfe6;
-  border-radius: 4px;
-  font-size: 1rem;
+.new-location-form .form-group input,
+.new-location-form .form-group select,
+.new-location-form .form-input {
+  width: 100% !important;
+  padding: 0.4rem !important;
+  border: 1px solid #dcdfe6 !important;
+  border-radius: 3px !important;
+  font-size: 0.85rem !important;
   transition: border-color 0.3s ease;
+  box-sizing: border-box;
 }
 
-.form-group input:focus,
-.form-group select:focus {
-  border-color: #409eff;
+.new-location-form .form-group input:focus,
+.new-location-form .form-group select:focus,
+.new-location-form .form-input:focus {
+  border-color: #409eff !important;
   outline: none;
-  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+  box-shadow: 0 0 0 1px rgba(64, 158, 255, 0.2) !important;
 }
 
-.form-group input.error {
-  border-color: #f56c6c;
+.new-location-form .form-group input.error,
+.new-location-form .form-input.error {
+  border-color: #f56c6c !important;
 }
 
-.error-text {
+.new-location-form .error-text {
   color: #dc3545;
-  font-size: 12px;
-  margin-top: 4px;
+  font-size: 10px;
+  margin-top: 2px;
   margin-bottom: 0;
   padding-left: 2px;
   font-weight: 400;
 }
 
-.error-message.general {
-  margin: 0 0 16px;
-  padding: 8px 12px;
+.new-location-form .error-message.general {
+  margin: 0 0 12px;
+  padding: 6px 8px;
   background-color: #fff5f5;
   border: 1px solid #ffebeb;
-  border-radius: 4px;
-  font-size: 13px;
+  border-radius: 3px;
+  font-size: 11px;
 }
 
-.form-input.error {
-  border-color: #dc3545;
-  background-color: #fff;
+.new-location-form .form-input.error:focus {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 1px #dc3545 !important;
 }
 
-.form-input.error:focus {
-  border-color: #dc3545;
-  box-shadow: 0 0 0 1px #dc3545;
-}
-
-.form-row {
+.new-location-form .form-row {
   display: flex;
-  gap: 1rem;
+  gap: 0.6rem;
   flex-wrap: wrap;
-  margin-bottom: 1rem;
+  margin-bottom: 0.6rem;
 }
 
-.form-row .form-group {
+.new-location-form .form-row .form-group {
   flex: 1;
-  min-width: 200px;
-  margin-bottom: 0.5rem;
+  min-width: 150px;
+  margin-bottom: 0.3rem;
 }
 
-.required {
+.new-location-form .required {
   color: #f56c6c;
 }
 
-.address-section {
-  margin-top: 2rem;
-  padding: 1.5rem;
+.new-location-form .address-section {
+  margin-top: 1rem;
+  padding: 0.8rem;
   border: 1px solid #ebeef5;
-  border-radius: 6px;
+  border-radius: 4px;
   background-color: #f8f9fa;
 }
 
-.address-section h3 {
-  margin-bottom: 1.5rem;
+.new-location-form .address-section h3 {
+  margin-bottom: 0.8rem;
   color: #1b5e20;
-  font-size: 1.25rem;
+  font-size: 0.9rem;
   font-family: 'Rubik', sans-serif;
   font-weight: 500;
 }
 
-.address-preview {
-  margin-top: 1.5rem;
-  padding: 1rem;
+.new-location-form .address-preview {
+  margin-top: 0.8rem;
+  padding: 0.6rem;
   background-color: white;
-  border-radius: 4px;
-  border-left: 4px solid #409eff;
+  border-radius: 3px;
+  border-left: 3px solid #409eff;
 }
 
-.address-preview h4 {
-  margin-bottom: 0.5rem;
+.new-location-form .address-preview h4 {
+  margin-bottom: 0.3rem;
   color: #606266;
+  font-size: 0.75rem;
 }
 
-.address-preview p {
+.new-location-form .address-preview p {
   font-weight: bold;
   color: #2c3e50;
+  font-size: 0.8rem;
 }
 
-.form-actions {
-  margin-top: 2rem;
-  text-align: center;
+.new-location-form .form-actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
 }
 
-.submit-button {
-  width: 100%;
-  padding: 12px;
+.new-location-form .submit-button {
+  flex: 1;
+  max-width: 120px;
+  padding: 8px 12px;
   background-color: #4CAF50;
   color: white;
   border: none;
-  border-radius: 5px;
-  font-size: 16px;
+  border-radius: 4px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.submit-button:hover {
+.new-location-form .submit-button:hover {
   background-color: #45a049;
 }
 
-.submit-button:disabled {
+.new-location-form .submit-button:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
 }
 
-.submit-button.loading {
+.new-location-form .submit-button.loading {
   opacity: 0.8;
   cursor: wait;
 }
 
-.address-subtitle {
-  font-size: 0.9rem;
+.new-location-form .cancel-button {
+  flex: 1;
+  max-width: 120px;
+  padding: 8px 12px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.new-location-form .cancel-button:hover {
+  background-color: #5a6268;
+}
+
+.new-location-form .address-subtitle {
+  font-size: 0.7rem;
   font-weight: normal;
   color: #606266;
-  margin-left: 0.5rem;
+  margin-left: 0.3rem;
 }
 
 @media (max-width: 768px) {
   .new-location-form {
-    padding: 1.5rem;
+    padding: 1rem;
   }
   
-  .form-row {
+  .new-location-form .form-row {
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.3rem;
   }
   
-  .form-row .form-group {
+  .new-location-form .form-row .form-group {
     min-width: 100%;
-    margin-bottom: 1rem;
+    margin-bottom: 0.6rem;
   }
 }
 
 @media (max-width: 576px) {
   .new-location-form {
-    padding: 1rem;
+    padding: 0.8rem;
   }
 } 

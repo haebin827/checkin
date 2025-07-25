@@ -116,7 +116,7 @@ const EditProfileModal = ({ isOpen, onClose, onSubmit, initialData, updateUserDa
                   type="text"
                   id="phone"
                   name="phone"
-                  placeholder="e.g., 010-1234-5678"
+                  placeholder="e.g., 1234567890"
                   className={`form-input ${errors.phone && touched.phone ? 'error' : ''}`}
                 />
                 <ErrorMessage name="phone" component="div" className="error-text" />

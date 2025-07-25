@@ -16,14 +16,13 @@ const LocationService = {
     try {
       return await Location.findAll();
     } catch (err) {
-      console.error('LocationService/findAllLocations:', err);
-      throw err;
+      throw new AppError('Invalid request', 404);
     }
   },
 
   async createLocation(locationData) {
     if (!locationData.name || !locationData.address) {
-      throw new Error('Name and address are required');
+      throw new AppError('Invalid request', 404);
     }
 
     const transaction = await db.sequelize.transaction();
@@ -42,7 +41,7 @@ const LocationService = {
       if (!transaction.finished) {
         await transaction.rollback();
       }
-      throw err;
+      throw new AppError(err, 404);
     }
   },
 
@@ -51,7 +50,7 @@ const LocationService = {
     try {
       const location = await Location.findByPk(locationId);
       if (!location) {
-        throw new Error('Location not found');
+        throw new AppError('Invalid request', 404);
       }
 
       if (locationData.name && locationData.name !== location.name) {
@@ -63,7 +62,7 @@ const LocationService = {
         });
 
         if (existingLocation) {
-          throw new Error('Location with this name already exists');
+          throw new AppError('Invalid request', 404);
         }
       }
 
@@ -72,8 +71,7 @@ const LocationService = {
       return location;
     } catch (err) {
       await transaction.rollback();
-      console.error('LocationService/updateLocation:', err);
-      throw err;
+      throw new AppError('Invalid request', 404);
     }
   },
 
@@ -82,15 +80,14 @@ const LocationService = {
     try {
       const location = await Location.findByPk(locationId);
       if (!location) {
-        throw new Error('Location not found');
+        throw new AppError('Invalid request', 404);
       }
 
       await location.update({ status: '0' }, { transaction });
       await transaction.commit();
     } catch (err) {
       await transaction.rollback();
-      console.error('LocationService/deleteLocation:', err);
-      throw err;
+      throw new AppError('Invalid request', 404);
     }
   },
 
@@ -103,7 +100,7 @@ const LocationService = {
       }
       return location;
     } catch (err) {
-      throw err;
+      throw new AppError('Invalid request', 404);
     }
   },
 
@@ -123,7 +120,7 @@ const LocationService = {
 
       return { token, url, qrCode };
     } catch (err) {
-      throw err;
+      throw new AppError('Invalid request', 404);
     }
   },
 
@@ -184,8 +181,7 @@ const LocationService = {
         }),
       );
 
-      const validEmails = guardianEmails.filter(email => email !== null);
-      console.log('Valid emails:', validEmails, formattedDate);
+      const validEmails = guardianEmails.filter(email => email !== null && email !== '');
 
       await Promise.all(
         validEmails.map(async email => {
@@ -199,7 +195,7 @@ const LocationService = {
               attemptMaker: 'guardian',
             });
           } catch (error) {
-            console.error(`Failed to send email to ${email}:`, error);
+            throw new AppError('Invalid request', 404);
           }
         }),
       );
@@ -208,7 +204,61 @@ const LocationService = {
       return history;
     } catch (err) {
       await transaction.rollback();
-      throw err;
+      throw new AppError('Invalid request', 404);
+    }
+  },
+
+  async sendManagerInviteEmail(managerEmail, locationId) {
+    const transaction = await db.sequelize.transaction();
+    try {
+      const location = await Location.findByPk(locationId, {
+        attributes: ['name'],
+        where: {
+          status: '1',
+        },
+      });
+
+      const user = await User.findOne({
+        attributes: ['id'],
+        where: {
+          email: managerEmail,
+        },
+      });
+
+      if (!location || user) {
+        throw new AppError('Invalid Request', 400);
+      }
+      await EmailService.sendManagerInviteEmail(managerEmail, locationId, location.name);
+      await transaction.commit();
+      return location.name;
+    } catch (err) {
+      await transaction.rollback();
+      throw new AppError('Invalid request', 400);
+    }
+  },
+
+  async retrieveManagerEmail(token) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+      if (decoded.type !== 'inviteManager') {
+        throw new AppError('Invalid access.', 403);
+      }
+
+      const user = await User.findOne({
+        attributes: ['id'],
+        where: {
+          email: decoded.email,
+        },
+      });
+
+      if (user) {
+        throw new AppError('Invalid access.', 403);
+      }
+
+      return { email: decoded.email, locationId: decoded.locationId };
+    } catch (err) {
+      throw new AppError('Invalid access', 403);
     }
   },
 };

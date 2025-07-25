@@ -10,9 +10,9 @@
   --text-light: #607D8B;
   --border-color: #DCEDC8;
   --shadow-color: rgba(27, 94, 32, 0.2);
-  --footer-height: 60px;
-  --footer-height-mobile: 45px;
-  --footer-height-small: 40px;
+  --footer-height: 40px;
+  --footer-height-mobile: 35px;
+  --footer-height-small: 30px;
 }
 
 .main-page {
@@ -39,10 +39,20 @@
 
 .content-container h1 {
   color: var(--primary-color);
-  font-size: 32px;
+  font-size: 30px;
   margin-bottom: 20px;
   position: relative;
   display: inline-block;
+}
+
+.mainpage-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--hover-color);
+  border-radius: 50%;
+  border-top-color: var(--primary-color);
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
 }
 
 .content-container h1::after {
@@ -188,7 +198,7 @@
   }
   
   .content-container h1 {
-    font-size: 28px;
+    font-size: 24px;
   }
   
   .page-header {
@@ -233,7 +243,7 @@
   }
   
   .content-container h1 {
-    font-size: 24px;
+    font-size: 20px;
   }
   
   .content-container h1::after {
@@ -261,7 +271,7 @@
   }
   
   .content-container h1 {
-    font-size: 22px;
+    font-size: 18px;
   }
   
   .admin-actions {

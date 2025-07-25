@@ -34,7 +34,7 @@ async function sendEmail(email) {
   `;
 
   try {
-    const info = await transporter.sendMail({
+    await transporter.sendMail({
       from: emailConfig.auth.user,
       to: email,
       subject: 'Signup Verification Code',
@@ -46,7 +46,6 @@ async function sendEmail(email) {
   }
 
   return {
-    info,
     code: verificationCode,
     expiresIn: 180,
     maxAttempts: 5,
@@ -55,7 +54,7 @@ async function sendEmail(email) {
 
 async function sendFindIdEmail(email) {
   const token = generateToken({ email, type: 'findId' }, '5m');
-  const link = `http://localhost:5051/verify-email?token=${token}`;
+  const link = `${process.env.CORS_ORIGIN_URL}/verify-email?token=${token}`;
   //const verificationLink = `http://10.9.5.157:5051/verify-email?token=${token}`;
   try {
     await transporter.sendMail({
@@ -78,7 +77,7 @@ async function sendFindIdEmail(email) {
 
 async function sendPasswordResetEmail(email) {
   const token = generateToken({ email, type: 'resetPassword' }, '5m');
-  const link = `http://localhost:5051/reset-password?token=${token}`;
+  const link = `${process.env.CORS_ORIGIN_URL}/reset-password?token=${token}`;
   //const resetLink = `http://10.9.5.157:5051/reset-password?token=${token}`;
   try {
     await transporter.sendMail({
@@ -98,7 +97,7 @@ async function sendPasswordResetEmail(email) {
   }
 }
 
-async function sendInviteEmail(email, childName) {
+async function sendGuardianInviteEmail(email, childName) {
   try {
     await transporter.sendMail({
       from: emailConfig.auth.user,
@@ -115,6 +114,7 @@ async function sendInviteEmail(email, childName) {
     });
     return true;
   } catch (err) {
+    console.error('ERR0R: ', err);
     throw new AppError('Internal Server Error', 500);
   }
 }
@@ -127,7 +127,6 @@ async function sendCheckinEmail({
   name,
   attemptMaker,
 }) {
-  console.log('SEND CHECK EMAIL: ', { email, checkinTime, childName, locationName, name });
   if (attemptMaker === 'manager') {
     name = `${name} <span style="color: #ff0000;">(Manager)</span>`;
   } else if (attemptMaker === 'admin') {
@@ -167,11 +166,33 @@ async function sendCheckinEmail({
   }
 }
 
+async function sendManagerInviteEmail(email, locationId, locationName) {
+  const token = generateToken({ email, type: 'inviteManager', locationId }, '1440m');
+  const link = `${process.env.CORS_ORIGIN_URL}/invitation?token=${token}`;
+  try {
+    await transporter.sendMail({
+      from: emailConfig.auth.user,
+      to: email,
+      subject: `❗ Manager Registration Invitation for ${locationName}`,
+      html: `
+                <h2>Invitation for Check-in System</h2>
+                <p>Click the link below to finish registration for <b>${locationName}</b>:</p>
+                <a href="${link}">Complete registration</a><br>
+                <p>This link will expire in 24 hrs.</p>
+            `,
+    });
+    return true;
+  } catch (err) {
+    throw new AppError('Internal Server Error', 500);
+  }
+}
+
 module.exports = {
   sendEmail,
   sendFindIdEmail,
   sendPasswordResetEmail,
-  sendInviteEmail,
+  sendGuardianInviteEmail,
   sendCheckinEmail,
+  sendManagerInviteEmail,
   verifyToken,
 };

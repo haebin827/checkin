@@ -1,4 +1,4 @@
-import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, useEffect, forwardRef } from 'react';
 import {
   FaCheckCircle,
   FaQrcode,
@@ -35,14 +35,7 @@ const CheckinChildList = forwardRef(({ onSelectChild }, ref) => {
   });
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedChildForCheckin, setSelectedChildForCheckin] = useState(null);
-
-  useImperativeHandle(ref, () => ({
-    updateCheckedInStatus: childId => {
-      setFilteredChildren(prevChildren =>
-        prevChildren.map(child => (child.id === childId ? { ...child, checkedIn: true } : child))
-      );
-    },
-  }));
+  const [disabledCheckinButton, setDisabledCheckinButton] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -95,8 +88,13 @@ const CheckinChildList = forwardRef(({ onSelectChild }, ref) => {
   };
 
   const handleSaveClick = async childId => {
+    if (editData.relationship.trim() === '') {
+      toast.error('Relationship cannot be empty.');
+      return;
+    }
     try {
-      const response = await ChildService.updateGuardianSettings(childId, user.id, {
+      const response = await ChildService.updateGuardianSettings(childId, {
+        userId: user.id,
         relationship: editData.relationship,
         isSms: editData.isSms,
       });
@@ -113,8 +111,8 @@ const CheckinChildList = forwardRef(({ onSelectChild }, ref) => {
                     isSms: editData.isSms,
                   },
                 }
-              : child
-          )
+              : child,
+          ),
         );
 
         setEditingChildId(null);
@@ -136,7 +134,7 @@ const CheckinChildList = forwardRef(({ onSelectChild }, ref) => {
       filtered = filtered.filter(
         child =>
           child.locationId === parseInt(selectedLocation) ||
-          child.location?.id === parseInt(selectedLocation)
+          child.location?.id === parseInt(selectedLocation),
       );
     }
 
@@ -145,7 +143,7 @@ const CheckinChildList = forwardRef(({ onSelectChild }, ref) => {
       filtered = filtered.filter(
         child =>
           child.engName.toLowerCase().includes(searchLower) ||
-          child.korName.toLowerCase().includes(searchLower)
+          child.korName.toLowerCase().includes(searchLower),
       );
     }
 
@@ -167,7 +165,7 @@ const CheckinChildList = forwardRef(({ onSelectChild }, ref) => {
   const totalPages = Math.ceil(filteredChildren.length / ITEMS_PER_PAGE);
   const paginatedChildren = filteredChildren.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
+    currentPage * ITEMS_PER_PAGE,
   );
 
   const handlePageChange = pageNumber => {
@@ -234,7 +232,7 @@ const CheckinChildList = forwardRef(({ onSelectChild }, ref) => {
               >
                 {pageNum}
               </button>
-            )
+            ),
           )}
         </div>
 
@@ -268,6 +266,7 @@ const CheckinChildList = forwardRef(({ onSelectChild }, ref) => {
   // Force checkin for Manager and Admin
   const handleConfirmCheckin = async () => {
     const child = selectedChildForCheckin;
+    setDisabledCheckinButton(true);
     try {
       const response = await ChildService.forceCheckin({
         userId: user.id,
@@ -293,6 +292,7 @@ const CheckinChildList = forwardRef(({ onSelectChild }, ref) => {
     } catch (error) {
       toast.error(`Check-in failed. Please contact to the system team.`);
     } finally {
+      setDisabledCheckinButton(false);
       setShowConfirmModal(false);
       setSelectedChildForCheckin(null);
     }
@@ -341,6 +341,7 @@ const CheckinChildList = forwardRef(({ onSelectChild }, ref) => {
       {loading ? (
         <div className="loading-container">
           <div className="loading-spinner"></div>
+          <div className="loading-text">Loading children...</div>
         </div>
       ) : (
         <div className="children-list">
@@ -515,7 +516,11 @@ const CheckinChildList = forwardRef(({ onSelectChild }, ref) => {
               >
                 Cancel
               </button>
-              <button className="confirm-button" onClick={handleConfirmCheckin}>
+              <button
+                className="confirm-button"
+                disabled={disabledCheckinButton}
+                onClick={handleConfirmCheckin}
+              >
                 Confirm Check-in
               </button>
             </div>

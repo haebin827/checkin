@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FaUser, FaBell, FaSignOutAlt, FaCog, FaChevronDown, FaBars } from 'react-icons/fa';
-import '../../assets/styles/components/Navbar.css';
+import '../../assets/styles/components/layout/Navbar.css';
 import AuthService from '../../services/AuthService.js';
 import { useAuth } from '../../hooks/useAuth.jsx';
 
@@ -64,11 +64,16 @@ const Navbar = () => {
               Data
             </Link>
           )}
-          {user.role !== 'guardian' && (
+          {/*{user.role !== 'guardian' && (
             <Link to="/new" className={`menu-item ${isActive('/new') ? 'active' : ''}`}>
               Registration
             </Link>
-          )}
+          )}*/}
+          {/*{user.role !== 'guardian' && (
+            <Link to="/new" className={`menu-item ${isActive('/new') ? 'active' : ''}`}>
+              Registration
+            </Link>
+          )}*/}
         </div>
 
         <div className="navbar-right">

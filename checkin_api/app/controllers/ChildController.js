@@ -3,19 +3,11 @@ const { updateUserValidation, childValidation } = require('../validations/valida
 const { validationResult } = require('express-validator');
 const AuthService = require('../services/AuthService');
 
-exports.getAllChildren = async (req, res) => {
-  const response = await ChildService.findAllChildren();
-  res.status(200).json({
-    success: true,
-    children: response,
-  });
-};
-
 exports.getChildrenByLocation = async (req, res) => {
   const locationId = req.params.locationId;
 
   if (!locationId) {
-    return res.status(400).json({
+    res.status(400).json({
       success: false,
     });
   }
@@ -39,7 +31,7 @@ exports.createChild = [
         return acc;
       }, {});
 
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         errors: formattedErrors,
       });
@@ -68,7 +60,6 @@ exports.deleteChild = async (req, res) => {
   await ChildService.deleteChild(req.params.id);
   res.status(200).json({
     success: true,
-    message: 'Child deleted successfully',
   });
 };
 
@@ -82,7 +73,7 @@ exports.showChildrenAndLocationList = async (req, res) => {
   const userId = req.query.id;
 
   if (!userId) {
-    return res.status(400).json({
+    res.status(400).json({
       success: false,
       message: 'Invalid request',
     });
@@ -100,13 +91,12 @@ exports.forceCheckin = async (req, res) => {
   const { locationId, childId, userId, ...otherData } = req.body;
 
   if (!locationId || !childId || !userId) {
-    return res.status(400).json({
+    res.status(400).json({
       success: false,
       message: 'Invalid request',
     });
   }
 
-  console.log('🔥🔥');
   const history = await ChildService.forceCheckin({
     locationId,
     childId,
@@ -124,10 +114,7 @@ exports.updateGuardianSettings = async (req, res) => {
   const { childId } = req.params;
   const { userId, relationship, isSms } = req.body;
 
-  const result = await ChildService.updateGuardianSettings(childId, userId, {
-    relationship,
-    isSms,
-  });
+  const result = await ChildService.updateGuardianSettings(childId, userId, relationship, isSms);
 
   res.status(200).json({
     success: true,

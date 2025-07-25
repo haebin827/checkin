@@ -3,27 +3,26 @@ import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import CheckinChildList from '../components/checkinChildList';
 import QrScanner from '../components/QrScanner';
-import InviteModal from '../components/modals/InviteModal';
+import GuardianInviteModal from '../components/modals/GuardianInviteModal.jsx';
+import QrModal from '../components/modals/QrModal';
 import { FaEnvelope, FaQrcode } from 'react-icons/fa';
 import '../assets/styles/pages/MainPage.css';
 import { useAuth } from '../hooks/useAuth.jsx';
 import LocationService from '../services/LocationService.js';
-import Modal from '../components/common/Modal.jsx';
 import Toast from '../components/common/Toast.jsx';
 import { toast } from 'react-hot-toast';
 import ChildService from '../services/ChildService.js';
+import ManagerInviteModal from '../components/modals/ManagerInviteModal.jsx';
 
 const MainPage = () => {
   const { user } = useAuth();
 
   const [selectedChild, setSelectedChild] = useState(null);
-  const childListRef = useRef(null);
-
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-  const [loadingQr, setLoadingQr] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
-  const [eventUrl, setEventUrl] = useState('');
+  const [loadingQr, setLoadingQr] = useState(false);
   const [currentQrCode, setCurrentQrCode] = useState('');
+  const [isManagerInviteModalOpen, setIsManagerInviteModalOpen] = useState(false);
 
   // -----------------------------------------------------
   // QR APIs
@@ -31,23 +30,23 @@ const MainPage = () => {
   const handleQrClick = async e => {
     e.stopPropagation();
     setLoadingQr(true);
-    setShowQrModal(true);
-    setEventUrl('');
+    if (!showQrModal) {
+      setShowQrModal(true);
+    }
     setCurrentQrCode('');
 
     const result = await LocationService.getQr(user.locationId);
 
     if (result.success) {
       setCurrentQrCode(result.qrCode);
-      if (result.url) {
-        setEventUrl(result.url);
-      }
     }
     setLoadingQr(false);
   };
 
   const handleDownload = () => {
-    if (!currentQrCode) return;
+    if (!currentQrCode) {
+      return;
+    }
 
     const link = document.createElement('a');
     link.href = currentQrCode;
@@ -58,21 +57,7 @@ const MainPage = () => {
     document.body.removeChild(link);
   };
 
-  const handleQrScanSuccess = (childId, qrData) => {
-    console.log(`체크인 성공 - 아이 ID: ${childId}, QR 데이터: ${qrData}`);
-
-    // 체크인 상태 업데이트
-    if (childListRef.current) {
-      childListRef.current.updateCheckedInStatus(childId);
-    }
-
-    // QR 스캔 화면 닫기
-    setSelectedChild(null);
-  };
-
-  // QR 스캐너에서 뒤로가기 핸들러
   const handleBackFromQrScan = () => {
-    console.log('QR 스캔 취소');
     setSelectedChild(null);
   };
 
@@ -83,22 +68,41 @@ const MainPage = () => {
     setIsInviteModalOpen(true);
   };
 
-  const handleSendInviteSubmit = async data => {
+  const handleManagerInvite = () => {
+    setIsManagerInviteModalOpen(true);
+  };
+
+  const handleSendGuardianInviteSubmit = async data => {
     try {
       const response = await ChildService.sendInviteEmail(data);
       if (response.data.success) {
         toast.success(
-          `Invitation email sent successfully to ${data.guardianEmail} for ${data.childName}!`
+          `Invitation email sent successfully to ${data.guardianEmail} for ${data.childName}!`,
         );
         setIsInviteModalOpen(false);
       } else {
-        toast.error(response.data.message || 'Failed to send invitation');
+        toast.error('Failed to send invitation. Please try again later.');
       }
     } catch (error) {
       console.error('Error sending invite:', error);
-      toast.error(
-        error.response?.data?.message || 'Failed to send invitation. Please try again later.'
-      );
+      toast.error('Failed to send invitation. Please try again later.');
+    }
+  };
+
+  const handleSendManagerInviteSubmit = async data => {
+    try {
+      const response = await LocationService.sendManagerInviteEmail(data);
+      if (response.data.success) {
+        toast.success(
+          `Invitation email sent successfully to ${data.managerEmail} for ${response.data.locationName}.`,
+        );
+        setIsManagerInviteModalOpen(false);
+      } else {
+        toast.error('Failed to send invitation. Please try again later.');
+      }
+    } catch (error) {
+      console.error('Error sending invite:', error);
+      toast.error('Failed to send invitation. Please try again later.');
     }
   };
 
@@ -110,7 +114,7 @@ const MainPage = () => {
     if (selectedChild) {
       return <QrScanner child={selectedChild} onBack={handleBackFromQrScan} />;
     } else {
-      return <CheckinChildList ref={childListRef} onSelectChild={handleChildSelect} />;
+      return <CheckinChildList onSelectChild={handleChildSelect} />;
     }
   };
 
@@ -122,16 +126,25 @@ const MainPage = () => {
         <main className="main-content">
           <div className="content-container">
             <div className="page-header">
-              <h1>Welcome to Check-In service.</h1>
+              <h1 style={{ fontSize: '1.5rem' }}>Welcome to Check-In service.</h1>
 
               {user.role !== 'guardian' && (
                 <div className="admin-actions">
                   <button className="admin-button invite-button" onClick={handleSendInvite}>
-                    <FaEnvelope /> Send invite email
+                    <FaEnvelope /> {user.role === 'manager' ? 'Send ' : 'Send Guardian '}
+                    invite email
                   </button>
-                  {user.role !== 'admin' && (
+                  {user.role === 'manager' && (
                     <button className="admin-button qr-button" onClick={e => handleQrClick(e)}>
                       <FaQrcode /> QR
+                    </button>
+                  )}
+                  {user.role === 'admin' && (
+                    <button
+                      className="admin-button manager-invite-button"
+                      onClick={handleManagerInvite}
+                    >
+                      <FaEnvelope /> Send Manager invite email
                     </button>
                   )}
                 </div>
@@ -143,43 +156,29 @@ const MainPage = () => {
       </div>
       <Footer />
 
-      {/* Invite Modal */}
-      <InviteModal
+      {/* Guardian Invite Modal */}
+      <GuardianInviteModal
         isOpen={isInviteModalOpen}
         onClose={() => setIsInviteModalOpen(false)}
-        onSend={handleSendInviteSubmit}
+        onSend={handleSendGuardianInviteSubmit}
       />
 
-      <Modal isOpen={showQrModal} onClose={() => setShowQrModal(false)} title="QR CODE">
-        <div className="qr-modal-content">
-          {loadingQr ? (
-            <div className="qr-loading">
-              <div className="loading-spinner"></div>
-              <p>Generating QR code...</p>
-            </div>
-          ) : currentQrCode ? (
-            <div className="qr-image-container">
-              <img src={currentQrCode} alt="QR code" className="qr-image" />
-              <p className="qr-description">Scan this QR code to check in</p>
-            </div>
-          ) : (
-            <div className="qr-error">
-              <p>Unable to generate QR code.</p>
-              <p>Please try again later.</p>
-            </div>
-          )}
-          <div className="qr-modal-actions">
-            {currentQrCode && !loadingQr && (
-              <button className="qr-download-button" onClick={handleDownload}>
-                Download QR Code
-              </button>
-            )}
-            <button className="qr-close-button" onClick={() => setShowQrModal(false)}>
-              Close
-            </button>
-          </div>
-        </div>
-      </Modal>
+      {/* Manager Invite Modal */}
+      <ManagerInviteModal
+        isOpen={isManagerInviteModalOpen}
+        onClose={() => setIsManagerInviteModalOpen(false)}
+        onSend={handleSendManagerInviteSubmit}
+      />
+
+      {/* QR Modal */}
+      <QrModal
+        isOpen={showQrModal}
+        onClose={() => setShowQrModal(false)}
+        loadingQr={loadingQr}
+        currentQrCode={currentQrCode}
+        onDownload={handleDownload}
+        onRegenerate={handleQrClick}
+      />
     </>
   );
 };

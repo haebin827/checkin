@@ -1,7 +1,6 @@
 const db = require('../models');
 const User = db.user;
 const bcrypt = require('bcryptjs');
-const { Op } = db.Sequelize;
 const EmailService = require('./EmailService');
 const AppError = require('../middlewares/AppError');
 
@@ -100,7 +99,7 @@ const AuthService = {
     }
   },
 
-  async register(data) {
+  async register(data, locationId = null) {
     const transaction = await db.sequelize.transaction();
 
     try {
@@ -115,6 +114,7 @@ const AuthService = {
           email: data.email,
           phone: data.phone,
           role: data.role || 'guardian',
+          location_id: locationId ? locationId : null,
         },
         { transaction },
       );
@@ -126,6 +126,7 @@ const AuthService = {
         username: newUser.username,
         email: newUser.email,
         role: newUser.role,
+        location_id: locationId ? locationId : null,
       };
     } catch (err) {
       if (transaction) await transaction.rollback();

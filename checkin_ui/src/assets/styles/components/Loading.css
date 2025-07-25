@@ -1,0 +1,169 @@
+/* ===========================
+   Common Loading Styles
+   =========================== */
+
+/* Basic loading container - for simple list/content loading */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    padding: 2rem;
+}
+
+/* Card-style loading container - for page/section loading */
+.loading-container.card-style {
+    background-color: var(--card-color, #ffffff);
+    border-radius: 8px;
+    box-shadow: var(--shadow-md, 0 4px 6px rgba(0, 0, 0, 0.1));
+    padding: 3rem;
+}
+
+/* Full-page loading container - for PrivateRoute */
+.loading-container.full-page {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--background-color, #f9f9f9);
+    z-index: 9999;
+    min-height: 100vh;
+}
+
+/* Basic loading spinner */
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border-color, #e0e0e0);
+    border-top: 3px solid var(--primary-color, #1b5e20);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+/* Large loading spinner - for important loading states */
+.loading-spinner.large {
+    width: 50px;
+    height: 50px;
+    border-width: 4px;
+}
+
+/* Small loading spinner - for buttons and small components */
+.loading-spinner.small {
+    width: 20px;
+    height: 20px;
+    border-width: 2px;
+    margin-bottom: 0;
+}
+
+/* Loading text */
+.loading-text {
+    color: var(--text-secondary, #757575);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    text-align: center;
+}
+
+/* Loading indicator for inline use */
+.loading-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: var(--hover-color, #f1f8e9);
+    border-radius: 4px;
+    color: var(--text-secondary, #757575);
+    font-size: 0.875rem;
+}
+
+.loading-indicator .loading-spinner {
+    width: 16px;
+    height: 16px;
+    border-width: 2px;
+    margin-bottom: 0;
+}
+
+/* QR loading specific styles */
+.qr-loading {
+    text-align: center;
+    padding: 40px 0;
+}
+
+.qr-loading .loading-spinner {
+    margin: 0 auto 16px;
+}
+
+/* Button loading state */
+.button-loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.button-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.button-loading .button-text {
+    opacity: 0;
+}
+
+/* Keyframes */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* CSS Variables fallbacks */
+:root {
+    --primary-color: #1b5e20;
+    --background-color: #f9f9f9;
+    --card-color: #ffffff;
+    --text-secondary: #757575;
+    --border-color: #e0e0e0;
+    --hover-color: #f1f8e9;
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .loading-container {
+        min-height: 150px;
+        padding: 1.5rem;
+    }
+
+    .loading-container.card-style {
+        padding: 2rem;
+    }
+
+    .loading-spinner.large {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media (max-width: 576px) {
+    .loading-container {
+        min-height: 120px;
+        padding: 1rem;
+    }
+
+    .loading-container.card-style {
+        padding: 1.5rem;
+    }
+}

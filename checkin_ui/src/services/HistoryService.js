@@ -1,11 +1,9 @@
-import http from "../http-common.js";
-
-const showHistoriesAndLocationList = (userId) => {
-    return http.get(`/history/list?id=${userId}`);
-};
+import http from '../http-common.js';
 
 const HistoryService = {
-    showHistoriesAndLocationList
+  showHistoriesAndLocationList(userId) {
+    return http.get(`/history/list?id=${userId}`);
+  },
 };
 
 export default HistoryService;

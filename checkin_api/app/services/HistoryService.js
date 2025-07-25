@@ -70,10 +70,9 @@ const HistoryService = {
           };
 
         case 'manager':
-          const manager = await User.findByPk(userId,
-              {
-                attributes: ['location_id'],
-              });
+          const manager = await User.findByPk(userId, {
+            attributes: ['location_id'],
+          });
           const location = await Location.findByPk(manager.location_id, {
             attributes: ['id', 'name'],
           });

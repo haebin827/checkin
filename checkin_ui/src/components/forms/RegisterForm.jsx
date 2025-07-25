@@ -68,7 +68,7 @@ const RegisterForm = ({ initialValues = {}, handleRegistrationSuccess }) => {
     <div className="register-container">
       <div className="register-card">
         <div className="register-header">
-          <h1>Register</h1>
+          <h1>Register {defaultValues.role === 'manager' ? 'for Manager' : ''}</h1>
           <p>Create an account to use the check-in service</p>
         </div>
 
@@ -112,6 +112,7 @@ const RegisterForm = ({ initialValues = {}, handleRegistrationSuccess }) => {
                     name="email"
                     placeholder="example@email.com"
                     className={errors.email && touched.email ? 'error' : ''}
+                    disabled={!!defaultValues.email}
                   />
                   <ErrorMessage name="email" component="div" className="error-text" />
                 </div>
@@ -216,7 +217,7 @@ const RegisterForm = ({ initialValues = {}, handleRegistrationSuccess }) => {
                         setFieldValue,
                         'privacy',
                         e.target.checked,
-                        setPrivacyError
+                        setPrivacyError,
                       )
                     }
                   />

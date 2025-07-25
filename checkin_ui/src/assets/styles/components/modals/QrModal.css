@@ -1,0 +1,179 @@
+/* QR Modal Styles */
+.qr-modal-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  text-align: center;
+}
+
+.qr-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+.qr-loading p {
+  margin-top: 16px;
+  color: var(--text-color, #333);
+  font-size: 14px;
+}
+
+.qr-image-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.qr-image {
+  max-width: 250px;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  padding: 10px;
+}
+
+.qr-description {
+  color: var(--text-light, #666);
+  font-size: 14px;
+  margin: 0;
+}
+
+.qr-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px 20px;
+}
+
+.qr-error p {
+  color: var(--text-color, #333);
+  font-size: 14px;
+  margin: 0;
+}
+
+.qr-modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  justify-content: center;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.qr-download-button {
+  background-color: var(--primary-color, #1b5e20);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qr-download-button:hover {
+  background-color: var(--secondary-color, #2e7d32);
+  transform: translateY(-1px);
+}
+
+.qr-regenerate-button {
+  background-color: var(--accent-color, #388e3c);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qr-regenerate-button:hover {
+  background-color: var(--primary-color, #1b5e20);
+  transform: translateY(-1px);
+}
+
+.qr-close-button {
+  background-color: var(--text-light, #666);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.qr-close-button:hover {
+  background-color: var(--text-color, #333);
+  transform: translateY(-1px);
+}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+  .qr-modal-content {
+    padding: 16px;
+  }
+  
+  .qr-image {
+    max-width: 200px;
+  }
+  
+  .qr-modal-actions {
+    margin-top: 20px;
+    gap: 8px;
+  }
+  
+  .qr-download-button,
+  .qr-regenerate-button,
+  .qr-close-button {
+    padding: 8px 12px;
+    font-size: 12px;
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .qr-modal-content {
+    padding: 12px;
+  }
+  
+  .qr-image {
+    max-width: 180px;
+  }
+  
+  .qr-modal-actions {
+    margin-top: 16px;
+    gap: 6px;
+    flex-wrap: nowrap;
+  }
+  
+  .qr-download-button,
+  .qr-regenerate-button,
+  .qr-close-button {
+    padding: 8px 6px;
+    font-size: 11px;
+    flex: 1;
+    min-width: 0;
+    justify-content: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+} 

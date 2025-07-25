@@ -28,19 +28,12 @@ const ProfilePage = () => {
         setIsLoading(true);
         const response = await AuthService.getUser(user.id);
 
-        if (!response.data.success) {
-          toast.error('Something went wrong. Please try again.');
-          return;
+        if (response.data.success) {
+          setCurrUser(response.data.user);
         }
-
-        setCurrUser(response.data.user);
       } catch (error) {
         console.error('Failed to fetch user data:', error);
         toast.error('Something went wrong. Please try again.');
-
-        if (error.response?.status === 401) {
-          nav('/');
-        }
       } finally {
         setIsLoading(false);
       }
@@ -96,7 +89,7 @@ const ProfilePage = () => {
       <div className="myinfo-page">
         <div className="myinfo-container">
           <div className="page-header">
-            <h2>My Profile</h2>
+            <h2 style={{ fontSize: '1.5rem' }}>My Profile</h2>
 
             <div className="admin-actions">
               <button className="admin-button" onClick={handleChangePassword}>
@@ -109,7 +102,10 @@ const ProfilePage = () => {
           </div>
 
           {isLoading ? (
-            <div className="loading-spinner">Loading...</div>
+            <div className="loading-container card-style">
+              <div className="loading-spinner"></div>
+              <div className="loading-text">Loading...</div>
+            </div>
           ) : (
             <div className="profile-card">
               <div className="profile-header">
@@ -119,6 +115,7 @@ const ProfilePage = () => {
                 <div className="profile-title">
                   <h2>
                     {currUser?.engName || user?.engName}
+                    {currUser?.korName || `  |  ${user?.korName}`}{' '}
                     {(currUser?.role === 'manager' || user?.role === 'manager') && (
                       <span className="role-tag">
                         {' '}
@@ -160,6 +157,7 @@ const ProfilePage = () => {
       </div>
       <Footer />
 
+      {/* Change Password Modal */}
       <ChangePasswordModal
         isOpen={isPasswordModalOpen}
         onClose={closePasswordModal}
@@ -167,6 +165,7 @@ const ProfilePage = () => {
         user={currUser || user}
       />
 
+      {/* Edit Profile Modal */}
       <EditProfileModal
         isOpen={isProfileModalOpen}
         onClose={closeProfileModal}

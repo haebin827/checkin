@@ -1,5 +1,6 @@
 const LocationService = require('../services/LocationService');
 const AppError = require('../middlewares/AppError');
+const ChildService = require('../services/ChildService');
 
 exports.getAllLocations = async (req, res) => {
   const response = await LocationService.findAllLocations();
@@ -8,7 +9,9 @@ exports.getAllLocations = async (req, res) => {
 
 exports.createLocation = async (req, res) => {
   if (!req.body) {
-    throw new AppError('Request body cannot be empty', 400);
+    res.status(400).json({
+      success: false,
+    });
   }
 
   const response = await LocationService.createLocation(req.body);
@@ -20,6 +23,14 @@ exports.createLocation = async (req, res) => {
 
 exports.updateLocation = async (req, res) => {
   const locationId = req.params.id;
+  const { name, phone, address } = req.body;
+
+  if (!locationId || !name || !phone || !address) {
+    res.status(400).json({
+      success: false,
+    });
+  }
+
   const locationData = {
     name: req.body.name,
     phone: req.body.phone,
@@ -38,7 +49,6 @@ exports.deleteLocation = async (req, res) => {
   await LocationService.deleteLocation(locationId);
   res.status(200).json({
     success: true,
-    message: 'Location deleted successfully',
   });
 };
 
@@ -48,7 +58,6 @@ exports.generateQr = async (req, res) => {
   if (!locationId) {
     return res.status(400).json({
       success: false,
-      message: 'locationId is required.',
     });
   }
 
@@ -68,9 +77,8 @@ exports.verifyQR = async (req, res) => {
   const { userId, childId } = req.body;
 
   if (!token || !uuid || !userId || !childId) {
-    res.status(401).json({
+    res.status(400).json({
       success: false,
-      message: 'Token or uuid or userId or childId is missing.',
     });
   }
 
@@ -80,4 +88,23 @@ exports.verifyQR = async (req, res) => {
     success: true,
     history: verifiedQr,
   });
+};
+
+exports.sendManagerInviteEmail = async (req, res) => {
+  const { managerEmail, locationId } = req.body;
+  console.log(managerEmail, locationId);
+  const result = await LocationService.sendManagerInviteEmail(managerEmail, locationId);
+  res.status(200).json({ success: true, locationName: result });
+};
+
+exports.retrieveManagerEmail = async (req, res) => {
+  const { token } = req.query;
+
+  if (!token) {
+    res.status(400).json({
+      success: false,
+    });
+  }
+  const data = await LocationService.retrieveManagerEmail(token);
+  res.status(200).json({ success: true, ...data });
 };

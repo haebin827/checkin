@@ -11,7 +11,7 @@ import RegisterCompleted from '../../components/forms/RegisterCompleted.jsx';
 
 const AdditionalInfoPage = () => {
   const nav = useNavigate();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, checkSession } = useAuth();
   const [isCompleted, setIsCompleted] = useState(false);
   const [registeredName, setRegisteredName] = useState('');
 
@@ -38,7 +38,7 @@ const AdditionalInfoPage = () => {
       });
 
       if (response.data.success) {
-        await AuthService.getCurrentSession();
+        await checkSession();
         setRegisteredName(values.engName);
         setIsCompleted(true);
       }

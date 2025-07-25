@@ -6,9 +6,8 @@ import { toast } from 'react-hot-toast';
 import ChildService from '../../services/ChildService.js';
 import { childSchema } from '../../validations/validations.js';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
-import Toast from '../common/Toast.jsx';
 
-const NewChildForm = () => {
+const NewChildForm = ({ onSuccess, onClose }) => {
   const { user } = useAuth();
 
   const [locations, setLocations] = useState([]);
@@ -50,15 +49,20 @@ const NewChildForm = () => {
       setSubmitting(true);
       const response = await ChildService.createChild(newChild);
       if (response.data.success) {
+        const createdChild = response.data.child;
         toast.success('Child information registered successfully!');
-        setTimeout(() => resetForm(), 100);
+
+        if (onSuccess) {
+          onSuccess(createdChild);
+        } else {
+          setTimeout(() => resetForm(), 100);
+        }
       }
     } catch (error) {
       console.error('Child registration failed:', error);
       if (error.response?.data?.errors) {
         const backendErrors = error.response.data.errors;
         Object.keys(backendErrors).forEach(field => {
-          // Convert backend field names to frontend field names if needed
           const frontendField =
             field === 'eng_name'
               ? 'engName'
@@ -79,8 +83,7 @@ const NewChildForm = () => {
 
   return (
     <div className="new-child-form">
-      <Toast />
-      <h2>Register New Child</h2>
+      {/*<h2>Register New Child</h2>*/}
 
       <Formik initialValues={initialValues} validationSchema={childSchema} onSubmit={handleSubmit}>
         {({ isSubmitting, errors, touched }) => (
@@ -166,6 +169,11 @@ const NewChildForm = () => {
               <button type="submit" className="submit-button" disabled={isSubmitting}>
                 {isSubmitting ? 'Registering...' : 'Register'}
               </button>
+              {onClose && (
+                <button type="button" className="cancel-button" onClick={onClose}>
+                  Cancel
+                </button>
+              )}
             </div>
           </Form>
         )}
